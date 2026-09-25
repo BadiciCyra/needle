@@ -1,0 +1,35 @@
+# Ortam değişkenleri ve sırlar
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+
+# Java / Spring
+target/
+.gradle/
+*.class
+
+# IDE ve işletim sistemi
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Loglar
+*.log
