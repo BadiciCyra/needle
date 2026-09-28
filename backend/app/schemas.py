@@ -146,6 +146,7 @@ class MatchResultItem(BaseModel):
     rank: int
     startup: StartupProfile
     score: float
+    vector_score: float = 0.0
     rationale: MatchRationale | None = None
     rejection: RejectionRationale | None = None
     filter_notes: list[str] = Field(default_factory=list, description="Kurumun tercihi dışında kalan noktalar")
