@@ -166,13 +166,23 @@ def build_match_graph(
                     near_miss_reason="Yakındı ama kısa listedeki adaylar daha yüksek puan aldı.",
                 )
                 return MatchResultItem(
-                    rank=rank, startup=c.startup, score=score, rejection=rejection, filter_notes=c.filter_notes
+                    rank=rank,
+                    startup=c.startup,
+                    score=score,
+                    vector_score=c.vector_score,
+                    rejection=rejection,
+                    filter_notes=c.filter_notes,
                 )
             rationale = matches.get(c.startup.id) or MatchRationale(
                 startup_id=c.startup.id, fit_summary="Gerekçe üretilemedi.", evidence=[]
             )
             return MatchResultItem(
-                rank=rank, startup=c.startup, score=score, rationale=rationale, filter_notes=c.filter_notes
+                rank=rank,
+                startup=c.startup,
+                score=score,
+                vector_score=c.vector_score,
+                rationale=rationale,
+                filter_notes=c.filter_notes,
             )
 
         result = MatchResult(
