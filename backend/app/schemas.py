@@ -148,6 +148,7 @@ class MatchResultItem(BaseModel):
     score: float
     rationale: MatchRationale | None = None
     rejection: RejectionRationale | None = None
+    filter_notes: list[str] = Field(default_factory=list, description="Kurumun tercihi dışında kalan noktalar")
 
 
 class MatchResult(BaseModel):
