@@ -1,0 +1,22 @@
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+pydantic-settings>=2.3
+
+# Veritabanı (Postgres + pgvector)
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+pgvector>=0.3
+
+# LLM orkestrasyonu (OpenAI uyumlu uç nokta: OmniRoute, Ollama, ...)
+langgraph>=0.2
+langchain-core>=0.3
+langchain-openai>=0.2
+
+# Embedding ve reranker (yerelde, açık kaynak)
+sentence-transformers>=3.0
+
+# Test
+pytest>=8.0
+httpx>=0.27

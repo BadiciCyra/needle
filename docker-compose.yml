@@ -1,0 +1,65 @@
+# Needle yerel geliştirme ortamı
+#
+# Kullanım:
+#   1. cp .env.example .env
+#   2. docker compose up -d db omniroute
+#   3. OmniRoute paneline gir (http://localhost:20128), sağlayıcı ekle ve bir model seç
+#      (sadece resmi API anahtarları kullanın), .env'de LLM_MODEL'i o modele ayarla
+#   4. docker compose up -d --build api   → http://localhost:8000/docs
+#
+# Servisler:
+#   db         5432   Postgres 16 + pgvector
+#   omniroute  20128  OpenAI uyumlu LLM ağ geçidi (sadece bu makineden erişilir)
+#   api        8000   Needle FastAPI backend
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: needle
+      POSTGRES_PASSWORD: needle
+      POSTGRES_DB: needle
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U needle -d needle"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  omniroute:
+    image: diegosouzapw/omniroute
+    environment:
+      DATA_DIR: /app/data
+      PORT: 20128
+    ports:
+      # Sadece loopback: içinde sağlayıcı anahtarları durduğu için dışarıya açılmaz
+      - "127.0.0.1:20128:20128"
+    volumes:
+      - omniroute-data:/app/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://needle:needle@db:5432/needle
+      LLM_BASE_URL: http://omniroute:20128/v1
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./backend/demo_cache:/app/demo_cache
+    depends_on:
+      db:
+        condition: service_healthy
+      omniroute:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  omniroute-data:
