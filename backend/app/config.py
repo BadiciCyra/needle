@@ -7,13 +7,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(".env", "../.env"), env_file_encoding="utf-8", extra="ignore")
 
     # Veritabanı
-    database_url: str = "postgresql+psycopg://needle:needle@localhost:5432/needle"
+    database_url: str = "postgresql+psycopg://needle:needle@127.0.0.1:5432/needle"
 
     # LLM: herhangi bir OpenAI uyumlu uç nokta (OmniRoute, Ollama, doğrudan sağlayıcı)
-    llm_base_url: str = "http://localhost:20128/v1"
+    llm_base_url: str = "http://127.0.0.1:20128/v1"
     llm_api_key: str = "not-needed"
     llm_model: str = "gemini-2.5-flash"
     llm_temperature: float = 0.1

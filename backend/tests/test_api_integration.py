@@ -1,7 +1,7 @@
 """Uçtan uca API testi: gerçek Postgres + pgvector, sahte LLM.
 
 Çalıştırmak için (docker compose up -d db sonrası):
-    NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@localhost:5432/needle python -m pytest tests/test_api_integration.py
+    NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@127.0.0.1:5432/needle python -m pytest tests/test_api_integration.py
 """
 
 import os
