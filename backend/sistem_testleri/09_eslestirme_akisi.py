@@ -131,10 +131,15 @@ if not gercek_mod():
 kontrol(all(e.startup_capability.lower() in {c.lower() for c in k.startup.capabilities}
             for k in a.shortlist for e in k.rationale.evidence), "kalan her iz girişimin profilinde gerçekten var")
 
+bilgi("Not: koruma sadece yetkinliğin profilde VAR olduğuna bakar, ifadeyle ALAKALI olup olmadığına bakmaz.")
+bilgi("Örn. 'şikayetleri sınıflandırmak ↔ randevuya gelmeme tahmini' gibi anlamsız bir iz korumadan geçer.")
+
 adim("E", "Kısa liste skorları (bilinen zayıf nokta)")
-dusuk = [k for k in a.shortlist if k.score < 0.1]
-bilgi(f"skoru 0,1'in altında olup yine de kısa listeye giren aday: {len(dusuk)}  "
-      f"({', '.join(k.startup.name for k in dusuk) or '-'})")
+birinci = a.shortlist[0].score
+dusuk = [k for k in a.shortlist[1:] if k.score < 0.5 * birinci]
+bilgi(f"1. adayın skoru: {birinci:.3f}")
+bilgi(f"bunun yarısından ({0.5 * birinci:.3f}) düşük skorla kısa listeye giren aday: {len(dusuk)}  "
+      f"({', '.join(f'{k.startup.name} {k.score:.2f}' for k in dusuk) or '-'})")
 bilgi("→ sistem kaliteden bağımsız her zaman 5 aday gösteriyor; minimum skor eşiği eklenmeli (rapor: sorun #1)")
 kontrol(True, "zayıf nokta görünür kılındı (henüz düzeltilmedi)")
 
