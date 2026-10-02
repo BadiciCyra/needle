@@ -84,8 +84,6 @@ adim(6, "Tercih dışı adaya not düşülmesi")
 notlu = annotate_relaxations(birlesik[:5], brief)
 for c in notlu:
     bilgi(f"{c.startup.name:<18} {c.startup.location:<10} {c.startup.maturity.value:<10} notlar: {c.filter_notes or '-'}")
-kaliteGoz = next(c for c in notlu if c.startup.name == "KaliteGöz") if any(
-    c.startup.name == "KaliteGöz" for c in notlu) else None
 kontrol(all(not c.filter_notes for c in notlu if c.startup.location == "Kocaeli"
             and c.startup.maturity in (Maturity.early_revenue, Maturity.growth)), "tercihe uyanlara not düşülmedi")
 kontrol(any(c.filter_notes for c in notlu), "tercih dışında kalan en az bir adaya not düşüldü")
