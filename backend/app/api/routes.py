@@ -142,7 +142,7 @@ def match_brief(
                 rank=item.rank,
                 score=item.score,
                 vector_score=item.vector_score,
-                rerank_score=item.score,
+                rerank_score=item.rerank_score,
                 rationale=item.rationale.model_dump() if item.rationale else None,
                 rejection=item.rejection.model_dump() if item.rejection else None,
             )

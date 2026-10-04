@@ -74,6 +74,7 @@ def test_close_scores_keep_full_shortlist_and_three_rejected(tmp_path):
     result = run(dealer_brief(), tmp_path)
     assert len(result.shortlist) == 5
     assert len(result.rejected) == 3
+    assert result.no_match is False
     assert result.shortlist[0].startup.id == "s01"
     assert all(item.rationale for item in result.shortlist)
     assert all(item.rejection.near_miss_reason.startswith("Yakındı") for item in result.rejected)
@@ -132,6 +133,7 @@ def test_high_min_score_setting_returns_no_match_with_near_misses(tmp_path):
     # Taban birincinin skorunun üstündeyse: kısa liste boş, en yakın 3 aday "yakındı ama" gerekçesiyle döner
     result = run(dealer_brief(), tmp_path, shortlist_min_score=0.99)
     assert result.shortlist == []
+    assert result.no_match is True
     assert len(result.rejected) == 3
     assert all(item.rejection.near_miss_reason.startswith("Yakındı") for item in result.rejected)
     assert any("uygun girişim yok" in line for line in result.retrieval_trace)
@@ -142,3 +144,24 @@ def test_high_min_score_setting_returns_no_match_with_near_misses(tmp_path):
 #çağrısı, dosyanın başındaki (run fonksiyonu sayesinde ayarı o test için değiştiriyor. İkinci test
 #ayrıca tüm akışın "uygun yok" durumunda çökmediğini de doğruluyor: LLM'e boş kısa liste
 #gidiyor, gerekçeler yine de üretiliyor.
+
+
+
+
+
+def test_raw_rerank_score_is_kept_before_preference_penalty(tmp_path):
+    # s01 İstanbul'da, kurum Trabzon istiyor → skoru 0,85 ile cezalandırılır; ham skor ayrıca saklanmalı
+    top = run(dealer_brief(location_preference="Trabzon"), tmp_path).shortlist[0]
+    assert top.filter_notes
+    assert abs(top.score - top.rerank_score * 0.85) < 1e-9
+
+
+#Bu test neyi kontrol ediyor? Cezalı skor, ham skorun tam olarak 0,85 katı olmalı. Ikisi aynı çıkarsa
+#ham skor saklanmıyor demektir.
+
+#abs（.) ‹ 1e-9 neden,|
+#neden değıl? Bilgisayarlar ondalıklı sayıları ikilik sistemde tutar ve
+#küçük yuvarlama hataları oluşur. 0.1 + 0.2 işlemi 0. 30000000000000004 sonucunu verir. Bu
+#yüzden ondalıklı sayılar hiçbir zaman
+#==) ile karşılaştırılmaz. "Fark çok küçük mü?" diye bakılır.
+#1e-9 = 0,000000001.
