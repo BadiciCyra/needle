@@ -4,6 +4,8 @@ Fikir 1'in (güven eşiği) ilk adımı. Kod değiştirmeden önce veriye bakıy
   1. Her ihtiyaç için aday bulunur ve çok dilli cross-encoder ile puanlanır.
   2. Doğru girişimin skoru ile kısa listedeki diğer adayların skorları yan yana yazılır.
   3. Farklı eşik kurallarının kaç doğru adayı tuttuğu, kaç gürültüyü attığı ölçülür.
+  4. Havuzda karşılığı OLMAYAN ihtiyaçlarla (negatif örnekler) en iyi adayın skoru ölçülür.
+  5. Farklı taban değerlerinde kaç doğru "uygun yok", kaç hatalı "uygun yok" dendiği karşılaştırılır.
 
 Not: Ham ihtiyaç metni kullanılır (brief adımı yok), bu yüzden LLM gerekmez.
 Gerçek sistemde reranker brief metnini görür; LLM bağlandığında bu analiz brief'lerle tekrarlanmalı.
@@ -13,6 +15,7 @@ Gerçek sistemde reranker brief metnini görür; LLM bağlandığında bu analiz
     python analiz/esik_analizi.py --sahte   # sadece script'in çalıştığını kontrol eder, sayılar anlamsız
 """
 
+import json
 import statistics
 import sys
 from pathlib import Path
@@ -25,7 +28,10 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from app.retrieval.base import SearchQuery  # noqa: E402
 from app.retrieval.memory import InMemoryRetriever  # noqa: E402
+from app.config import get_settings  # noqa: E402
 from app.seed_data import load_needs, load_startups  # noqa: E402
+
+NEGATIF_DOSYA = Path(__file__).resolve().parent / "negatif_ihtiyaclar.json"
 
 # Her ihtiyacın "doğru" girişimi (sistem_testleri/07_reranker.py ile aynı etiketler)
 DOGRU = {
@@ -37,19 +43,25 @@ HAVUZ = 20       # reranker'a giden aday sayısı (match_graph'taki retrieve_top
 KISA_LISTE = 5   # bugünkü sabit kısa liste boyu
 
 
-def topla(embedder, reranker) -> list[dict]:
-    """Her ihtiyaç için kısa listeyi (ilk 5) skorlarıyla döndürür."""
+def load_negatives() -> list[dict]:
+    """Havuzda karşılığı olmayan ihtiyaçlar: sistem bunlarda "uygun yok" demeli."""
+    return json.loads(NEGATIF_DOSYA.read_text(encoding="utf-8"))
+
+
+def topla(embedder, reranker, needs: list[dict], dogru: dict | None) -> list[dict]:
+    """Her ihtiyaç için kısa listeyi (ilk 5) skorlarıyla döndürür. Negatif ihtiyaçlarda dogru=None."""
     retriever = InMemoryRetriever(load_startups(), embedder)
     satirlar = []
-    for need in load_needs():
+    for need in needs:
         metin = need["raw_text"]
         adaylar = retriever.search(SearchQuery(label="ham", vector=embedder.embed_query(metin), top_k=HAVUZ))
         sirali = reranker.rerank(metin, adaylar)
         satirlar.append(
             {
                 "id": need["id"],
-                "dogru": DOGRU[need["id"]],
+                "dogru": dogru[need["id"]] if dogru else None,
                 "kisa": [(c.startup.id, c.rerank_score) for c in sirali[:KISA_LISTE]],
+                "birinci_ad": sirali[0].startup.name if sirali else "-",
             }
         )
     return satirlar
@@ -134,6 +146,49 @@ def esik_tablosu(satirlar: list[dict]) -> None:
         yaz(f"skor ≥ {r:.1f} × birinci", degerlendir(satirlar, lambda skor, birinci, r=r: skor >= r * birinci))
 
 
+def negatif_tablosu(negatifler: list[dict], pozitifler: list[dict]) -> None:
+    print("\n4) NEGATİF İHTİYAÇLAR   (havuzda karşılığı yok → sistem 'uygun yok' demeli)")
+    print(f"   {'ihtiyaç':<9}{'birinci skor':<15}{'2. skor':<10}en yakın girişim")
+    for s in negatifler:
+        ikinci = s["kisa"][1][1] if len(s["kisa"]) > 1 else 0.0
+        print(f"   {s['id']:<9}{s['kisa'][0][1]:<15.4f}{ikinci:<10.4f}{s['birinci_ad']}")
+
+    poz_birinci = sorted(s["kisa"][0][1] for s in pozitifler)
+    neg_birinci = sorted(s["kisa"][0][1] for s in negatifler)
+    print(f"\n   pozitiflerde birinci skor: en düşük {poz_birinci[0]:.4f}, medyan {statistics.median(poz_birinci):.4f}")
+    print(f"   negatiflerde birinci skor: en yüksek {neg_birinci[-1]:.4f}, medyan {statistics.median(neg_birinci):.4f}")
+    if poz_birinci[0] > neg_birinci[-1]:
+        print("   → İki grup tamamen ayrılabiliyor: aralarına konan her taban kusursuz çalışır.")
+    else:
+        ortak = sum(x <= neg_birinci[-1] for x in poz_birinci)
+        print(f"   → İki grup üst üste biniyor: {ortak} pozitif ihtiyacın birinci skoru en yüksek negatiften düşük.")
+
+
+def taban_tablosu(pozitifler: list[dict], negatifler: list[dict]) -> None:
+    settings = get_settings()
+    oran = settings.shortlist_relative_ratio
+    print(f"\n5) TABAN TARAMASI   (göreli oran {oran} sabit; birleşik kural: taban + kırpma)")
+    print("   doğru aday listede   : pozitiflerde doğru girişim son kısa listede (yüksek olmalı)")
+    print("   hatalı 'uygun yok'   : uygun girişimi olan ihtiyaçta 'uygun yok' dendi (düşük olmalı)")
+    print("   doğru 'uygun yok'    : karşılığı olmayan ihtiyaçta 'uygun yok' dendi (yüksek olmalı)")
+    print(f"\n   {'taban':<10}{'doğru aday listede':<21}{'hatalı uygun yok':<19}{'doğru uygun yok'}")
+    for taban in (0.001, 0.002, 0.003, 0.005, 0.01, 0.02, 0.05, 0.1):
+        dogru_listede = hatali_yok = 0
+        for s in pozitifler:
+            birinci = s["kisa"][0][1]
+            if birinci < taban:
+                hatali_yok += 1
+                continue
+            kalan = {sid for sid, skor in s["kisa"] if skor >= oran * birinci}
+            dogru_listede += s["dogru"] in kalan
+        dogru_yok = sum(s["kisa"][0][1] < taban for s in negatifler)
+        isaret = "  ← şu anki ayar" if abs(taban - settings.shortlist_min_score) < 1e-12 else ""
+        print(
+            f"   {taban:<10}{f'{dogru_listede}/{len(pozitifler)}':<21}{f'{hatali_yok}/{len(pozitifler)}':<19}"
+            f"{dogru_yok}/{len(negatifler)}{isaret}"
+        )
+
+
 def main() -> None:
     if "--sahte" in sys.argv:
         from app.embeddings import HashingEmbedder
@@ -149,10 +204,14 @@ def main() -> None:
         embedder, reranker = get_embedder(), CrossEncoderReranker(get_settings().rerank_model)
         print("Modeller yükleniyor (ilk çalıştırmada indirilir)...")
 
-    satirlar = topla(embedder, reranker)
+    satirlar = topla(embedder, reranker, load_needs(), DOGRU)
     ihtiyac_tablosu(satirlar)
     dagilim(satirlar)
     esik_tablosu(satirlar)
+
+    negatifler = topla(embedder, reranker, load_negatives(), None)
+    negatif_tablosu(negatifler, satirlar)
+    taban_tablosu(satirlar, negatifler)
 
 
 if __name__ == "__main__":
