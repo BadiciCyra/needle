@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
-
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     max_retrieval_rounds: int = 3      # yetersiz sonuçta en fazla kaç tur genişletilecek
     shortlist_size: int = 5
     rejected_size: int = 3
+
+    # Güven eşiği (Fikir 1): kısa liste sabit sayıyla değil kaliteyle kesilir
+    shortlist_min_score: float = Field(0.003, ge=0, le=1)       # birincinin skoru bunun altındaysa "uygun girişim yok"
+    shortlist_relative_ratio: float = Field(0.3, ge=0, le=1)    # birincinin skorunun en az bu oranını alan kısa listeye girer
+
 
     # Brief
     max_followup_questions: int = 3
