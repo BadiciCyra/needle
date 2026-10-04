@@ -184,6 +184,8 @@ def build_match_graph(
         # Lokasyon / olgunluk tercihleri yumuşak cezadır: alakalı ama tercih dışı aday yine üst sıraya çıkabilir,
         # yalnızca skoru düşürülür ve notu sonuçta görünür. Alaka düzeyi tercihin önüne geçer.
         for candidate in ranked:
+            candidate.raw_rerank_score = candidate.rerank_score  # ham skor, ceza öncesi (kalibrasyon için saklanır)
+            #Sıra önemli: Bu satır cezadan önce olmalı. Sonra olursa cezalı skoru kopyalamış oluruz ve düzeltmek istediğimiz hatayı tekrar etmiş oluruz.
             if candidate.filter_notes:
                 candidate.rerank_score = (candidate.rerank_score or 0.0) * PREFERENCE_PENALTY
         ranked.sort(key=lambda c: c.rerank_score or 0.0, reverse=True)
@@ -225,6 +227,8 @@ def build_match_graph(
         matches = {r.startup_id: r for r in state["rationales"].matches}
         rejections = {r.startup_id: r for r in state["rationales"].rejections}
 
+
+
         def item(rank: int, c: Candidate, rejected: bool) -> MatchResultItem:
             score = c.rerank_score if c.rerank_score is not None else c.vector_score
             if rejected:
@@ -237,6 +241,7 @@ def build_match_graph(
                     startup=c.startup,
                     score=score,
                     vector_score=c.vector_score,
+                    rerank_score=c.raw_rerank_score,
                     rejection=rejection,
                     filter_notes=c.filter_notes,
                 )
@@ -248,6 +253,7 @@ def build_match_graph(
                 startup=c.startup,
                 score=score,
                 vector_score=c.vector_score,
+                rerank_score=c.raw_rerank_score,
                 rationale=rationale,
                 filter_notes=c.filter_notes,
             )
@@ -255,6 +261,7 @@ def build_match_graph(
         result = MatchResult(
             shortlist=[item(i + 1, c, False) for i, c in enumerate(state["shortlist"])],
             rejected=[item(i + 1, c, True) for i, c in enumerate(state["rejected"])],
+            no_match=not state["shortlist"],
             retrieval_trace=state["trace"],
         )
         return {"result": result}
