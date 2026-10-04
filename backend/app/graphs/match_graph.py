@@ -75,6 +75,60 @@ def _guard_rationales(batch: RationaleBatch, shortlist: list[Candidate]) -> Rati
     return batch
 
 
+#Üç tasarım kararı ve gereçkeleri;
+
+
+#1.Neden ayrı bir fonksiyon? Kural rerank düğümünün içine de yazılabilirdi. Ayrı bir
+#fonksiyon olunca tüm grafı, LLM'i ve embedder'ı çalıştırmadan, sadece birkaç sayıyla test
+#edebiliyoruz. Yan etkisi olmayan bu tür fonksiyonlara saf fonksiyon (pure function) deniyor:
+#aynı girdiye her zaman aynı çıktıyı veriyor. Projede strategy.py'deki fonksiyonlar da böyle yazılmış.
+
+#2."Yakındı ama" listesi neden değişti? Eskiden her zaman 6., 7. ve 8. sıradakiler oluyordu.
+#Şimdi kısa listeye giremeyen en yakın adaylar oluyor. n01'de kırpılan 2., 3. ve 4. adaylar.
+#Program yöneticisi için "neden bunlar listede değil" sorusu asıl bu adaylar için anlamlı.
+
+#3."Uygun yok" durumunda elenenler neden dolu? Kısa liste boş olsa bile en yakın 3 aday
+#"yakındı ama" listesine geçiyor. Böylece LLM her biri için "yakındı ama X yetkinliği yok"
+#gerekçesini yazıyor. Bir sonraki fikirdeki eksik yetkinlik raporu bu gerekçelerden beslenecek.
+
+
+def select_shortlist(
+    ranked: list[Candidate], min_score: float, ratio: float, max_size: int, rejected_size: int
+) -> tuple[list[Candidate], list[Candidate], str]:
+    """Güven eşiği: kısa listeyi sabit sayıyla değil kaliteyle keser.
+
+    1. Taban: en iyi adayın skoru min_score'un altındaysa kısa liste boştur ("uygun girişim yok").
+    2. Kırpma: en iyinin skorunun en az `ratio` katını alan adaylar kısa listeye girer (en fazla max_size).
+    Kısa listeye giremeyen en yakın adaylar "yakındı ama" listesine geçer.
+    """
+    if not ranked:
+        return [], [], "Güven eşiği: hiç aday yok → uygun girişim yok"
+
+    top = ranked[0].rerank_score or 0.0
+    if top < min_score:
+        note = f"Güven eşiği: en iyi skor {top:.3f} < taban {min_score} → uygun girişim yok"
+        return [], ranked[:rejected_size], note
+
+    limit = ratio * top
+    shortlist = [c for c in ranked[:max_size] if (c.rerank_score or 0.0) >= limit]
+    rejected = ranked[len(shortlist) : len(shortlist) + rejected_size]
+    note = f"Güven eşiği: sınır {limit:.3f} (= {ratio} × {top:.3f}) → {len(shortlist)} kısa liste"
+    return shortlist, rejected, note
+
+#üstteki satırın açıklamaları 
+
+#ranked == Reranker'ın skora göre büyükten küçüğe sıraladığı adaylar
+#-> tuple[...]  ==  Fonksiyon üç şey döndürüyor: kısa liste, elenenler ve ize yazılacak bir not
+#if not ranked:	    Hiç aday yoksa (ör. filtreler her şeyi elediyse) çökmemek için. Bu kontrol olmasaydı bir sonraki satırdaki ranked[0] hata verirdi
+#top = ranked[0].rerank_score   ==  Birincinin skoru. Liste sıralı olduğu için en yüksek skor her zaman ilk elemanda
+#or 0.0     ==   Skor None ise 0 kabul et. Skor tipi float | None olduğu için bu bir güvenlik önlemi
+#if top < min_score:	Taban kontrolü. Birinci bile zayıfsa kısa liste boş kalır, en yakın 3 aday "yakındı ama" listesine gider
+#limit = ratio * top    ==  Göreli sınır. n01 için 0,3 × 0,143 = 0,043
+#[c for c in ranked[:max_size] if ...]  ==  İlk 5'in içinden sınırı geçenler. Bu yazım biçimine list comprehension deniyor: "şu listedeki her c için, koşul doğruysa yeni listeye al"
+#ranked[len(shortlist) : len(shortlist) + rejected_size]    ==	Kısa listenin hemen arkasından gelen 3 aday. Kısa listede 1 aday varsa 2., 3. ve 4. sıradakiler oluyor
+#
+
+
 def build_match_graph(
     retriever: Retriever,
     embedder: Embedder,
@@ -134,12 +188,25 @@ def build_match_graph(
                 candidate.rerank_score = (candidate.rerank_score or 0.0) * PREFERENCE_PENALTY
         ranked.sort(key=lambda c: c.rerank_score or 0.0, reverse=True)
 
-        shortlist = ranked[: settings.shortlist_size]
-        rejected = ranked[settings.shortlist_size : settings.shortlist_size + settings.rejected_size]
+#Ne değişti: Sabit [:5] kesimi gitti. Yerine yeni fonksiyon çağrılıyor ve Adım 2'de eklediğin iki
+#ayar settings üzerinden fonksiyona veriliyor. Düğmeler motora burada bağlanıyor. İze de yeni
+#bir satır ekleniyor. Böylece her eşleştirmede eşiğin ne olduğu ve kaç adayın geçtiği kayıt altında kalıyor.
 
+
+        shortlist, rejected, threshold_note = select_shortlist(
+            ranked,
+            min_score=settings.shortlist_min_score,
+            ratio=settings.shortlist_relative_ratio,
+            max_size=settings.shortlist_size,
+            rejected_size=settings.rejected_size,
+        )
+        
         trace = state["trace"] + [
-            f"Yeniden sıralama ({reranker.name}): {len(ranked)} aday → {len(shortlist)} kısa liste, {len(rejected)} elenen"
+            f"Yeniden sıralama ({reranker.name}): {len(ranked)} aday → {len(shortlist)} kısa liste, {len(rejected)} elenen",
+            threshold_note,
         ]
+        
+        
         return {"shortlist": shortlist, "rejected": rejected, "trace": trace}
 
     def explain(state: MatchState) -> MatchState:
