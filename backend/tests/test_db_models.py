@@ -14,6 +14,8 @@ def test_all_tables_are_defined():
         "matches",
         "pilots",
         "milestones",
+        "users",
+        "auth_sessions",
     }
 
 

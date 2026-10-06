@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     shortlist_size: int = 5
     rejected_size: int = 3
 
+    # Hesaplar
+    session_days: int = 14  # oturum çerezinin geçerlilik süresi
+    cookie_secure: bool = False  # HTTPS arkasında yayına alınınca true olmalı
+
     # Pilot takibi
     pilot_stale_days: int = 10  # bu kadar gün hareketsiz kalan aktif pilot için uyarı
 
