@@ -1,5 +1,7 @@
+import json
+
 from app.schemas import REQUIRED_BRIEF_FIELDS
-from app.seed_data import load_needs, load_startups
+from app.seed_data import SEED_DIR, load_needs, load_startups
 
 
 def test_forty_valid_startups_with_unique_ids():
@@ -7,6 +9,14 @@ def test_forty_valid_startups_with_unique_ids():
     assert len(startups) == 40
     assert len({s.id for s in startups}) == 40
     assert all(s.capabilities for s in startups)
+
+
+def test_real_startups_are_valid_and_sourced():
+    startups = load_startups("startups_gercek.json")
+    assert len({s.id for s in startups}) == len(startups) >= 100
+    assert not {s.id for s in startups} & {s.id for s in load_startups()}  # kurgusal id'lerle çakışmaz
+    raw = json.loads((SEED_DIR / "startups_gercek.json").read_text(encoding="utf-8"))
+    assert all(item["kaynak"] and all(u.startswith("https://") for u in item["kaynak"]) for item in raw)
 
 
 def test_twenty_needs_with_organization_units():
