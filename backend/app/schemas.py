@@ -70,7 +70,8 @@ class Brief(BaseModel):
 
 class FollowUpQuestion(BaseModel):
     field: str = Field(description="Sorunun doldurmaya çalıştığı brief alanı")
-    question: str = Field(description="Kuruma sorulacak kısa, net soru")
+    question: str = Field(description="Kuruma sorulacak kısa, sade soru")
+    examples: list[str] = Field(default_factory=list, description="Tek dokunuşla seçilebilecek 2-4 kısa hazır cevap")
 
 
 class FollowUpQuestions(BaseModel):

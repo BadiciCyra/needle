@@ -25,11 +25,18 @@ class LLMBackend(Protocol):
     def complete(self, messages: list[dict]) -> str: ...
 
 
+class LLMNotConfigured(RuntimeError):
+    """LLM_API_KEY tanımlı değil."""
+
+
 class OpenAICompatibleBackend:
     """langchain-openai üzerinden herhangi bir OpenAI uyumlu uç noktaya bağlanır."""
 
     def __init__(self, settings: Settings):
         from langchain_openai import ChatOpenAI
+
+        if not settings.llm_api_key:
+            raise LLMNotConfigured("LLM_API_KEY boş")
 
         self.model_name = settings.llm_model
         self._chat = ChatOpenAI(

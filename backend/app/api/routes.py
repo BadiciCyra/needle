@@ -1,15 +1,15 @@
 """Needle API uç noktaları."""
 
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api import schemas as api
 from app.api.deps import embedder_dep, llm_dep, reranker_dep, retriever_dep
 from app.config import Settings, get_settings
-from app.db.models import BriefRecord, Match, MatchRun, Need, Organization, Pilot, Startup
+from app.db.models import BriefRecord, Match, MatchRun, Milestone, Need, Organization, Pilot, Startup
 from app.db.session import get_db
 from app.embeddings import Embedder
 from app.graphs.brief_graph import build_brief_graph
@@ -110,6 +110,74 @@ def get_brief(brief_id: int, session: Session = Depends(get_db)):
     return _brief_out(_get_brief(session, brief_id))
 
 
+def _latest_run(session: Session, brief_id: int) -> MatchRun | None:
+    return session.scalars(
+        select(MatchRun).where(MatchRun.brief_id == brief_id).order_by(MatchRun.id.desc()).limit(1)
+    ).first()
+
+
+@router.get("/needs", response_model=list[api.NeedSummary], summary="İhtiyaçlar (en yeni önce)")
+def list_needs(session: Session = Depends(get_db)):
+    rows = session.execute(
+        select(BriefRecord, Need, Organization.name)
+        .join(Need, BriefRecord.need_id == Need.id)
+        .outerjoin(Organization, Need.organization_id == Organization.id)
+        .order_by(BriefRecord.id.desc())
+    ).all()
+    out = []
+    for record, need, organization in rows:
+        run = _latest_run(session, record.id)
+        counts = dict(
+            session.execute(
+                select(Match.status, func.count()).where(Match.run_id == run.id, Match.kind == "shortlist").group_by(Match.status)
+            ).all()
+        ) if run else {}
+        out.append(
+            api.NeedSummary(
+                brief_id=record.id,
+                need_id=need.id,
+                title=(record.data or {}).get("title") or need.raw_text[:60],
+                status=record.status,
+                raw_text=need.raw_text,
+                organization=organization,
+                created_at=need.created_at,
+                shortlist_count=sum(counts.values()),
+                accepted_count=counts.get("accepted", 0),
+            )
+        )
+    return out
+
+
+@router.get("/briefs/{brief_id}/match", response_model=api.SavedMatchOut, summary="Son eşleştirme sonucu")
+def get_latest_match(brief_id: int, session: Session = Depends(get_db)):
+    _get_brief(session, brief_id)
+    run = _latest_run(session, brief_id)
+    if run is None:
+        raise HTTPException(404, "Bu brief için henüz eşleştirme yapılmadı")
+    rows = session.execute(
+        select(Match, Startup).join(Startup, Match.startup_id == Startup.id).where(Match.run_id == run.id).order_by(Match.rank)
+    ).all()
+    items: dict[str, list[api.SavedMatchItem]] = {"shortlist": [], "rejected": []}
+    for match, startup in rows:
+        items[match.kind].append(
+            api.SavedMatchItem(
+                match_id=match.id,
+                status=match.status,
+                rank=match.rank,
+                startup=to_profile(startup),
+                score=match.score,
+                vector_score=match.vector_score,
+                rationale=match.rationale,
+                # reddedilen kısa liste adayında rejection yalnızca ret sebebini taşır, "yakındı ama" gerekçesi yoktur
+                rejection=match.rejection if match.rejection and "near_miss_reason" in match.rejection else None,
+                declined_reason=(match.rejection or {}).get("declined_reason"),
+            )
+        )
+    return api.SavedMatchOut(
+        brief_id=brief_id, run_id=run.id, created_at=run.created_at, retrieval_trace=run.trace, **items
+    )
+
+
 @router.post("/briefs/{brief_id}/match", response_model=api.MatchOut, summary="Gerekçeli eşleştirme")
 def match_brief(
     brief_id: int,
@@ -186,3 +254,77 @@ def decide_match(match_id: int, payload: api.DecisionIn, session: Session = Depe
 def list_startups(session: Session = Depends(get_db)):
     rows = session.scalars(select(Startup).order_by(Startup.id)).all()
     return [to_profile(row) for row in rows]
+
+
+def _pilot_out(session: Session, pilot: Pilot, settings: Settings) -> api.PilotOut:
+    match = session.get(Match, pilot.match_id)
+    record = session.get(BriefRecord, match.brief_id)
+    milestones = session.scalars(select(Milestone).where(Milestone.pilot_id == pilot.id).order_by(Milestone.id)).all()
+    days_inactive = (datetime.now(timezone.utc) - pilot.last_activity_at).days
+    return api.PilotOut(
+        id=pilot.id,
+        status=pilot.status,
+        match_id=match.id,
+        brief_id=record.id,
+        brief_title=(record.data or {}).get("title") or record.need.raw_text[:60],
+        startup=to_profile(session.get(Startup, match.startup_id)),
+        started_at=pilot.started_at,
+        last_activity_at=pilot.last_activity_at,
+        days_inactive=days_inactive,
+        stale=pilot.status == "active" and days_inactive >= settings.pilot_stale_days,
+        outcome=pilot.outcome,
+        outcome_score=pilot.outcome_score,
+        milestones=[
+            api.MilestoneOut(id=m.id, title=m.title, due_date=m.due_date, completed_at=m.completed_at) for m in milestones
+        ],
+    )
+
+
+def _get_pilot(session: Session, pilot_id: int) -> Pilot:
+    pilot = session.get(Pilot, pilot_id)
+    if pilot is None:
+        raise HTTPException(404, "Pilot bulunamadı")
+    return pilot
+
+
+@router.get("/pilots", response_model=list[api.PilotOut], summary="Pilotlar (hareketsizlik uyarısıyla)")
+def list_pilots(session: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
+    pilots = session.scalars(select(Pilot).order_by(Pilot.id.desc())).all()
+    return [_pilot_out(session, p, settings) for p in pilots]
+
+
+@router.patch("/pilots/{pilot_id}", response_model=api.PilotOut, summary="Pilot durumu / sonucu")
+def update_pilot(
+    pilot_id: int, payload: api.PilotUpdate, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+):
+    pilot = _get_pilot(session, pilot_id)
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(pilot, field, value)
+    pilot.last_activity_at = datetime.now(timezone.utc)
+    session.commit()
+    return _pilot_out(session, pilot, settings)
+
+
+@router.post("/pilots/{pilot_id}/milestones", response_model=api.PilotOut, summary="Kilometre taşı ekle")
+def add_milestone(
+    pilot_id: int, payload: api.MilestoneIn, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+):
+    pilot = _get_pilot(session, pilot_id)
+    due = datetime.combine(payload.due_date, time(), tzinfo=timezone.utc) if payload.due_date else None
+    session.add(Milestone(pilot_id=pilot.id, title=payload.title, due_date=due))
+    pilot.last_activity_at = datetime.now(timezone.utc)
+    session.commit()
+    return _pilot_out(session, pilot, settings)
+
+
+@router.post("/milestones/{milestone_id}/complete", response_model=api.PilotOut, summary="Kilometre taşını tamamla")
+def complete_milestone(milestone_id: int, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
+    milestone = session.get(Milestone, milestone_id)
+    if milestone is None:
+        raise HTTPException(404, "Kilometre taşı bulunamadı")
+    now = datetime.now(timezone.utc)
+    milestone.completed_at = milestone.completed_at or now
+    pilot = _get_pilot(session, milestone.pilot_id)
+    pilot.last_activity_at = now
+    session.commit()
+    return _pilot_out(session, pilot, settings)
