@@ -1,0 +1,2103 @@
+[
+ {
+  "id": "g001",
+  "name": "Sestek",
+  "sector": "yazılım",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "çağrı merkezi yapay zeka ajanları",
+   "Türkçe konuşma tanıma",
+   "metinden sese çeviri",
+   "temsilci asistanı ve canlı yönlendirme",
+   "otomatik çağrı puanlama ve konuşma analitiği"
+  ],
+  "description": "Müşteri hizmetleri için otonom yapay zeka ajanları, konuşma tanıma, ses sentezi ve görüşmelerin tamamını analiz eden konuşma analitiği platformu.",
+  "past_pilots": [
+   "Beko: çağrıların %70'inin otonom çözümü (sitedeki vaka)"
+  ],
+  "kaynak": [
+   "https://www.sestek.com/",
+   "https://turkiye.ai/portfolio/sestek/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede Beko vakası ve yurt dışı ofisler (Dubai) yer alıyor."
+ },
+ {
+  "id": "g002",
+  "name": "Kronnika",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "robotik süreç otomasyonu (RPA)",
+   "dijital asistanlar",
+   "tekrarlayan ofis işlerinin otomasyonu",
+   "RPA eğitimi ve sertifikasyonu"
+  ],
+  "description": "Tekrarlayan ve zaman alan işleri 7/24 yapan yerli RPA platformu; sektöre ve sürece özel otomasyon çözümleri ve RPA akademisi sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://kronnika.com/tr/anasayfa",
+   "https://turkiye.ai/portfolio/kronnika/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede referanslar ve başarı hikayeleri bölümü var."
+ },
+ {
+  "id": "g003",
+  "name": "Voiser",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "metinden sese çeviri (Türkçe dahil 70+ dil)",
+   "sesten yazıya deşifre",
+   "yapay zeka seslendirme"
+  ],
+  "description": "Türkçe ve 70'ten fazla dilde metni sese çeviren ve ses kayıtlarını yazıya döken yapay zeka seslendirme ve deşifre platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.voiser.net/",
+   "https://turkiye.ai/portfolio/voiser/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede fiyatlandırma ve müşteriler sayfası var."
+ },
+ {
+  "id": "g004",
+  "name": "Apilex",
+  "sector": "hukuk",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "hukuki araştırma asistanı",
+   "semantik içtihat arama",
+   "sözleşme analizi",
+   "hukuki belge üretimi"
+  ],
+  "description": "Avukatlar ve hukuk büroları için 11 milyonu aşkın karar üzerinde semantik arama, sözleşme analizi ve otomatik belge üretimi yapan yapay zeka hukuk asistanı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.apilex.ai",
+   "https://turkiye.ai/portfolio/apilex/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kayıt ve demo akışı açık; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g005",
+  "name": "Lextum",
+  "sector": "hukuk",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "semantik emsal karar arama (Yargıtay, Danıştay, AYM, BAM)",
+   "dilekçe hazırlama",
+   "sözleşme oluşturma",
+   "UYAP ve UETS e-tebligat entegrasyonu"
+  ],
+  "description": "Avukatlar için 11 milyon yüksek yargı kararında semantik emsal arama, içtihat destekli dilekçe ve sözleşme hazırlama sunan, UYAP uyumlu yapay zeka asistanı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://lextum.ai/",
+   "https://turkiye.ai/portfolio/lextum/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Paketler ve ücretsiz deneme sunuluyor."
+ },
+ {
+  "id": "g006",
+  "name": "Leagle",
+  "sector": "hukuk",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "hukuki doküman arama",
+   "hukuki araştırma asistanı",
+   "MS Word eklentisi",
+   "hukuk dosyası yönetimi"
+  ],
+  "description": "Türk hukuku için yapay zeka katmanı: hukuki araştırma, doküman arama, asistan ve Word eklentisiyle hukuk iş akışlarını tek platformda toplar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.leagleapp.com",
+   "https://turkiye.ai/portfolio/leagle/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma ve iş birlikleri sayfası var."
+ },
+ {
+  "id": "g007",
+  "name": "NisusAI",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka ajanları",
+   "robotik süreç otomasyonu (RPA)",
+   "otomasyon orkestrasyonu ve yönetişimi",
+   "UiPath entegrasyonu"
+  ],
+  "description": "Kurumların yapay zeka ajanlarını, yazılım robotlarını ve süreçlerini tek merkezden yöneten ajan tabanlı dijital iş gücü platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://nisus-ai.com/en",
+   "https://turkiye.ai/portfolio/nisusai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "UiPath akredite çözüm ortağı; İTÜ BigBang 2025 ilk 50."
+ },
+ {
+  "id": "g008",
+  "name": "JetLink",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "çok kanallı sohbet botu",
+   "sesli yapay zeka asistanı",
+   "müşteri etkileşimi otomasyonu",
+   "konuşma analitiği"
+  ],
+  "description": "Web, mesajlaşma ve telefon gibi tüm müşteri temas noktalarında konuşmaları otomatikleştiren çok kanallı yapay zeka ajan platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.jetlink.io",
+   "https://turkiye.ai/portfolio/jetlink/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede vaka çalışmaları ve iş ortakları bölümü var."
+ },
+ {
+  "id": "g009",
+  "name": "Etkin AI",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "e-ticaret müşteri hizmetleri sohbet botu",
+   "WhatsApp ve Instagram yapay zeka asistanı",
+   "yapay zeka telefon ajanı",
+   "satış asistanı"
+  ],
+  "description": "E-ticaret markaları için WhatsApp, Instagram, web sohbet ve telefonda müşteriyi anlayıp yanıt veren yapay zeka müşteri temsilcisi ve satış asistanı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.etkin.ai",
+   "https://turkiye.ai/portfolio/etkin-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma ve başarı hikayeleri sayfası var."
+ },
+ {
+  "id": "g010",
+  "name": "AI Agent TR",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "Türkçe sesli yapay zeka ajanı",
+   "telefon ve WhatsApp randevu/sipariş alma",
+   "dahili CRM ve kampanya yönetimi",
+   "SIP ve CRM entegrasyonu"
+  ],
+  "description": "Telefon ve WhatsApp'ta müşterileri 7/24 karşılayan, randevu ve sipariş alan, doğru kişiye yönlendiren Türkçe yapay zeka çağrı merkezi ajanı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://aiagenttr.com",
+   "https://turkiye.ai/portfolio/ai-agent-tr/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "14 günlük deneme ve referanslar sayfası var."
+ },
+ {
+  "id": "g011",
+  "name": "Callyby AI",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "yapay zeka çağrı merkezi",
+   "30+ dilde sesli asistan",
+   "müşteri talebi yönlendirme",
+   "sektöre özel çağrı senaryoları (havayolu, bankacılık, sigorta)"
+  ],
+  "description": "Çağrı merkezlerinde 30'dan fazla dilde 7/24 müşteriyi dinleyen, süreci yöneten ve aksiyon alan yapay zeka.",
+  "past_pilots": [
+   "Solimpeks ve Ege Yapı (sitedeki müşteri hikayeleri)"
+  ],
+  "kaynak": [
+   "https://www.callby.ai",
+   "https://turkiye.ai/portfolio/callyby-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede müşteri hikayeleri var."
+ },
+ {
+  "id": "g012",
+  "name": "Novaforge",
+  "sector": "yazılım",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "kurumsal sesli yapay zeka",
+   "müşteri arama otomasyonu",
+   "işe alım ön görüşme aramaları",
+   "şirket içi (on-prem) kurulum"
+  ],
+  "description": "Müşteri, işe alım ve takip aramalarını 30 dilde yürüten, şirket içine kurulabilen, KVKK ve BDDK uyumlu sesli yapay zeka ajan altyapısı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.novaforge.tech",
+   "https://turkiye.ai/portfolio/novaforge/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "7 günlük deneme var; müşteri referansı görülmedi."
+ },
+ {
+  "id": "g013",
+  "name": "Robomotion",
+  "sector": "yazılım",
+  "maturity": "buyume",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "iş akışı otomasyonu",
+   "yapay zeka ajanı oluşturma",
+   "RPA",
+   "yerel veya bulutta çalıştırma"
+  ],
+  "description": "İş akışları, yapay zeka ajanları ve uygulamalar kurmaya yarayan, yerelde ya da bulutta çalışan otomasyon platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.robomotion.io",
+   "https://turkiye.ai/portfolio/robomotion/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede dünya genelinde 20.000+ kullanıcı belirtiliyor."
+ },
+ {
+  "id": "g014",
+  "name": "VooDoo RPA",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "ekran tabanlı robotik süreç otomasyonu",
+   "entegrasyonsuz masaüstü otomasyon",
+   "robot yönetim konsolu"
+  ],
+  "description": "Kural tabanlı tekrarlayan ekran işlerini entegrasyon gerektirmeden otomatikleştiren, ücretsiz sürümü de olan RPA platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.voodoorpa.com/",
+   "https://turkiye.ai/portfolio/voodoo-rpa/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlar, iş ortakları ve vaka çalışmaları sayfası var."
+ },
+ {
+  "id": "g015",
+  "name": "Hirize",
+  "sector": "insan kaynakları",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "özgeçmiş ayrıştırma (CV parsing)",
+   "fatura ve belge veri çıkarımı",
+   "aday eşleştirme ve puanlama",
+   "çalışan devir tahmini"
+  ],
+  "description": "Özgeçmiş, fatura ve kurumsal belgelerden yüksek doğrulukla veri çıkaran, aday eşleştirme ve işten ayrılma tahmini yapan belge zekâsı platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://hirize.hr/",
+   "https://turkiye.ai/portfolio/hirize/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "API ürünleri ve müşteri hikayeleri var."
+ },
+ {
+  "id": "g016",
+  "name": "ONO",
+  "sector": "insan kaynakları",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka ile aday bulma",
+   "aday eşleştirme",
+   "yapay zeka mülakat",
+   "yetenek değerlendirme ve kariyer planlama"
+  ],
+  "description": "CV'den kısa listeye kadar işe alımın her adımına yapay zeka getiren insan kaynakları platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://onenewone.com/",
+   "https://turkiye.ai/portfolio/ono/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Demo akışı ve geniş ürün yelpazesi; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g017",
+  "name": "Meetgate",
+  "sector": "insan kaynakları",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka destekli aday değerlendirme",
+   "video mülakat",
+   "çok dilli mülakat",
+   "KVKK ve GDPR uyumlu işe alım"
+  ],
+  "description": "Yapay zeka destekli aday değerlendirme ve işe alım platformu; mülakat sürecini kısaltır ve maliyeti düşürür.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://meetgate.ai/",
+   "https://turkiye.ai/portfolio/meetgate/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 500+ şirket verisine dayalı karşılaştırma var."
+ },
+ {
+  "id": "g018",
+  "name": "T4 People Analytics",
+  "sector": "insan kaynakları",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "insan analitiği",
+   "çalışan bağlılığı analizi",
+   "İK veri yönetimi",
+   "işe alımda uygun aday tahmini"
+  ],
+  "description": "İK verisini kontrol altına alıp çalışan bağlılığı, işe alım ve organizasyonel dönüşüm için içgörü üreten insan analitiği platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://t4peopleanalytics.com",
+   "https://turkiye.ai/portfolio/t4-people-analytics/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün paketleri ve kullanım senaryoları var."
+ },
+ {
+  "id": "g019",
+  "name": "Documind",
+  "sector": "yazılım",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "belge veri çıkarımı",
+   "fatura, sözleşme ve form işleme",
+   "görsel-dil modelleriyle belge anlama",
+   "yapılandırılmış JSON çıktı"
+  ],
+  "description": "Her türlü belgeden yapay zeka ile yapılandırılmış veri çıkaran, fatura, sözleşme ve form işlemeyi otomatikleştiren platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://documind.cloud",
+   "https://turkiye.ai/portfolio/documind/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "TRAI haritasına Nisan 2026'da eklendi; fiyatlandırma sayfası var."
+ },
+ {
+  "id": "g020",
+  "name": "Ollang",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "yapay zeka dublaj ve altyazı",
+   "çeviri ve yerelleştirme otomasyonu",
+   "konuşmadan metne",
+   "canlı çeviri"
+  ],
+  "description": "Kurumsal içerik için çeviri, dublaj, altyazı ve teslimatı otomatikleştiren yerelleştirme platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.ollang.com",
+   "https://turkiye.ai/portfolio/ollang/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kurumsal sektör sayfaları var; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g021",
+  "name": "Gurubase",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "bilgi tabanından yapay zeka ajanı oluşturma",
+   "kaynak gösteren soru-cevap",
+   "Confluence, Jira, Zendesk, Slack entegrasyonu",
+   "şirket içi kurulum"
+  ],
+  "description": "Şirketin bilgi tabanını, her cevabında kaynak gösteren ve emin değilse 'bilmiyorum' diyen yapay zeka ajanlarına dönüştüren platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://gurubase.io/",
+   "https://turkiye.ai/portfolio/gurubase/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma sayfası var."
+ },
+ {
+  "id": "g022",
+  "name": "Skymod",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "kurumsal yapay zeka ajan platformu",
+   "kurumsal arama ve sohbet",
+   "bulut, VPC ve şirket içi kurulum",
+   "yapay zeka yönetişimi"
+  ],
+  "description": "Kurumların yapay zeka ajanlarını, iş akışlarını, arama ve sohbet uygulamalarını kendi altyapılarında kurup yönettiği platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://skymod.tech",
+   "https://turkiye.ai/portfolio/skymod/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "700+ hazır uygulama ve Sky AI Summit etkinliği."
+ },
+ {
+  "id": "g023",
+  "name": "Alterna CX",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "müşteri deneyimi analitiği",
+   "geri bildirim birleştirme",
+   "çağrı merkezi verisi analizi",
+   "çalışan sesi analizi"
+  ],
+  "description": "Tüm kanallardaki müşteri geri bildirimlerini birleştirip skorları neyin etkilediğini gösteren müşteri deneyimi analitiği platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://alternacx.com",
+   "https://turkiye.ai/portfolio/alterna-cx/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Müşteriler sayfası var."
+ },
+ {
+  "id": "g024",
+  "name": "Exairon",
+  "sector": "yazılım",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "müşteri deneyimi otomasyonu",
+   "yapay zeka sohbet botu",
+   "insan ve yapay zeka hibrit destek ekibi"
+  ],
+  "description": "İnsan ve yapay zeka ajanlarının birlikte çalıştığı, dijital kanallarda müşteri deneyimini otomatikleştiren platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://exairon.com",
+   "https://turkiye.ai/portfolio/exairon/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma ve ücretsiz deneme var."
+ },
+ {
+  "id": "g025",
+  "name": "Usersdot",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "pazar ve tüketici trend analizi",
+   "alışveriş davranışı içgörüsü",
+   "rakip analizi",
+   "7/24 yapay zeka müşteri hizmetleri"
+  ],
+  "description": "Markalar için pazar trendlerini, alışveriş içgörülerini ve perakende medyasını analiz eden, müşteri hizmeti veren yapay zeka ajanları.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://usersdot.com",
+   "https://turkiye.ai/portfolio/usersdot/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Demo akışı var; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g026",
+  "name": "Pi Robotik",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "robotik görüntü işleme",
+   "kalite kontrol ve varlık-tamlık kontrolü",
+   "robotik kaynak ve paletleme",
+   "OCR ve barkod okuma",
+   "2D/3D ölçüm"
+  ],
+  "description": "Görebilen robotlarla üretimde kalite kontrol, robotik kaynak, paletleme ve CNC besleme çözümleri kuran endüstriyel otomasyon şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.pirobotik.com/",
+   "https://turkiye.ai/portfolio/pi-robotik/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Mühendislik ve kurulum hizmetleri veriyor."
+ },
+ {
+  "id": "g027",
+  "name": "Arche Robotics",
+  "sector": "üretim",
+  "maturity": "mvp",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka destekli robot iş gücü",
+   "robot uygulama pazaryeri",
+   "operasyon standardizasyonu"
+  ],
+  "description": "Sağlık, perakende ve üretim gibi sektörlerde B2B operasyonlar için yapay zeka destekli robot iş gücü geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://archerobotics.com/",
+   "https://turkiye.ai/portfolio/arche-robotics/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün detayı sınırlı."
+ },
+ {
+  "id": "g028",
+  "name": "Gitek Vision",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "Niğde",
+  "capabilities": [
+   "görüntü işleme ile tohum ve çekirdek sayma",
+   "endüstriyel kalite kontrol",
+   "sayma makinesi üretimi"
+  ],
+  "description": "Görüntü işleme, yapay zeka ve endüstriyel otomasyonla tohum ve çekirdek sayma makineleri ve kalite kontrol uygulamaları geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.gitekvision.com",
+   "https://turkiye.ai/portfolio/gitek-vision/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Satılan ürünleri (sayma makineleri) var."
+ },
+ {
+  "id": "g029",
+  "name": "Konzek",
+  "sector": "üretim",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "üretim yürütme sistemi (MES)",
+   "enerji yönetim sistemi",
+   "üretim izleme ve analizi",
+   "endüstriyel IoT",
+   "izlenebilirlik"
+  ],
+  "description": "Retmes MES yazılımıyla ERP ile üretim sahasını birleştirip üretim, kalite ve izlenebilirliği gerçek zamanlı yöneten, enerji yönetimi de sunan şirket.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.konzek.com",
+   "https://turkiye.ai/portfolio/konzek/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Almanya ofisleri ve referanslar sayfası var."
+ },
+ {
+  "id": "g030",
+  "name": "Spechtlab",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "2D/3D profil ölçüm sensörü",
+   "genişlik ölçüm sistemi",
+   "yapay zeka destekli karakter tanıma",
+   "kesme bıçağı kontrolü"
+  ],
+  "description": "Demir-çelik ve beyaz eşya gibi sanayilere yerli profil ölçüm sensörleri ve yapay zeka destekli kalite kontrol sistemleri sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://spechtlab.com",
+   "https://turkiye.ai/portfolio/spechtlab/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün kataloğu ve sektör uygulamaları var."
+ },
+ {
+  "id": "g031",
+  "name": "Cognitiwe",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "görüntü işleme ile meyve-sebze tazelik takibi",
+   "raf stok takibi",
+   "üretim hattında kalite kontrol",
+   "iş sağlığı ve güvenliği izleme"
+  ],
+  "description": "Perakende ve üretim için görüntü tabanlı tahminsel yapay zeka; taze ürün takibi, stok, kayıp önleme, kalite ve İSG izleme yapar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://cognitiwe.ai/",
+   "https://turkiye.ai/portfolio/cognitiwe/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Vaka çalışmaları ve yurt dışı ofisler (Estonya, İtalya)."
+ },
+ {
+  "id": "g032",
+  "name": "Visio Mex",
+  "sector": "üretim",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "makine görüşü ile hata tespiti",
+   "360° yüzey denetimi",
+   "robotik otomasyon",
+   "üretim hattı kalite kontrolü"
+  ],
+  "description": "Üretim hatları için makine görüşü, robotik otomasyon ve kalite kontrol sistemlerini anahtar teslim kurar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://visiomex.com",
+   "https://turkiye.ai/portfolio/visio-mex/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 200+ tamamlanmış proje ve 40+ referans."
+ },
+ {
+  "id": "g033",
+  "name": "Dataguess",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "görüntü işleme ile kalite kontrol",
+   "kestirimci bakım",
+   "endüstriyel anomali tespiti",
+   "uç cihazda yapay zeka (edge AI)",
+   "kodsuz model eğitimi"
+  ],
+  "description": "Üretim için kodsuz yapay zeka araçları: görüntü işlemeyle kalite kontrol, kestirimci bakım, anomali tespiti ve uçta yapay zeka.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.dataguess.com/",
+   "https://turkiye.ai/portfolio/dataguess-teknoloji/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Birden fazla ürün (Inspector, Predictor)."
+ },
+ {
+  "id": "g034",
+  "name": "Yeditek",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "Bursa",
+  "capabilities": [
+   "endüstriyel görüntü işleme",
+   "görsel denetim sistemleri",
+   "yapay zeka ile iş güvenliği",
+   "kalite kontrol tezgahı tasarımı"
+  ],
+  "description": "Endüstriyel ihtiyaçlar için anahtar teslim görüntü işleme, yapay zeka ve kalite kontrol tezgahı çözümleri sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://yeditek.com/",
+   "https://turkiye.ai/portfolio/yeditek/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Anahtar teslim proje hizmeti veriyor."
+ },
+ {
+  "id": "g035",
+  "name": "Proxus",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "Tekirdağ",
+  "capabilities": [
+   "endüstriyel veri platformu",
+   "makine ve protokol bağlantısı",
+   "birleşik ad alanı (UNS)",
+   "uç veri işleme",
+   "ERP ve MES entegrasyonu"
+  ],
+  "description": "Sahadaki operasyonel (OT) veriyi toplayıp bağlamlandıran, saklayan ve ERP/MES ile buluta taşıyan endüstriyel veri platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.proxus.io/",
+   "https://turkiye.ai/portfolio/proxus-iiot-platform/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün olarak satılıyor."
+ },
+ {
+  "id": "g036",
+  "name": "AirGemba",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "endüstriyel IoT",
+   "kestirimci bakım",
+   "varlık performans yönetimi",
+   "marka bağımsız cihaz verisi toplama"
+  ],
+  "description": "Tüm cihaz verisini tek platformda toplayıp arızaları tahmin eden ve bakımı optimize eden endüstriyel IoT ve varlık performans yönetimi platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://airgemba.com/",
+   "https://turkiye.ai/portfolio/airgemba/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Demo ve uygulama sunuluyor."
+ },
+ {
+  "id": "g037",
+  "name": "Pdmechanics",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "kablosuz durum izleme sensörü",
+   "makine öğrenmesiyle anomali tespiti",
+   "ekipman risk skorlaması",
+   "kestirimci bakım"
+  ],
+  "description": "Kritik üretim ekipmanlarını kablosuz sensör ve makine öğrenmesiyle izleyip plansız duruşları önleyen kestirimci bakım platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://pdmechanics.com/",
+   "https://turkiye.ai/portfolio/pdmechanics/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma sayfası var."
+ },
+ {
+  "id": "g038",
+  "name": "Inovako",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "kodsuz endüstriyel görüntü işleme",
+   "kalite denetimi",
+   "derin öğrenmeyle hata tespiti"
+  ],
+  "description": "Otomotiv, beyaz eşya ve gıda gibi sektörlerde kalite denetimi için kodsuz görüntü işleme ve yapay zeka çözümleri geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://inovako.com",
+   "https://turkiye.ai/portfolio/inovako/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürünler (DeepMaster, Lumitec) ve iş ortaklığı programı."
+ },
+ {
+  "id": "g039",
+  "name": "Intenseye",
+  "sector": "iş güvenliği",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "görüntü işleme ile iş güvenliği",
+   "gerçek zamanlı tehlike tespiti",
+   "mevcut kameralarla çalışma",
+   "uç donanım (Sentinel)"
+  ],
+  "description": "Mevcut kameralarda ya da kendi cihazlarında çalışan görüntü işleme yapay zekasıyla iş yerinde ciddi yaralanmaları gerçek zamanlı önleyen platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.intenseye.com",
+   "https://turkiye.ai/portfolio/intenseye/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kendi donanım ailesi ve küresel müşteri tabanı."
+ },
+ {
+  "id": "g040",
+  "name": "Time Reactor",
+  "sector": "üretim",
+  "maturity": "mvp",
+  "location": "İzmir",
+  "capabilities": [
+   "zaman serisi anomali tespiti",
+   "üretim verisi tahminleme",
+   "kestirimci analitik"
+  ],
+  "description": "Üretim süreçlerindeki zaman serisi verisinde anomali tespiti ve trend tahmini yapan yapay zeka platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://timereactor.ai",
+   "https://turkiye.ai/portfolio/time-reactor-ai-systems/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kuluçka merkezinde (DEPARK Bambu); demo aşaması."
+ },
+ {
+  "id": "g041",
+  "name": "Algi AI",
+  "sector": "iş güvenliği",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka video analitiği",
+   "mevcut kameralarla kalite kontrol",
+   "iş güvenliği ihlali tespiti",
+   "perakende ve akıllı şehir analitiği"
+  ],
+  "description": "Mevcut kameraları karar destek sistemine çeviren, perakende, üretim, akıllı şehir ve iş güvenliği için gerçek zamanlı video analitiği.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://algi.ai",
+   "https://turkiye.ai/portfolio/algi-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "500+ hazır kural ve mobil/masaüstü uygulamalar."
+ },
+ {
+  "id": "g042",
+  "name": "MaestroHub",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "endüstriyel veri yönetimi",
+   "120+ makine türüne bağlantı",
+   "fabrika verisini yapay zeka ajanlarına açma (MCP)",
+   "dijital fabrika simülatörü"
+  ],
+  "description": "90'dan fazla bağlayıcıyla fabrika makinelerinden veri toplayıp bağlamlandıran ve hem insanlara hem yapay zeka ajanlarına açan endüstriyel veri platformu.",
+  "past_pilots": [
+   "BSH: %15 operasyonel verimlilik",
+   "Ford Otosan: %95 tahmin doğruluğu",
+   "Akkim: günde 8 ton buhar tasarrufu"
+  ],
+  "kaynak": [
+   "https://maestrohub.com/",
+   "https://turkiye.ai/portfolio/maestrohub-yazilim-anonim-sirketi/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitedeki müşteri hikayeleri."
+ },
+ {
+  "id": "g043",
+  "name": "TeknoTAM",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "Bursa",
+  "capabilities": [
+   "uç cihazda yapay zeka (edge AI)",
+   "akıllı kamera ve AIoT",
+   "endüstriyel otomasyon",
+   "güvenlik analitiği"
+  ],
+  "description": "Standart kameraları ve sistemleri akıllı AIoT güvenlik ve endüstriyel otomasyon çözümlerine dönüştüren donanım, yazılım ve uç yapay zeka geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.teknotam.com.tr",
+   "https://turkiye.ai/portfolio/teknotam/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Satış ve teknik destek ofisi var."
+ },
+ {
+  "id": "g044",
+  "name": "Khenda",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka ile dijital zaman etüdü",
+   "hat dengeleme",
+   "görüntü tabanlı gerçek zamanlı üretim izleme (Vision MES)",
+   "yanlış parça ve güvenlik tespiti"
+  ],
+  "description": "Üretim hatlarında yapay zeka destekli zaman etüdü, hat dengeleme ve kamera tabanlı gerçek zamanlı üretim izlemeyle sürekli iyileştirme platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.khenda.com/",
+   "https://turkiye.ai/portfolio/khenda/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "ABD şirketi ve fiyatlandırma sayfası var."
+ },
+ {
+  "id": "g045",
+  "name": "Sensemore",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "makine sağlığı analizi",
+   "titreşim tabanlı durum izleme",
+   "kestirimci bakım",
+   "enerji izleme"
+  ],
+  "description": "Donanım, yazılım ve yapay zekayla makine sağlığını analiz eden, kestirimci bakım ve enerji izleme sunan güvenilirlik platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://sensemore.io/",
+   "https://turkiye.ai/portfolio/sensemore/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Vaka çalışmaları ve çimento, demir-çelik, ilaç gibi sektör referansları."
+ },
+ {
+  "id": "g046",
+  "name": "Skysens",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "kodsuz endüstriyel IoT platformu",
+   "arıza tahmini",
+   "enerji israfı tespiti",
+   "LoRaWAN ve 4G/5G ağ sunucusu"
+  ],
+  "description": "Tesislerde arızaları tahmin eden ve enerji israfını azaltan, kendi LoRaWAN ağ sunucusu olan kodsuz yapay zeka destekli endüstriyel IoT platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://skysens.io",
+   "https://turkiye.ai/portfolio/skysens/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ücretsiz plan ve fiyatlandırma var."
+ },
+ {
+  "id": "g047",
+  "name": "Visiobit",
+  "sector": "üretim",
+  "maturity": "ilk_gelir",
+  "location": "Kocaeli",
+  "capabilities": [
+   "IoT veri yönetimi",
+   "üretim yürütme sistemi (MES)",
+   "yalın üretim yazılımı (LeanOps)",
+   "AGV filo yönetimi"
+  ],
+  "description": "IoT veri yönetimi, MES, LeanOps ve yapay zeka destekli üretim optimizasyonu sunan dijital dönüşüm şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://visiobit.com",
+   "https://turkiye.ai/portfolio/visiobit/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Referans müşteriler sayfası var."
+ },
+ {
+  "id": "g048",
+  "name": "Saha Robotik",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "Kocaeli",
+  "capabilities": [
+   "otonom servis robotları",
+   "otonom teslimat ve kurye robotu",
+   "restoran servis robotu",
+   "hologram akıllı asistan"
+  ],
+  "description": "Market, kargo ve restoran servisi için buluta bağlı tam otonom servis ve teslimat robotları üreten robotik şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://saharobotik.com/",
+   "https://turkiye.ai/portfolio/saha-robotik/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede müşteriler bölümü ve sipariş akışı var."
+ },
+ {
+  "id": "g049",
+  "name": "Roltek",
+  "sector": "endüstriyel IoT",
+  "maturity": "ilk_gelir",
+  "location": "İzmir",
+  "capabilities": [
+   "LoRaWAN, NB-IoT ve 4G ağ geçitleri",
+   "endüstriyel sensörler",
+   "enerji izleme ve sayaç okuma",
+   "su yönetimi ve akıllı sulama",
+   "gerçek zamanlı konum takibi"
+  ],
+  "description": "Endüstriyel otomasyon, akıllı şehir, enerji ve tarım için IoT donanımı, sensörler ve IoT platformu sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.roltek.com.tr/",
+   "https://turkiye.ai/portfolio/roltek-teknoloji/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Donanım satışı ve garanti/onarım merkezi var."
+ },
+ {
+  "id": "g050",
+  "name": "Meshine Tech",
+  "sector": "enerji",
+  "maturity": "ilk_gelir",
+  "location": "İzmir",
+  "capabilities": [
+   "otonom endüstriyel drone",
+   "güneş santrali (GES) muayenesi",
+   "termal görüntüleme",
+   "depo içi inceleme",
+   "GIS ve haritalama"
+  ],
+  "description": "Güvenlik, enerji, depo inceleme ve haritalama için yapay zeka ve bilgisayarlı görü destekli otonom endüstriyel drone çözümleri.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.meshine.tech/tr/",
+   "https://turkiye.ai/portfolio/meshine-tech/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kendi drone modelleri ve projeler sayfası."
+ },
+ {
+  "id": "g051",
+  "name": "Apollo IoT",
+  "sector": "enerji",
+  "maturity": "buyume",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "enerji maliyeti optimizasyonu",
+   "enerji verimliliği analizi",
+   "otomatik karbon takibi",
+   "sürdürülebilirlik raporlama"
+  ],
+  "description": "Enerji maliyetlerini yöneten, verimliliği artıran ve karbon emisyonunu otomatik izleyen yapay zeka destekli enerji ve sürdürülebilirlik platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.apolloiot.com/",
+   "https://turkiye.ai/portfolio/apollo-iot/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 500+ işletme belirtiliyor."
+ },
+ {
+  "id": "g052",
+  "name": "Solarify",
+  "sector": "enerji",
+  "maturity": "ilk_gelir",
+  "location": "İzmir",
+  "capabilities": [
+   "güneş santrali (GES) performans izleme",
+   "yapay zeka ile arıza ve kayıp analizi",
+   "portföy yönetimi"
+  ],
+  "description": "Güneş enerjisi santralleri için yapay zeka tabanlı performans izleme, analiz ve iş yönetimi platformu.",
+  "past_pilots": [
+   "MAXIMA Enerji (sitedeki müşteri yorumu)"
+  ],
+  "kaynak": [
+   "https://solarify.io/tr",
+   "https://turkiye.ai/portfolio/solarify/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ücretli paketler ve müşteri yorumları."
+ },
+ {
+  "id": "g053",
+  "name": "smartPulse",
+  "sector": "enerji",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "algoritmik elektrik ticareti",
+   "gün içi piyasa otomasyonu",
+   "batarya depolama (BESS) optimizasyonu",
+   "yenilenebilir portföy yönetimi",
+   "tüketim tahmini"
+  ],
+  "description": "Elektrik ticareti için algoritmik işlem, piyasa analitiği, batarya depolama optimizasyonu ve portföy yönetimini tek platformda sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://smartpulse.io"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Volue tarafından satın alındı (sitede duyuru)."
+ },
+ {
+  "id": "g054",
+  "name": "AREYLight AI",
+  "sector": "akıllı şehir",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "yapay zeka ile sokak aydınlatması yönetimi",
+   "enerji tasarrufu",
+   "aydınlatma bakımı izleme"
+  ],
+  "description": "Mevcut sokak aydınlatma ağlarını uyarlanabilir, veri odaklı ve enerji tasarruflu akıllı şehir altyapısına dönüştürür.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://areylight.com",
+   "https://turkiye.ai/portfolio/areylight-ai-solutions/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Site içeriği sınırlı."
+ },
+ {
+  "id": "g055",
+  "name": "Hummingdrone",
+  "sector": "enerji",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "otonom drone ile güneş santrali muayenesi"
+  ],
+  "description": "Güneş enerjisi santrallerinin muayenesi için otonom drone çözümü geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://hummingdrone.co/",
+   "https://turkiye.ai/portfolio/hummingdrone/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Site içeriği sınırlı; yalnızca başlık okunabildi."
+ },
+ {
+  "id": "g056",
+  "name": "SmartMoles",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "İzmir",
+  "capabilities": [
+   "toprak nem sensörleri",
+   "akıllı vanalar ve sulama otomasyonu",
+   "dijital yönetim bölgesi mühendisliği (DYBM)",
+   "su yönetimi"
+  ],
+  "description": "Akıllı sensörler, vanalar ve dijital yönetim bölgesi mühendisliğiyle tarımda su yönetimi ve akıllı sulama sistemleri kurar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.smartmoles.com",
+   "https://turkiye.ai/portfolio/smart-moles/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Online mağaza ve anahtar teslim kurulum."
+ },
+ {
+  "id": "g057",
+  "name": "Buluttan",
+  "sector": "enerji",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "hiper-yerel hava tahmini",
+   "yenilenebilir enerji üretim tahmini",
+   "şiddetli hava uyarıları",
+   "hava durumu API'si"
+  ],
+  "description": "Enerji, havacılık, tarım, lojistik ve sigorta için yapay zeka tabanlı hiper-yerel hava tahmini ve karar desteği sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.buluttan.com/",
+   "https://turkiye.ai/portfolio/buluttan/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "ABD, İspanya, İtalya, Fransa pazarları."
+ },
+ {
+  "id": "g058",
+  "name": "Visiosoft",
+  "sector": "akıllı şehir",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "plaka tanıma",
+   "insansız otopark yönetimi",
+   "temassız ödeme ve HGS",
+   "bariyer kontrolü"
+  ],
+  "description": "Plaka tanıma, temassız ödeme ve bariyer kontrolüyle otoparkları tek merkezden yöneten insansız otopark sistemi.",
+  "past_pilots": [
+   "Metropark AVM, Crowne Plaza, İstanbul Akvaryum (sitedeki referanslar)"
+  ],
+  "kaynak": [
+   "https://www.visiosoft.com.tr/",
+   "https://turkiye.ai/portfolio/visiosoft/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 33 referans."
+ },
+ {
+  "id": "g059",
+  "name": "Parabol",
+  "sector": "akıllı şehir",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "akıllı ulaşım analitiği",
+   "seyahat talebi ve başlangıç-varış analizi",
+   "trafik güvenliği",
+   "toplu taşıma yönetimi"
+  ],
+  "description": "Akıllı ulaşım ve trafik güvenliği için çok modlu hareketlilik analitiği ve yönetim çözümleri geliştirir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.paraboly.com",
+   "https://turkiye.ai/portfolio/parabol-yazilim/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ulusal ve uluslararası projeler sayfası."
+ },
+ {
+  "id": "g060",
+  "name": "Optiyol",
+  "sector": "lojistik",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "rota optimizasyonu",
+   "son kilometre teslimat planlama",
+   "sürücü yönlendirme",
+   "canlı rota takibi"
+  ],
+  "description": "Gerçek operasyon kısıtlarını dikkate alan rota optimizasyonu, saha yönlendirmesi ve canlı takip sunan lojistik platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.optiyol.com",
+   "https://turkiye.ai/portfolio/optiyol-2/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "ABD ofisi ve ABD müşterileri."
+ },
+ {
+  "id": "g061",
+  "name": "SmartOpt",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "araç rotalama",
+   "talep ve fiyat tahmini",
+   "stok optimizasyonu",
+   "tedarik ağı tasarımı",
+   "üretim planlama"
+  ],
+  "description": "Rota, stok, talep tahmini, üretim planı ve tedarik ağı tasarımı için optimizasyon ürünleri sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.smartopt.com.tr",
+   "https://turkiye.ai/portfolio/smartopt/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "İspanya pazarı ve sektör sayfaları."
+ },
+ {
+  "id": "g062",
+  "name": "WareOp",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "depo analitiği",
+   "toplama rotası optimizasyonu",
+   "yerleşim (slotting) optimizasyonu",
+   "RTLS ile takip"
+  ],
+  "description": "Depolarda yerleşim ve toplama verimsizliklerini ısı haritalarıyla gösteren, RTLS ile rota optimizasyonu yapan depo analitiği çözümleri.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.wareop.com/",
+   "https://turkiye.ai/portfolio/wareop/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Müşteriler sayfası var."
+ },
+ {
+  "id": "g063",
+  "name": "QDelivery",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "teslimat rota planlama",
+   "sipariş takibi",
+   "teslimat kanıtı (POD)",
+   "sürücü uygulaması"
+  ],
+  "description": "Rota planlama, sipariş işleme, canlı takip ve teslimat kanıtıyla teslimat operasyonlarını uçtan uca yöneten yazılım.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.qdelivery.app",
+   "https://turkiye.ai/portfolio/qdelivery/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma ve vaka çalışmaları."
+ },
+ {
+  "id": "g064",
+  "name": "Bottobo Robotics",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "otonom mobil robot (AMR)",
+   "depo toplama otomasyonu",
+   "palet ve araba taşıma",
+   "depo yönetim sistemi entegrasyonu"
+  ],
+  "description": "Depolarda insanlarla birlikte çalışan, toplama verimini artıran ve 1 tona kadar yük taşıyan otonom mobil robotlar üretir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.bottobo.com",
+   "https://webrazzi.com/2023/04/27/bottobo-robotics-1-75-milyon-dolar-yatirim-aldi/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "1,75 milyon dolar yatırım (Webrazzi, 2023)."
+ },
+ {
+  "id": "g065",
+  "name": "Nuvolog",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "taşıma yönetim sistemi (TMS)",
+   "spot navlun satın alma",
+   "karbon emisyonu izleme",
+   "rampa ve zaman dilimi yönetimi"
+  ],
+  "description": "Spot navlun alımı, karbon takibi, rampa planlama ve araç görünürlüğüyle lojistik operasyonlarını dijitalleştiren platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://nuvolog.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ekonomist'in lojistik girişimleri listesinde."
+ },
+ {
+  "id": "g066",
+  "name": "Cargopanel",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "uluslararası kargo teklifi karşılaştırma",
+   "gönderi yönetimi",
+   "e-ihracat lojistiği",
+   "pazaryeri entegrasyonları"
+  ],
+  "description": "Yurt dışı gönderiler için teklif karşılaştırma, gönderi oluşturma ve takibi tek panelde toplayan dijital lojistik platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://cargopanel.co",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ekonomist'in lojistik girişimleri listesinde."
+ },
+ {
+  "id": "g067",
+  "name": "Navlungo",
+  "sector": "lojistik",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "uluslararası kargo teklifi",
+   "depolama ve fulfillment",
+   "ABD gümrük vergisi hesaplama",
+   "pazaryeri entegrasyonu"
+  ],
+  "description": "130'dan fazla ülkeye kargo teklifi, depolama ve fulfillment operasyonlarını yöneten e-ihracat lojistiği platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://navlungo.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "130+ ülke; Parkpalet ile birlikte anılıyor."
+ },
+ {
+  "id": "g068",
+  "name": "Kamyonda",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "taşımacılar için ödeme tahsilatı (tüm bankaların POS'u tek uygulamada)",
+   "e-fatura",
+   "yakıt, HGS ve sigorta hizmetleri"
+  ],
+  "description": "Kamyoncuların ödemelerini tek uygulamadan almasını, e-fatura kesmesini ve yakıt, HGS, sigorta ihtiyaçlarını karşılamasını sağlayan lojistik ödeme platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://kamyonda.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Kayıtlı kullanıcı akışı açık."
+ },
+ {
+  "id": "g069",
+  "name": "Nakliyelazım",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "anında nakliye fiyatlandırma",
+   "otomatik araç atama",
+   "bireysel ve kurumsal taşıma planlama",
+   "yük takibi"
+  ],
+  "description": "Karayolu taşımacılığında otomatik fiyatlandırma ve araç atamasıyla evden eve, ofis ve kurumsal taşımaları planlayan platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://nakliyelazim.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Taşıyıcı ağı ve çağrı hattı var."
+ },
+ {
+  "id": "g070",
+  "name": "Asnak",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "kontratlı ve spot navlun süreç yönetimi",
+   "nakliye izleme",
+   "lojistik doküman yönetimi",
+   "çok modlu lojistik operasyonları (Logicure)"
+  ],
+  "description": "Yük sahiplerinin uçtan uca lojistik operasyonlarını, navlun satın almayı ve takibi tek noktadan yönettiği freightech platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://asnak.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Birden fazla ürün (Logicure, ATOM, ASPN)."
+ },
+ {
+  "id": "g071",
+  "name": "Ship to More",
+  "sector": "lojistik",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "kapıdan kapıya uluslararası hava kargo",
+   "kargo fiyat hesaplama",
+   "müşteri gönderi paneli"
+  ],
+  "description": "UPS ve FedEx yetkili iş ortağı olarak kapıdan kapıya uluslararası hava kargo hizmetini dijital panelle sunar.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://shiptomore.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Referanslar bölümü var."
+ },
+ {
+  "id": "g072",
+  "name": "Paketera",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "markaya özel baskılı ambalaj tedariki",
+   "e-ticaret ve horeca ambalajı",
+   "özel ölçü üretim"
+  ],
+  "description": "E-ticaret, perakende ve horeca için markaya özel baskılı ambalaj alımını dijitalleştiren B2B platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://paketera.com",
+   "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Online satış yapıyor (69 ürün)."
+ },
+ {
+  "id": "g073",
+  "name": "Evreka",
+  "sector": "akıllı şehir",
+  "maturity": "buyume",
+  "location": "Ankara",
+  "capabilities": [
+   "atık yönetimi yazılımı",
+   "atık toplama operasyon yönetimi",
+   "sınır ötesi atık mevzuatı uyumu (DIWASS)",
+   "atık verisi panosu"
+  ],
+  "description": "Atık yönetiminin tüm aşamaları için akıllı yazılım çözümleri sunan küresel SaaS şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://evreka.co"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Hollanda ofisi ve küresel müşteri tabanı."
+ },
+ {
+  "id": "g074",
+  "name": "solarVis",
+  "sector": "enerji",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "güneş enerjisi sistemi 3D çatı tasarımı",
+   "fizibilite analizi",
+   "teklif hazırlama",
+   "güneş enerjisi satış CRM'i"
+  ],
+  "description": "Güneş enerjisi firmaları için 3D çatı tasarımı, fizibilite, teklif ve CRM'i birleştiren satış ve tasarım platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://solarvis.co"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fiyatlandırma ve ABD şirketi."
+ },
+ {
+  "id": "g075",
+  "name": "Faradai",
+  "sector": "enerji",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "enerji verisi yönetimi",
+   "karbon ve ESG raporlama",
+   "bina ve tesis enerji analitiği",
+   "enerji IoT platformu"
+  ],
+  "description": "Eski adı Reengen olan, enerji, karbon ve ESG verisini yöneten yazılım; binalar ve tesisler için enerji tüketimini toplar ve analiz eder.",
+  "past_pilots": [
+   "Odeabank (Reengen Enerji AI & IoT platformu)"
+  ],
+  "kaynak": [
+   "https://faradai.ai",
+   "https://uk.linkedin.com/company/reengen",
+   "https://egirisim.com/2017/11/07/enerji-sektorunde-veri-analizi-yapan-reengen-capria-idacapital-cem-tufekciden-yatirim-aldi/",
+   "https://blog.ariteknokent.com.tr/reengen-ile-enerji-sektoru-dijitallesiyor/",
+   "https://medium.com/reengen/odeabank-dijital-enerji-s%C3%BCrd%C3%BCr%C3%BClebilirlik-y%C3%B6netiminde-oracle-bulut-tabanl%C4%B1-reengen-enerji-ai-c3f40a8e47a"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "2017'den beri yatırım almış; şehir İTÜ ARI Teknokent kaynağından."
+ },
+ {
+  "id": "g076",
+  "name": "Yeşil Science",
+  "sector": "sağlık",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "klinik karar destek",
+   "tıbbi dil modelleri",
+   "kişisel sağlık asistanı",
+   "sağlık kurumları için özel yazılım"
+  ],
+  "description": "Klinik karar desteğinden tıbbi dil modellerine kadar sağlık için yapay zeka sistemleri geliştirip değerlendiren şirket.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.yesilscience.com/",
+   "https://turkiye.ai/portfolio/yesil-science/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürünler ve araştırma bölümü var; müşteri bilgisi yok."
+ },
+ {
+  "id": "g077",
+  "name": "MediTechLabs",
+  "sector": "sağlık",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "konuşma tanıma ile tıbbi raporlama",
+   "klinik dokümantasyon otomasyonu",
+   "tıbbi doğal dil işleme"
+  ],
+  "description": "Konuşma tanıma ve doğal dil işlemeyle klinisyenlerin tıbbi dokümantasyon ve raporlama yükünü azaltan yapay zeka araçları.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.meditechlabs.ai",
+   "https://turkiye.ai/portfolio/meditechlabs/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Çözümler sayfası var; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g078",
+  "name": "Hevi AI",
+  "sector": "sağlık",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "radyoloji görüntü analizi",
+   "mamografide meme kanseri tespiti",
+   "inme tespiti",
+   "prostat ve akciğer röntgeni analizi"
+  ],
+  "description": "Mamografi, inme, prostat ve akciğer görüntülerinde radyologların hastalığı daha erken saptamasına yardım eden yapay zeka çözümleri.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://hevi.ai",
+   "https://turkiye.ai/portfolio/heviai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Birden fazla klinik ürün."
+ },
+ {
+  "id": "g079",
+  "name": "EyeCheckup",
+  "sector": "sağlık",
+  "maturity": "ilk_gelir",
+  "location": "Antalya",
+  "capabilities": [
+   "retina fundus görüntüsü analizi",
+   "diyabetik retinopati taraması",
+   "kalp-damar ve böbrek hastalığı riski taraması"
+  ],
+  "description": "Retina fundus görüntülerini yapay zekayla analiz ederek göz hastalıkları, kalp-damar ve böbrek riski taramasını destekler.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.eye-checkup.com",
+   "https://turkiye.ai/portfolio/eye-checkup/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Lancet Digital Health ve Nature Eye yayınları; İngiltere şirketi."
+ },
+ {
+  "id": "g080",
+  "name": "Beynex",
+  "sector": "sağlık",
+  "maturity": "mvp",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "bilişsel gerilemenin erken tespiti",
+   "dijital bilişsel sağlık izleme",
+   "bakım veren uygulaması"
+  ],
+  "description": "Bilişsel hastalıkların erken sinyallerini yakalayan, takip ve kişiye özel bakım sunan yapay zeka tabanlı dijital sensör.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://beynex.com/",
+   "https://turkiye.ai/portfolio/beynex/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Yatırımcı ve iş birlikçiler var; ürün aşaması net değil."
+ },
+ {
+  "id": "g081",
+  "name": "SmartAlpha",
+  "sector": "sağlık",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "gerçek zamanlı yapay zeka ultrason rehberliği",
+   "ultrason görüntü kalitesi desteği",
+   "ultrason cihazı entegrasyonu"
+  ],
+  "description": "Gerçek zamanlı yapay zeka rehberliğiyle ultrason taramasındaki uzmanlık engelini kaldıran, FDA onaylı ve CE işaretli çözüm.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://smartalpha.ai"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "FDA onaylı ve CE işaretli; seçili cihazlarda mevcut."
+ },
+ {
+  "id": "g082",
+  "name": "FarmLabs",
+  "sector": "tarım",
+  "maturity": "buyume",
+  "location": "Ankara",
+  "capabilities": [
+   "uydu ile tarla izleme",
+   "değişken oranlı gübreleme (VRA)",
+   "otonom traktör yönlendirme (RTK)",
+   "tarımsal karbon ve sürdürülebilirlik",
+   "tarım verisi API'si"
+  ],
+  "description": "Uydudan toprağa hassas tarım platformu: tarla izleme, değişken oranlı gübreleme, otonom yönlendirme ve karbon takibi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.farmlabs.io",
+   "https://turkiye.ai/portfolio/farmlabs-tarim-teknolojileri-ve-arge-a-s/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 200.000+ hektar ve 10.000+ kullanıcı."
+ },
+ {
+  "id": "g083",
+  "name": "Görsentam",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "Bursa",
+  "capabilities": [
+   "tarımsal hastalık ve zararlı erken uyarı",
+   "feromon kamerası ile görüntü işleme",
+   "fenolojiye göre gübreleme önerisi",
+   "tarımsal meteoroloji istasyonu"
+  ],
+  "description": "Meteoroloji istasyonu ve feromon kamerası verisini yapay zekayla işleyerek tarımsal hastalık ve zararlılara karşı erken uyarı veren sistem.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.gorsentam.com",
+   "https://turkiye.ai/portfolio/gorsentam-tarim-teknolojileri/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün ve hizmet satışı var."
+ },
+ {
+  "id": "g084",
+  "name": "Agrovech",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "Sakarya",
+  "capabilities": [
+   "uydu ve drone ile tarla takibi",
+   "NDVI ve bitki sağlığı analizi",
+   "verim tahmini",
+   "değişken oranlı müdahale haritaları"
+  ],
+  "description": "Uydu, drone ve yapay zekayla donanım gerektirmeden tarla takibi, NDVI analizi, verim tahmini ve müdahale haritası sunan hassas tarım platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.agrovech.com/",
+   "https://turkiye.ai/portfolio/agrovech/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Türkiye genelinde hizmet veriyor."
+ },
+ {
+  "id": "g085",
+  "name": "Topraq",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "toprak ve yaprak öz suyu analizi",
+   "sulama optimizasyonu istasyonu",
+   "dijital feromon tuzağı",
+   "çiftlik yönetim sistemi"
+  ],
+  "description": "Akıllı sensörler, toprak/yaprak analizleri, uydu hizmeti ve çiftlik yönetim yazılımıyla tarımsal verimliliği artıran veri odaklı tarım şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.topraq.ai/",
+   "https://turkiye.ai/portfolio/topraq-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Saha uygulamaları ve başarı hikayeleri var."
+ },
+ {
+  "id": "g086",
+  "name": "wiCow",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "süt ineği vücut sıcaklığı izleme",
+   "ahır iklimi izleme",
+   "akıllı ahır soğutma kontrolü",
+   "sıcaklık stresi önleme"
+  ],
+  "description": "Hayvan düzeyinde izlemeyi akıllı ahır soğutmasıyla birleştirerek süt sığırlarında sıcaklık stresini önleyen sistem.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.wicow.io/",
+   "https://turkiye.ai/portfolio/wicow/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Donanım ürünleri satılıyor."
+ },
+ {
+  "id": "g087",
+  "name": "Doktar",
+  "sector": "tarım",
+  "maturity": "buyume",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka ve IoT ile hassas tarım",
+   "uydu ile tarla izleme",
+   "tarımsal sürdürülebilirlik ve emisyon ölçümü",
+   "rejeneratif tarım uygulamaları"
+  ],
+  "description": "Yapay zeka, veri ve rejeneratif tarım uygulamalarıyla verimi artıran ve sürdürülebilirlik hedeflerini ölçülebilir sonuçlara çeviren tarım teknolojisi şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://doktar.com",
+   "https://tracxn.com/d/explore/agritech-startups-in-turkey/__gAet27aG_P3mLBR2qp17PjPpvvyXJslZJm1eVavUny8#top-companies"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Hollanda iletişim hattı ve kurumsal müşteriler."
+ },
+ {
+  "id": "g088",
+  "name": "Agrovisio",
+  "sector": "tarım",
+  "maturity": "ilk_gelir",
+  "location": "Ankara",
+  "capabilities": [
+   "uydu görüntüsüyle tarla izleme",
+   "ekili alan ve verim tahmini",
+   "hasat zamanı tahmini",
+   "bitki sağlığı analizi"
+  ],
+  "description": "Uydu görüntüsü ve yapay zekayla tarım alanlarını yıl boyu izleyip ekili alan, verim, hasat zamanı ve bitki sağlığını tahmin eden platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://agrovis.io",
+   "https://turkiye.ai/portfolio/agrovisio/",
+   "https://www.aa.com.tr/tr/isdunyasi/guncel/turktraktorden-tarim-teknolojileri-girisimi-agrovisioya-yatirim/684522",
+   "https://egirisim.com/2019/08/31/agrovisio-yapay-zeka-ile-tarim-alanlarini-takip-ederek-verimliligini-arttiran-girisim/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "TürkTraktör'den yatırım (AA); şehir ODTÜ Teknokent kaynağından."
+ },
+ {
+  "id": "g089",
+  "name": "Nerodata",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "dolandırıcılık (fraud) tespiti",
+   "kara para aklamayla mücadele (AML)",
+   "uzaktan müşteri edinimi",
+   "risk yönetimi"
+  ],
+  "description": "Veri odaklı dolandırıcılık tespiti, AML ve uzaktan müşteri edinimi çözümleri üreten risk yönetimi şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://nerodata.com/tr",
+   "https://turkiye.ai/portfolio/nerodata/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürünler ve ofisler sayfası var."
+ },
+ {
+  "id": "g090",
+  "name": "Merchant Insight",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "üye işyeri risk istihbaratı",
+   "açık kaynak veriyle işyeri izleme",
+   "kart şeması uyumu",
+   "işyeri kabul (onboarding) kontrolü"
+  ],
+  "description": "Bankalar ve ödeme kuruluşları için açık kaynak veriyle üye işyeri riskini ve kart şeması uyumunu sürekli izleyen platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://merchantinsight.io",
+   "https://turkiye.ai/portfolio/merchant-insight/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Demo akışı; müşteri sayısı belirtilmemiş."
+ },
+ {
+  "id": "g091",
+  "name": "Masraff",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "yapay zeka ile fiş tarama",
+   "kurumsal masraf ve harcırah yönetimi",
+   "çok seviyeli onay akışı",
+   "kurumsal kart mutabakatı"
+  ],
+  "description": "Yapay zekayla fiş tarama, onay akışları, kurumsal kart mutabakatı ve seyahat masrafını otomatikleştiren kurumsal masraf yönetimi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.masraff.co",
+   "https://turkiye.ai/portfolio/masraff/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede canlı işlem sayaçları var."
+ },
+ {
+  "id": "g092",
+  "name": "Lumnion",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "makine öğrenmesiyle sigorta fiyatlama",
+   "risk modelleme",
+   "tarife motoru",
+   "etki analizi"
+  ],
+  "description": "Hayat dışı ve sağlık sigortacılığı için uçtan uca, açıklanabilir makine öğrenmesi tabanlı fiyatlama platformu.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://lumnion.com",
+   "https://turkiye.ai/portfolio/lumnion/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Münih ofisi ve müşteriler sayfası."
+ },
+ {
+  "id": "g093",
+  "name": "JetScoring (F-RAY)",
+  "sector": "finans",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "mali tablolardan OCR ile veri çıkarımı",
+   "anlık finansal risk raporu",
+   "likidite ve iflas tahmini"
+  ],
+  "description": "Her formattaki mali tabloyu okuyup dijitalleştiren ve makine öğrenmesiyle anlık finansal risk raporu, likidite ve iflas tahmini üreten platform.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://jetscoring.com/",
+   "https://turkiye.ai/portfolio/f-ray/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Referanslar bölümü var."
+ },
+ {
+  "id": "g094",
+  "name": "Colendi",
+  "sector": "finans",
+  "maturity": "buyume",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "alternatif kredi skorlama",
+   "mikrokredi",
+   "şimdi al sonra öde",
+   "gömülü finans API'leri"
+  ],
+  "description": "Alternatif skorlama, mikrokredi, şimdi al sonra öde ve gömülü finans hizmetleri sunan finansal teknoloji şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://colendi.com",
+   "https://fintechtime.com/2026/03/turkiye-fintech-sektoru-2025-yilinda-214-milyon-dolar-yatirim-aldi/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Fintechtime'a göre 18 milyon müşteri ve dijital banka lisansı."
+ },
+ {
+  "id": "g095",
+  "name": "Bon Intelligence",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "mağaza içi yapay zeka analitiği",
+   "mağaza içi medya",
+   "kayıp önleme",
+   "RFID ürün takibi"
+  ],
+  "description": "Perakende için yapay zeka analitiği, mağaza içi medya, kayıp önleme ve RFID'yi tek platformda birleştiren sistem entegratörü.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.bonintel.com/",
+   "https://turkiye.ai/portfolio/bon-intelligence/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Müşteriler ve iş ortakları sayfası."
+ },
+ {
+  "id": "g096",
+  "name": "RNV AI",
+  "sector": "perakende",
+  "maturity": "buyume",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "perakende talep tahmini",
+   "stok ikmal önerisi",
+   "mağazalar arası transfer optimizasyonu"
+  ],
+  "description": "Perakende markaları için yapay zeka destekli stok optimizasyonu ve talep tahmini; ikmal ve mağazalar arası transfer önerir.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.rnv.ai",
+   "https://turkiye.ai/portfolio/rnv-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede 167 perakende markası ve 11 ülke."
+ },
+ {
+  "id": "g097",
+  "name": "Bee2 AI",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "Kocaeli",
+  "capabilities": [
+   "perakende talep tahmini",
+   "stok planlama",
+   "fiyat ve promosyon optimizasyonu",
+   "sezon planlama"
+  ],
+  "description": "Perakendeciler için talep tahmini, stok planlama ve fiyat optimizasyonu yapan, müşteriye özel modüller geliştiren yapay zeka şirketi.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://bee2.ai/",
+   "https://turkiye.ai/portfolio/bee2-ai/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Ürün modülleri satılıyor."
+ },
+ {
+  "id": "g098",
+  "name": "Trendbox",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "geleneksel kanal satış verisi",
+   "hızlı tüketim (FMCG) pazar analitiği",
+   "stok tükenme riski tahmini"
+  ],
+  "description": "Geleneksel kanal perakendesini gerçek zamanlı hızlı tüketim verisine dönüştüren, neyin neden sattığını gösteren yapay zeka analitiği.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://trendbox.io",
+   "https://turkiye.ai/portfolio/trendbox/",
+   "https://www.capital.com.tr/sektorler/teknoloji/teknolojiyle-gelen-stok-devrimi"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Bölgesel pazar veri analitiğinde büyüyor."
+ },
+ {
+  "id": "g099",
+  "name": "BuyBuddy",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "Belirtilmemiş",
+  "capabilities": [
+   "yapay zeka ile raf ve ürün takibi",
+   "stok sorunu tespiti",
+   "mağazacılık aksiyon önerisi"
+  ],
+  "description": "Her ürünü takip edip raftaki sorunları bulan, çözüm öneren ve aksiyon alan yapay zeka mağazacılık (merchandiser) asistanı.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://buybuddy.co"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Sitede kullanan markalar var."
+ },
+ {
+  "id": "g100",
+  "name": "Autocheckout",
+  "sector": "perakende",
+  "maturity": "ilk_gelir",
+  "location": "İstanbul",
+  "capabilities": [
+   "görüntü işleme ile hızlı kasa",
+   "ürün tanıma",
+   "kasa kuyruğunu azaltma"
+  ],
+  "description": "Büyük süpermarketlerde yapay zeka ile hızlı ürün tarayarak kasa kuyruklarını azaltan otomatik kasa çözümü.",
+  "past_pilots": [],
+  "kaynak": [
+   "https://www.ai-checkout.net/",
+   "https://turkiye.ai/portfolio/autocheckout/"
+  ],
+  "olgunluk_tahmini": true,
+  "olgunluk_notu": "Birden fazla sektör kullanım senaryosu."
+ }
+]
