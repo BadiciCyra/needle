@@ -29,6 +29,34 @@ class Organization(Base):
     # İhtiyacı yazan birim (ör. inovasyon) ve yaşayan birim (ör. saha satış) ayrı tutulur.
     author_unit: Mapped[str | None] = mapped_column(String(200))
     owner_unit: Mapped[str | None] = mapped_column(String(200))
+    # Firma hesabının ilk girişte doldurduğu profil (api.schemas.OrgProfile); brief'in boş alanlarını besler
+    profile: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
+    onboarded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(254), unique=True, index=True)  # küçük harfe çevrilmiş
+    password_hash: Mapped[str] = mapped_column(String(255))  # argon2id
+    name: Mapped[str] = mapped_column(String(200))
+    role: Mapped[str] = mapped_column(String(20), default="firma")  # firma | yonetici
+    organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    organization: Mapped[Organization | None] = relationship()
+
+
+class AuthSession(Base):
+    """Oturum: çerezdeki rastgele anahtarın yalnızca SHA-256 özeti saklanır."""
+
+    __tablename__ = "auth_sessions"
+
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class Need(Base):
@@ -40,6 +68,7 @@ class Need(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     brief: Mapped["BriefRecord | None"] = relationship(back_populates="need")
+    organization: Mapped[Organization | None] = relationship()
 
 
 class BriefRecord(Base):
@@ -115,7 +144,8 @@ class Pilot(Base):
     last_activity_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     # Kapalı döngü: pilot sonucu ileride eşleştirme ağırlıklarına geri beslenebilir.
     outcome: Mapped[str | None] = mapped_column(Text)
-    outcome_score: Mapped[float | None] = mapped_column(Float)
+    outcome_score: Mapped[float | None] = mapped_column(Float)  # eski 0-10 puan; yerini result aldı
+    result: Mapped[str | None] = mapped_column(String(10))  # İşe yaradı mı: evet | kismen | hayir
 
 
 class Milestone(Base):

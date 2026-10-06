@@ -8,11 +8,12 @@ from sqlalchemy.orm import Session
 
 from app.api import schemas as api
 from app.api.deps import embedder_dep, llm_dep, reranker_dep, retriever_dep
+from app.auth import current_user, ensure_visible, org_scope
 from app.config import Settings, get_settings
-from app.db.models import BriefRecord, Match, MatchRun, Milestone, Need, Organization, Pilot, Startup
+from app.db.models import BriefRecord, Match, MatchRun, Milestone, Need, Organization, Pilot, Startup, User
 from app.db.session import get_db
 from app.embeddings import Embedder
-from app.graphs.brief_graph import build_brief_graph
+from app.graphs.brief_graph import build_brief_graph, profile_defaults
 from app.graphs.match_graph import build_match_graph
 from app.llm.client import StructuredLLM
 from app.rerank.rerankers import Reranker
@@ -44,33 +45,48 @@ def _apply_brief_state(record: BriefRecord, state: dict, embedder: Embedder) -> 
         record.embedding = embedder.embed_query(Brief.model_validate(state["brief"]).to_search_text())
 
 
-def _get_brief(session: Session, brief_id: int) -> BriefRecord:
+def _get_brief(session: Session, brief_id: int, user: User) -> BriefRecord:
+    """Brief'i getirir; firma kullanıcısı yalnızca kendi kurumunun brief'ine erişebilir."""
     record = session.get(BriefRecord, brief_id)
     if record is None:
         raise HTTPException(404, "Brief bulunamadı")
+    ensure_visible(user, record.need.organization_id)
     return record
+
+
+def _defaults_for(session: Session, organization_id: int | None) -> dict:
+    organization = session.get(Organization, organization_id) if organization_id else None
+    return profile_defaults(organization.profile if organization else None)
 
 
 @router.post("/needs", response_model=api.BriefOut, summary="İhtiyaç metninden brief üret")
 def create_need(
     payload: api.NeedIn,
     session: Session = Depends(get_db),
+    user: User = Depends(current_user),
     llm: StructuredLLM = Depends(llm_dep),
     embedder: Embedder = Depends(embedder_dep),
     settings: Settings = Depends(get_settings),
 ):
-    organization_id = None
-    if payload.organization:
+    if user.role == "firma":
+        # Firma her zaman kendi kurumu adına ihtiyaç girer; gövdedeki kurum bilgisi yok sayılır
+        organization_id = user.organization_id
+    elif payload.organization:
+        # Program yöneticisi bir kurum adına ihtiyaç girebilir
         organization = Organization(**payload.organization.model_dump())
         session.add(organization)
         session.flush()
         organization_id = organization.id
+    else:
+        organization_id = None
 
     need = Need(raw_text=payload.raw_text, organization_id=organization_id)
     session.add(need)
     session.flush()
 
-    state = build_brief_graph(llm, settings).invoke({"raw_text": payload.raw_text})
+    state = build_brief_graph(llm, settings).invoke(
+        {"raw_text": payload.raw_text, "defaults": _defaults_for(session, organization_id)}
+    )
     record = BriefRecord(need_id=need.id, data={}, followup_questions=[], answers={})
     _apply_brief_state(record, state, embedder)
     session.add(record)
@@ -83,11 +99,12 @@ def answer_followups(
     brief_id: int,
     payload: api.AnswersIn,
     session: Session = Depends(get_db),
+    user: User = Depends(current_user),
     llm: StructuredLLM = Depends(llm_dep),
     embedder: Embedder = Depends(embedder_dep),
     settings: Settings = Depends(get_settings),
 ):
-    record = _get_brief(session, brief_id)
+    record = _get_brief(session, brief_id, user)
     if record.status != "needs_input":
         raise HTTPException(409, "Bu brief takip sorusu beklemiyor")
 
@@ -97,6 +114,7 @@ def answer_followups(
             "answers": payload.answers,
             "asked_questions": record.followup_questions,
             "followup_rounds": 1,
+            "defaults": _defaults_for(session, record.need.organization_id),
         }
     )
     record.answers = payload.answers
@@ -106,8 +124,8 @@ def answer_followups(
 
 
 @router.get("/briefs/{brief_id}", response_model=api.BriefOut, summary="Brief'in son hali")
-def get_brief(brief_id: int, session: Session = Depends(get_db)):
-    return _brief_out(_get_brief(session, brief_id))
+def get_brief(brief_id: int, session: Session = Depends(get_db), user: User = Depends(current_user)):
+    return _brief_out(_get_brief(session, brief_id, user))
 
 
 def _latest_run(session: Session, brief_id: int) -> MatchRun | None:
@@ -117,13 +135,17 @@ def _latest_run(session: Session, brief_id: int) -> MatchRun | None:
 
 
 @router.get("/needs", response_model=list[api.NeedSummary], summary="İhtiyaçlar (en yeni önce)")
-def list_needs(session: Session = Depends(get_db)):
-    rows = session.execute(
+def list_needs(session: Session = Depends(get_db), user: User = Depends(current_user)):
+    query = (
         select(BriefRecord, Need, Organization.name)
         .join(Need, BriefRecord.need_id == Need.id)
         .outerjoin(Organization, Need.organization_id == Organization.id)
         .order_by(BriefRecord.id.desc())
-    ).all()
+    )
+    scope = org_scope(user)
+    if scope is not None:
+        query = query.where(Need.organization_id == scope)
+    rows = session.execute(query).all()
     out = []
     for record, need, organization in rows:
         run = _latest_run(session, record.id)
@@ -149,8 +171,8 @@ def list_needs(session: Session = Depends(get_db)):
 
 
 @router.get("/briefs/{brief_id}/match", response_model=api.SavedMatchOut, summary="Son eşleştirme sonucu")
-def get_latest_match(brief_id: int, session: Session = Depends(get_db)):
-    _get_brief(session, brief_id)
+def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: User = Depends(current_user)):
+    _get_brief(session, brief_id, user)
     run = _latest_run(session, brief_id)
     if run is None:
         raise HTTPException(404, "Bu brief için henüz eşleştirme yapılmadı")
@@ -182,13 +204,14 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db)):
 def match_brief(
     brief_id: int,
     session: Session = Depends(get_db),
+    user: User = Depends(current_user),
     retriever: Retriever = Depends(retriever_dep),
     embedder: Embedder = Depends(embedder_dep),
     reranker: Reranker = Depends(reranker_dep),
     llm: StructuredLLM = Depends(llm_dep),
     settings: Settings = Depends(get_settings),
 ):
-    record = _get_brief(session, brief_id)
+    record = _get_brief(session, brief_id, user)
     if record.status != "final":
         raise HTTPException(409, "Önce takip sorularını cevaplayın; brief henüz tamamlanmadı")
 
@@ -223,10 +246,13 @@ def match_brief(
 
 
 @router.post("/matches/{match_id}/decision", response_model=api.DecisionOut, summary="Eşleşmeyi kabul et / reddet")
-def decide_match(match_id: int, payload: api.DecisionIn, session: Session = Depends(get_db)):
+def decide_match(
+    match_id: int, payload: api.DecisionIn, session: Session = Depends(get_db), user: User = Depends(current_user)
+):
     match = session.get(Match, match_id)
     if match is None:
         raise HTTPException(404, "Eşleşme bulunamadı")
+    _get_brief(session, match.brief_id, user)
     if match.status != "suggested":
         raise HTTPException(409, f"Bu eşleşme için zaten karar verilmiş: {match.status}")
 
@@ -251,7 +277,7 @@ def decide_match(match_id: int, payload: api.DecisionIn, session: Session = Depe
 
 
 @router.get("/startups", response_model=list[StartupProfile], summary="Girişim havuzu")
-def list_startups(session: Session = Depends(get_db)):
+def list_startups(session: Session = Depends(get_db), _: User = Depends(current_user)):
     rows = session.scalars(select(Startup).order_by(Startup.id)).all()
     return [to_profile(row) for row in rows]
 
@@ -273,31 +299,47 @@ def _pilot_out(session: Session, pilot: Pilot, settings: Settings) -> api.PilotO
         days_inactive=days_inactive,
         stale=pilot.status == "active" and days_inactive >= settings.pilot_stale_days,
         outcome=pilot.outcome,
-        outcome_score=pilot.outcome_score,
+        result=pilot.result,
+        organization=record.need.organization.name if record.need.organization_id else None,
         milestones=[
             api.MilestoneOut(id=m.id, title=m.title, due_date=m.due_date, completed_at=m.completed_at) for m in milestones
         ],
     )
 
 
-def _get_pilot(session: Session, pilot_id: int) -> Pilot:
+def _get_pilot(session: Session, pilot_id: int, user: User) -> Pilot:
     pilot = session.get(Pilot, pilot_id)
     if pilot is None:
         raise HTTPException(404, "Pilot bulunamadı")
+    _get_brief(session, session.get(Match, pilot.match_id).brief_id, user)
     return pilot
 
 
 @router.get("/pilots", response_model=list[api.PilotOut], summary="Pilotlar (hareketsizlik uyarısıyla)")
-def list_pilots(session: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
-    pilots = session.scalars(select(Pilot).order_by(Pilot.id.desc())).all()
-    return [_pilot_out(session, p, settings) for p in pilots]
+def list_pilots(
+    session: Session = Depends(get_db), user: User = Depends(current_user), settings: Settings = Depends(get_settings)
+):
+    query = select(Pilot).order_by(Pilot.id.desc())
+    scope = org_scope(user)
+    if scope is not None:
+        query = (
+            query.join(Match, Pilot.match_id == Match.id)
+            .join(BriefRecord, Match.brief_id == BriefRecord.id)
+            .join(Need, BriefRecord.need_id == Need.id)
+            .where(Need.organization_id == scope)
+        )
+    return [_pilot_out(session, p, settings) for p in session.scalars(query).all()]
 
 
 @router.patch("/pilots/{pilot_id}", response_model=api.PilotOut, summary="Pilot durumu / sonucu")
 def update_pilot(
-    pilot_id: int, payload: api.PilotUpdate, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+    pilot_id: int,
+    payload: api.PilotUpdate,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
 ):
-    pilot = _get_pilot(session, pilot_id)
+    pilot = _get_pilot(session, pilot_id, user)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(pilot, field, value)
     pilot.last_activity_at = datetime.now(timezone.utc)
@@ -307,9 +349,13 @@ def update_pilot(
 
 @router.post("/pilots/{pilot_id}/milestones", response_model=api.PilotOut, summary="Kilometre taşı ekle")
 def add_milestone(
-    pilot_id: int, payload: api.MilestoneIn, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)
+    pilot_id: int,
+    payload: api.MilestoneIn,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
 ):
-    pilot = _get_pilot(session, pilot_id)
+    pilot = _get_pilot(session, pilot_id, user)
     due = datetime.combine(payload.due_date, time(), tzinfo=timezone.utc) if payload.due_date else None
     session.add(Milestone(pilot_id=pilot.id, title=payload.title, due_date=due))
     pilot.last_activity_at = datetime.now(timezone.utc)
@@ -318,13 +364,18 @@ def add_milestone(
 
 
 @router.post("/milestones/{milestone_id}/complete", response_model=api.PilotOut, summary="Kilometre taşını tamamla")
-def complete_milestone(milestone_id: int, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
+def complete_milestone(
+    milestone_id: int,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
+):
     milestone = session.get(Milestone, milestone_id)
     if milestone is None:
         raise HTTPException(404, "Kilometre taşı bulunamadı")
+    pilot = _get_pilot(session, milestone.pilot_id, user)  # yetki kontrolü değişiklikten önce
     now = datetime.now(timezone.utc)
     milestone.completed_at = milestone.completed_at or now
-    pilot = _get_pilot(session, milestone.pilot_id)
     pilot.last_activity_at = now
     session.commit()
     return _pilot_out(session, pilot, settings)

@@ -29,6 +29,27 @@ class BriefState(TypedDict, total=False):
     missing_fields: list[str]
     questions: list[dict]
     status: str                       # needs_input | final
+    defaults: dict                    # firma profilinden gelen varsayılanlar (profile_defaults)
+
+
+def profile_defaults(profile: dict | None) -> dict:
+    """Firma profilini brief alanlarına çevirir. Yalnızca brief'te boş kalan alanları doldurmak için kullanılır."""
+    if not profile:
+        return {}
+    defaults = {
+        "sector": profile.get("sector"),
+        "min_maturity": profile.get("preferred_maturity"),
+        "budget": profile.get("budget_range"),
+        "timeline": profile.get("pilot_duration"),
+    }
+    if profile.get("startup_location") == "ayni_sehir":
+        defaults["location_preference"] = profile.get("city")
+    return {key: value for key, value in defaults.items() if value}
+
+
+def apply_defaults(brief: dict, defaults: dict) -> dict:
+    """Metinde ya da cevaplarda geçen bilgiyi asla ezmez; sadece boş alanları doldurur."""
+    return {**brief, **{key: value for key, value in defaults.items() if not brief.get(key)}}
 
 
 def build_brief_graph(llm: StructuredLLM, settings: Settings | None = None):
@@ -59,7 +80,7 @@ def build_brief_graph(llm: StructuredLLM, settings: Settings | None = None):
         return {"brief": brief.model_dump(mode="json")}
 
     def check_completeness(state: BriefState) -> BriefState:
-        brief = Brief.model_validate(state["brief"])
+        brief = Brief.model_validate(apply_defaults(state["brief"], state.get("defaults") or {}))
         missing = brief.computed_missing_fields()  # LLM'in beyanı değil, kodun hesabı
         brief.missing_fields = missing
         return {"brief": brief.model_dump(mode="json"), "missing_fields": missing}
