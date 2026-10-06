@@ -18,8 +18,10 @@ import { Spotlight, spotlight, type SpotlightActionGroupData } from '@mantine/sp
 import {
   IconApi,
   IconBuildingCommunity,
+  IconBuildingSkyscraper,
   IconFileDescription,
   IconLayoutDashboard,
+  IconLogout,
   IconMoon,
   IconPlus,
   IconRocket,
@@ -29,12 +31,16 @@ import {
 import { useMemo } from 'react'
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
+import { AuthProvider, useAuth } from './auth'
+import { StitchLoader } from './components/StitchLoader'
 import { AppDataProvider, useAppData } from './data'
+import { LoginPage, RegisterPage } from './pages/AuthPages'
 import BriefPage from './pages/BriefPage'
 import DashboardPage from './pages/DashboardPage'
 import EcosystemPage from './pages/EcosystemPage'
 import NeedsPage from './pages/NeedsPage'
 import NewNeedPage from './pages/NewNeedPage'
+import OnboardingPage from './pages/OnboardingPage'
 import PilotsPage from './pages/PilotsPage'
 
 function Logo({ light = false }: { light?: boolean }) {
@@ -48,6 +54,30 @@ function Logo({ light = false }: { light?: boolean }) {
         needle
       </Text>
     </Group>
+  )
+}
+
+function AccountCard() {
+  const { me, logout } = useAuth()
+  if (!me) return null
+  return (
+    <Box px={14} py={12} style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <Group justify="space-between" wrap="nowrap" gap="xs">
+        <div style={{ minWidth: 0 }}>
+          <Text size="sm" c="#f4f1ea" fw={500} truncate>
+            {me.role === 'yonetici' ? 'Program yöneticisi' : me.organization?.name}
+          </Text>
+          <Text size="xs" c="#9a958a" truncate>
+            {me.name}
+          </Text>
+        </div>
+        <Tooltip label="Çıkış yap">
+          <ActionIcon variant="subtle" color="gray" onClick={logout} aria-label="Çıkış yap">
+            <IconLogout size={17} />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
+    </Box>
   )
 }
 
@@ -77,6 +107,7 @@ const isActive = (pathname: string, to: string) => (to === '/' ? pathname === '/
 function Navigation({ onNavigate }: { onNavigate: () => void }) {
   const { pathname } = useLocation()
   const { needs, pilots, startups } = useAppData()
+  const { isAdmin } = useAuth()
   const openNeeds = needs?.filter((n) => n.accepted_count === 0).length
   const activePilots = pilots?.filter((p) => p.status === 'active').length
   const stale = pilots?.some((p) => p.stale)
@@ -114,6 +145,12 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
       )}
       <div className="app-section-label">Ekosistem</div>
       {item('/ekosistem', 'Girişimler', IconBuildingCommunity, count(startups?.length))}
+      {!isAdmin && (
+        <>
+          <div className="app-section-label">Hesap</div>
+          {item('/profil', 'Firma profili', IconBuildingSkyscraper)}
+        </>
+      )}
     </>
   )
 }
@@ -247,6 +284,7 @@ function Shell() {
           <Navigation onNavigate={close} />
         </AppShell.Section>
         <AppShell.Section>
+          <AccountCard />
           <SystemStatus />
         </AppShell.Section>
       </AppShell.Navbar>
@@ -260,6 +298,7 @@ function Shell() {
             <Route path="/ihtiyaclar/:briefId" element={<BriefPage />} />
             <Route path="/pilotlar" element={<PilotsPage />} />
             <Route path="/ekosistem" element={<EcosystemPage />} />
+            <Route path="/profil" element={<OnboardingPage mode="edit" />} />
             <Route path="/yeni" element={<Navigate to="/ihtiyaclar/yeni" replace />} />
             <Route path="/girisimler" element={<Navigate to="/ekosistem" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -271,10 +310,35 @@ function Shell() {
   )
 }
 
-export default function App() {
+function Gate() {
+  const { me, loading } = useAuth()
+  if (loading)
+    return (
+      <Box h="100vh" style={{ display: 'grid', placeItems: 'center' }}>
+        <StitchLoader width={180} />
+      </Box>
+    )
+  if (!me)
+    return (
+      <Routes>
+        <Route path="/kayit" element={<RegisterPage />} />
+        <Route path="*" element={<LoginPage />} />
+      </Routes>
+    )
+  // Firma ilk girişte profilini doldurur; yönetici doğrudan panele girer
+  if (me.role === 'firma' && !me.organization?.onboarded) return <OnboardingPage mode="onboarding" />
   return (
-    <AppDataProvider>
+    // Hesap değişince (çıkış/giriş) veriler sıfırdan yüklensin
+    <AppDataProvider key={me.id}>
       <Shell />
     </AppDataProvider>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
   )
 }
