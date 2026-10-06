@@ -3,13 +3,14 @@
 import logging
 from contextlib import asynccontextmanager
 
+import openai
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.api.routes import router
 from app.config import get_settings
 from app.llm.cache import DemoCacheMiss
-from app.llm.client import StructuredOutputError
+from app.llm.client import LLMNotConfigured, StructuredOutputError
 
 logger = logging.getLogger("needle")
 
@@ -37,6 +38,42 @@ app.include_router(router)
 @app.exception_handler(DemoCacheMiss)
 async def demo_cache_miss(_: Request, error: DemoCacheMiss):
     return JSONResponse(status_code=503, content={"detail": f"Demo modu: istek önbellekte yok. {error}"})
+
+
+@app.exception_handler(LLMNotConfigured)
+async def llm_not_configured(_: Request, __: LLMNotConfigured):
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": "LLM anahtarı tanımlı değil. .env dosyasında LLM_API_KEY'e Gemini anahtarını yazın "
+            "(https://aistudio.google.com/apikey) ve API'yi yeniden başlatın."
+        },
+    )
+
+
+@app.exception_handler(openai.AuthenticationError)
+async def llm_auth_error(_: Request, error: openai.AuthenticationError):
+    return JSONResponse(
+        status_code=502,
+        content={
+            "detail": "LLM isteği reddedildi (geçersiz anahtar). .env dosyasındaki LLM_API_KEY'i kontrol edin. "
+            f"Sağlayıcı cevabı: {error.message}"
+        },
+    )
+
+
+@app.exception_handler(openai.APIConnectionError)
+async def llm_connection_error(_: Request, error: openai.APIConnectionError):
+    settings = get_settings()
+    return JSONResponse(
+        status_code=502,
+        content={"detail": f"LLM'e ulaşılamadı ({settings.llm_base_url}). İnternet bağlantısını ve LLM_BASE_URL'i kontrol edin. {error}"},
+    )
+
+
+@app.exception_handler(openai.APIStatusError)
+async def llm_status_error(_: Request, error: openai.APIStatusError):
+    return JSONResponse(status_code=502, content={"detail": f"LLM sağlayıcısı hata döndürdü ({error.status_code}): {error.message}"})
 
 
 @app.exception_handler(StructuredOutputError)

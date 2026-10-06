@@ -106,4 +106,24 @@ def test_full_flow_need_to_pilot(client):
     again = client.post(f"/matches/{top_match_id}/decision", json={"decision": "decline"})
     assert again.status_code == 409
 
+    declined_id = result["match_ids"][result["shortlist"][1]["startup"]["id"]]
+    client.post(f"/matches/{declined_id}/decision", json={"decision": "decline", "reason": "Bütçe uymadı"})
+
+    needs = client.get("/needs").json()
+    assert needs[0]["brief_id"] == body["brief_id"] and needs[0]["accepted_count"] == 1
+
+    saved = client.get(f"/briefs/{body['brief_id']}/match").json()
+    by_id = {item["match_id"]: item for item in saved["shortlist"]}
+    assert by_id[top_match_id]["status"] == "accepted"
+    assert by_id[declined_id]["declined_reason"] == "Bütçe uymadı" and by_id[declined_id]["rejection"] is None
+
+    pilot_id = decision.json()["pilot_id"]
+    pilot = client.post(f"/pilots/{pilot_id}/milestones", json={"title": "Veri erişimi", "due_date": "2026-11-01"}).json()
+    assert pilot["startup"]["id"] == "s01" and pilot["stale"] is False
+    pilot = client.post(f"/milestones/{pilot['milestones'][0]['id']}/complete").json()
+    assert pilot["milestones"][0]["completed_at"]
+    pilot = client.patch(f"/pilots/{pilot_id}", json={"status": "done", "outcome_score": 8}).json()
+    assert pilot["status"] == "done"
+    assert [p["id"] for p in client.get("/pilots").json()] == [pilot_id]
+
     assert len(client.get("/startups").json()) == 40

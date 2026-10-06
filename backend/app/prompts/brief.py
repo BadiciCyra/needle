@@ -24,13 +24,22 @@ Kurum, eksik bilgiler için sorulan takip sorularını şöyle cevapladı:
 
 Bu cevapları da kullanarak brief'i güncelle."""
 
-FOLLOWUP_SYSTEM = """Bir kurumun ihtiyaç brief'inde eksik kalan alanlar için kuruma takip soruları hazırlıyorsun.
+FOLLOWUP_SYSTEM = """Bir kurumun ihtiyacında eksik kalan bilgileri tamamlamak için kuruma kısa sorular hazırlıyorsun.
+Soruları okuyan kişi teknik olmayan, yoğun bir birim yöneticisi; birkaç saniyede anlayıp cevaplayabilmeli.
 
-Kurallar:
+Soru yazım kuralları:
+- Gündelik, sade Türkçe kullan. "Siz" diye hitap et.
+- Her soru tek bir şeyi sorsun ve en fazla 14 kelime olsun.
+- Kurumun kendi konusuna atıf yap (ör. "şikayet", "fren diski"); genel kalıp cümle kurma.
+- Şu kelimeleri kullanma: pilot, kapsam, kriter, ölçülebilir, metrik, KPI, brief, entegrasyon, yetkinlik.
+- Parantez içinde örnek verme; örnekleri examples alanına yaz.
 - Her eksik alan için en fazla bir soru sor; toplam en fazla {max_questions} soru.
-- Sorular kısa, net ve cevaplaması kolay olsun; mümkünse örnek ver (ör. "3 ay mı, 6 ay mı?").
 - Kurumun zaten verdiği bilgiyi tekrar sorma.
-- field alanına sorunun doldurduğu brief alanının adını yaz."""
+
+examples: Kurumun tek dokunuşla seçebileceği 2-4 kısa hazır cevap yaz (her biri en fazla 6 kelime).
+Kurumun konusuna uygun, gerçekçi ve birbirinden farklı seçenekler olsun.
+
+field alanına sorunun tamamladığı alanın adını yaz (aşağıdaki listeden)."""
 
 FOLLOWUP_USER = """Kurumun ihtiyaç metni:
 \"\"\"{raw_text}\"\"\"
@@ -40,9 +49,9 @@ FOLLOWUP_USER = """Kurumun ihtiyaç metni:
 
 Eksik alanlar: {missing}
 
-Alan açıklamaları:
-- problem: çözülmesi gereken asıl problem
-- scope: kapsam (hangi birim, hangi veri, hangi sistem, ne kadar hacim)
-- required_capabilities: girişimde aranan teknik yetkinlikler
-- success_criteria: pilotun başarılı sayılması için ölçülebilir kriter
-- timeline: beklenen pilot süresi"""
+Alanların anlamı (soruyu bu bilgiyi almak için kur, ama bu terimleri kullanma):
+- problem: asıl sorun ne
+- scope: ne kadar iş/veri var, nerede ve hangi sistemde oluyor
+- required_capabilities: nasıl bir teknik çözüm aranıyor
+- success_criteria: işin işe yaradığını neye bakarak anlarlar (bir sayı/hedef)
+- timeline: denemeyi ne kadar sürede görmek istiyorlar"""
