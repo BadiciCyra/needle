@@ -79,7 +79,38 @@ rozet, sosyal ağ ve mobil uygulama [yol haritasında](#yol-haritası) duruyor.
 
 ## Kurulum
 
-> Proje aktif geliştirme aşamasında. Kurulum adımları ilk çalışan sürümle birlikte eklenecek.
+Gereken: Docker Desktop. (Geliştirme için ayrıca Python 3.12+ ve Node 20+.)
+
+1. `.env.example` dosyasını `.env` olarak kopyala ve `LLM_API_KEY` satırına bir Gemini API anahtarı yaz
+   ([Google AI Studio](https://aistudio.google.com/apikey)). LLM katmanı herhangi bir OpenAI uyumlu uç noktayla
+   çalışır; Ollama veya OmniRoute için `.env.example`'daki notlara bak.
+2. Her şeyi başlat:
+
+```bash
+docker compose up -d --build
+```
+
+| Adres | Ne |
+|---|---|
+| http://localhost:3000 | Needle arayüzü |
+| http://localhost:8000/docs | API dokümanı (`.env`'de `API_PORT` verildiyse o port) |
+
+API ilk açılışta girişim tablosu boşsa `STARTUPS_FILE` dosyasındaki girişimleri (varsayılan:
+[kaynaklı gerçek girişimler](backend/seed/startups_gercek.json)) embedding'leriyle yükler. İlk açılışta
+embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
+
+### Geliştirme (Docker'sız API ve arayüz)
+
+```bash
+docker compose up -d db
+pip install -r backend/requirements.txt
+python -m uvicorn app.main:app --app-dir backend --port 8010
+npm --prefix frontend install
+npm --prefix frontend run dev        # http://localhost:5173, /api → 127.0.0.1:8010
+```
+
+Testler: `cd backend && python -m pytest`. Uçtan uca API testi ayrı bir veritabanı ister
+(test tabloları silip yeniden kurar): `NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@127.0.0.1:5432/needle_test`.
 
 ## Katkı
 
