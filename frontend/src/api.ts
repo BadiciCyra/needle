@@ -1,6 +1,9 @@
 import type {
   BriefOut,
   Health,
+  Me,
+  OrgProfile,
+  PilotResult,
   MatchOut,
   MatchView,
   NeedSummary,
@@ -35,9 +38,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       /* gövde JSON değil */
     }
+    if (response.status === 401 && !path.startsWith('/auth/')) onUnauthorized?.()
     throw new ApiError(response.status, detail)
   }
+  if (response.status === 204) return undefined as T
   return response.json() as Promise<T>
+}
+
+// Oturum düşerse (süre doldu, başka sekmede çıkış) uygulama giriş ekranına döner
+let onUnauthorized: (() => void) | null = null
+export const setUnauthorizedHandler = (handler: (() => void) | null) => {
+  onUnauthorized = handler
 }
 
 const post = <T>(path: string, body?: unknown) =>
@@ -45,6 +56,12 @@ const post = <T>(path: string, body?: unknown) =>
 
 export const api = {
   health: () => request<Health>('/health'),
+  me: () => request<Me>('/auth/me'),
+  login: (email: string, password: string) => post<Me>('/auth/login', { email, password }),
+  register: (body: { name: string; email: string; password: string; organization_name: string; kvkk_onay: boolean }) =>
+    post<Me>('/auth/register', body),
+  logout: () => post<void>('/auth/logout'),
+  saveProfile: (profile: OrgProfile) => request<Me>('/auth/profile', { method: 'PUT', body: JSON.stringify(profile) }),
   createNeed: (raw_text: string, organization?: { name: string; sector?: string; author_unit?: string; owner_unit?: string }) =>
     post<BriefOut>('/needs', { raw_text, organization }),
   listNeeds: () => request<NeedSummary[]>('/needs'),
@@ -56,7 +73,7 @@ export const api = {
     post<{ match_id: number; status: string; pilot_id: number | null }>(`/matches/${matchId}/decision`, { decision, reason }),
   startups: () => request<StartupProfile[]>('/startups'),
   pilots: () => request<Pilot[]>('/pilots'),
-  updatePilot: (pilotId: number, body: { status?: PilotStatus; outcome?: string; outcome_score?: number }) =>
+  updatePilot: (pilotId: number, body: { status?: PilotStatus; outcome?: string; result?: PilotResult }) =>
     request<Pilot>(`/pilots/${pilotId}`, { method: 'PATCH', body: JSON.stringify(body) }),
   addMilestone: (pilotId: number, title: string, due_date?: string) =>
     post<Pilot>(`/pilots/${pilotId}/milestones`, { title, due_date: due_date || null }),

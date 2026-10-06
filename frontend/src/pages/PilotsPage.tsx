@@ -6,7 +6,6 @@ import {
   Divider,
   Drawer,
   Group,
-  NumberInput,
   Progress,
   ScrollArea,
   SegmentedControl,
@@ -26,10 +25,11 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { api } from '../api'
+import { useAuth } from '../auth'
 import { EmptyState, MetaItem, OrgAvatar, PageHeader, PageLoader, StatStrip, Tag } from '../components/ui'
 import { useAppData } from '../data'
-import { formatDate, PILOT_STATUS, TAG_COLOR, timeAgo } from '../labels'
-import type { Pilot, PilotStatus } from '../types'
+import { formatDate, PILOT_RESULT, PILOT_STATUS, TAG_COLOR, timeAgo } from '../labels'
+import type { Pilot, PilotResult, PilotStatus } from '../types'
 
 const progressOf = (p: Pilot) => {
   const total = p.milestones.length
@@ -41,7 +41,6 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
   const [title, setTitle] = useState('')
   const [due, setDue] = useState('')
   const [outcome, setOutcome] = useState(pilot.outcome ?? '')
-  const [score, setScore] = useState<number | string>(pilot.outcome_score ?? '')
   const { total, done, pct } = progressOf(pilot)
 
   const run = async (action: () => Promise<Pilot>, message?: string) => {
@@ -157,28 +156,37 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
 
       <div>
         <Text className="app-section-title" mb={4}>
-          Sonuç
+          İşe yaradı mı?
         </Text>
         <Text size="sm" c="dimmed" mb="sm">
-          Pilot bittiğinde sonucu ve puanı kaydedin; ileride eşleştirmelere geri beslenecek.
+          Deneme bitince tek dokunuşla işaretleyin. Bu bilgi, ileride benzer ihtiyaçlarda hangi girişimin öne çıkacağını
+          belirlemek için kullanılacak.
         </Text>
         <Stack gap="sm">
-          <Textarea placeholder="Pilot neyle sonuçlandı?" autosize minRows={3} value={outcome} onChange={(e) => setOutcome(e.currentTarget.value)} />
-          <Group align="flex-end" justify="space-between">
-            <NumberInput label="Puan (0–10)" min={0} max={10} w={140} value={score} onChange={setScore} />
+          <SegmentedControl
+            fullWidth
+            value={pilot.result ?? ''}
+            onChange={(value) => run(() => api.updatePilot(pilot.id, { result: value as PilotResult }), 'Sonuç kaydedildi')}
+            data={[
+              { value: 'evet', label: 'Evet' },
+              { value: 'kismen', label: 'Kısmen' },
+              { value: 'hayir', label: 'Hayır' },
+            ]}
+          />
+          <Textarea
+            placeholder="İsterseniz kısa bir not: ne işe yaradı, ne yaramadı?"
+            autosize
+            minRows={2}
+            value={outcome}
+            onChange={(e) => setOutcome(e.currentTarget.value)}
+          />
+          <Group justify="flex-end">
             <Button
-              onClick={() =>
-                run(
-                  () =>
-                    api.updatePilot(pilot.id, {
-                      outcome: outcome.trim() || undefined,
-                      outcome_score: score === '' ? undefined : Number(score),
-                    }),
-                  'Sonuç kaydedildi',
-                )
-              }
+              variant="default"
+              disabled={outcome.trim() === (pilot.outcome ?? '')}
+              onClick={() => run(() => api.updatePilot(pilot.id, { outcome: outcome.trim() }), 'Not kaydedildi')}
             >
-              Sonucu kaydet
+              Notu kaydet
             </Button>
           </Group>
         </Stack>
@@ -189,6 +197,7 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
 
 export default function PilotsPage() {
   const { pilots, setPilot } = useAppData()
+  const { isAdmin } = useAuth()
   const [filter, setFilter] = useState('active')
   const [openId, setOpenId] = useState<number | null>(null)
   const open = pilots?.find((p) => p.id === openId) ?? null
@@ -275,6 +284,7 @@ export default function PilotsPage() {
                                 {p.startup.name}
                               </Text>
                               <Text size="xs" c="dimmed" lineClamp={1}>
+                                {isAdmin && p.organization ? `${p.organization} · ` : ''}
                                 {p.brief_title}
                               </Text>
                             </div>
@@ -282,6 +292,11 @@ export default function PilotsPage() {
                         </Table.Td>
                         <Table.Td>
                           <Tag color={PILOT_STATUS[p.status].color}>{PILOT_STATUS[p.status].label}</Tag>
+                          {p.result && (
+                            <Text size="xs" c="dimmed" mt={2}>
+                              İşe yaradı mı: {PILOT_RESULT[p.result]}
+                            </Text>
+                          )}
                         </Table.Td>
                         <Table.Td>
                           <Group gap="xs" wrap="nowrap">
