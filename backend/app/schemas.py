@@ -113,6 +113,7 @@ class Candidate(BaseModel):
     startup: StartupProfile
     vector_score: float = 0.0
     rerank_score: float | None = None
+    raw_rerank_score: float | None = Field(None, description="Reranker'ın ham skoru, tercih cezası uygulanmadan önce")
     filter_notes: list[str] = Field(default_factory=list, description="Hangi filtreye takıldı / hangisi gevşetildi")
 
 
@@ -147,6 +148,7 @@ class MatchResultItem(BaseModel):
     rank: int
     startup: StartupProfile
     score: float
+    rerank_score: float | None = Field(None, description="Reranker'ın ham skoru (tercih cezası öncesi)")
     vector_score: float = 0.0
     rationale: MatchRationale | None = None
     rejection: RejectionRationale | None = None
@@ -157,6 +159,24 @@ class MatchResult(BaseModel):
     brief_id: int | None = None
     shortlist: list[MatchResultItem]
     rejected: list[MatchResultItem]
+    no_match: bool = Field(
+        False,
+        description="Kısa listeye girecek kadar güçlü eşleşme bulunamadı. Havuzda uygun girişim olmayabilir "
+        "ya da arama uygun adayı kaçırmış olabilir.",
+    )
     retrieval_trace: list[str] = Field(
         default_factory=list, description="Dinamik RAG'in hangi turda ne yaptığının kaydı (şeffaflık için)"
     )
+
+
+
+
+#Neden iki ayrıskor alanı? Candidate) grafın içinde taşınan nesne, MatchResultItem ise
+#dışarıya verilen sonuç. Ham skoru içeride hesaplayıp dışarıya taşımak için ikisinde de bir alan
+#gerekiyor.
+
+#no_match açıklaması neden bu kadar uzun? nil'den öğrendiğimiz ders bu. Sistem havuzda
+#uygun girişim yok" diyemez, çünkü bazen uygun girişim vardır ama arama onu kaçırır. Açıklama
+#Iki ihtimali de dürüstçe söylüyor. Bu açıklama API dokümanında ( /docs) sayfasında) görünecek
+#ve arayüzü yazan kişi mesajı buna göre seçecek.
+
