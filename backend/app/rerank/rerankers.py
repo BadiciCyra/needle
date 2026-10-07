@@ -18,6 +18,9 @@ from app.schemas import Candidate
 
 class Reranker(Protocol):
     name: str
+    # Güven eşiği varsayılanları (match_graph.select_shortlist); her sıralayıcının skor ölçeğine göre
+    min_score: float
+    relative_ratio: float
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
         """rerank_score'u doldurur ve adayları azalan skora göre döndürür (0-1 arası)."""
@@ -26,6 +29,8 @@ class Reranker(Protocol):
 
 class PassthroughReranker:
     name = "none"
+    min_score = 0.0  # kosinüs benzerliği mutlak alaka söylemez; kırpma yapılmaz
+    relative_ratio = 0.0
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
         for candidate in candidates:
@@ -35,6 +40,8 @@ class PassthroughReranker:
 
 class CrossEncoderReranker:
     name = "cross_encoder"
+    min_score = 0.003  # analiz/esik_analizi.py: negatif ihtiyaçlarda birinci bile bunun altında kalıyor
+    relative_ratio = 0.3
 
     def __init__(self, model_name: str):
         self.model_name = model_name
@@ -67,6 +74,10 @@ class _LLMScores(BaseModel):
 
 class LLMReranker:
     name = "llm"
+    # 0-10 puanın onda biri: birinci 4/10 veya altındaysa "güçlü eşleşme yok"; birincinin %60'ının
+    # altındakiler kırpılır (ör. 9/10 birinciyken 5/10 ve altı listeye girmez)
+    min_score = 0.5
+    relative_ratio = 0.6
 
     def __init__(self, llm: StructuredLLM):
         self.llm = llm

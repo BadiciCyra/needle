@@ -209,7 +209,7 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
     <Stack gap="md">
       {view.shortlist.length === 0 && (
         <Alert variant="light" color="gray" icon={<IconInfoCircle size={18} />}>
-          Bu ihtiyaç için yeterince güçlü bir eşleşme bulunamadı. En yakın adaylar aşağıda gerekçeleriyle listeleniyor.
+          Bu ihtiyaç için yeterince güçlü bir eşleşme bulunamadı. Havuzda uygun girişim olmayabilir ya da arama kaçırmış olabilir; en yakın adaylar aşağıda gerekçeleriyle listeleniyor.
         </Alert>
       )}
       {view.shortlist.map((item) => (

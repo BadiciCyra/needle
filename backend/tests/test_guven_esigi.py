@@ -4,20 +4,13 @@ Skorlar analiz/esik_analizi.py ile ölçülen gerçek reranker skorlarından al�
 """
 
 from app.graphs.match_graph import select_shortlist
+from app.rerank.rerankers import LLMReranker
 from app.schemas import Candidate
 from app.seed_data import load_startups
 
 STARTUPS = load_startups()
 MIN_SCORE = 0.003
 RATIO = 0.3
-
-
-#ranked(0.143, 0.001, ...): Verilen skorlarla sahte bir aday listesi kuruyor. 
-# Her testte Candidate(...) yazmak yerine bunu kullanıyoruz. 
-# select(...): select_shortlist'i bizim eşiklerimizle (0,003 ve 0,3) çağırıyor.
-#ids(...): Aday listesini id listesine çeviriyor, karşılaştırmayı kolaylaştırıyor.
-
-
 
 
 def ranked(*scores: float) -> list[Candidate]:
@@ -33,7 +26,6 @@ def ids(candidates: list[Candidate]) -> list[str]:
     return [c.startup.id for c in candidates]
 
 
-
 def test_clear_winner_is_shown_alone():
     # n01 (bayi şikayeti): birinci açık ara önde, diğerleri alakasız
     candidates = ranked(0.143, 0.001, 0.0, 0.0, 0.0, 0.0)
@@ -42,18 +34,12 @@ def test_clear_winner_is_shown_alone():
     # kırpılan en yakın adaylar "yakındı ama" listesine geçer
     assert ids(rejected) == ids(candidates[1:4])
     assert "1 kısa liste" in note
-#bu fonksiyonun girdisi n01 skorları
-#beklenen 1 kısa liste sonraki 3 elenen aday
-#kırpma "olabilitesi olan" adayların listesi 
 
 
 def test_close_runner_up_stays_in_shortlist():
     # n08: ikinci aday birincinin %56'sını almış → sınır 0,3 × 0,018 = 0,0054'ü geçer
     shortlist, _, _ = select(ranked(0.018, 0.010, 0.004, 0.001, 0.001))
     assert len(shortlist) == 2
-#bu fonksiyonun girdisi n08 skorları 
-#2 kısa liste
-#yakın ikinci adayın kırpılması 
 
 
 def test_weak_top_score_means_no_suitable_startup():
@@ -62,29 +48,12 @@ def test_weak_top_score_means_no_suitable_startup():
     assert shortlist == []
     assert len(rejected) == 3  # en yakın adaylar yine de "yakındı ama" gerekçesi için saklanır
     assert "uygun girişim yok" in note
-#bu fonksiyonun girdisi n011 skorları 
-#ksıa liste boş 3 eleman
-#taban
 
 
 def test_no_candidates_at_all():
     shortlist, rejected, note = select([])
     assert shortlist == [] and rejected == []
     assert "uygun girişim yok" in note
-#bu fonksiyonun girdisi boş liste
-#çökmeden uygun yok 
-#if not ranked: koruması sağlar 
-
-
-
-
-
-
-
-#Aşşağıdaki son iki test sınır durumlarını (edge case) sınıyor. 
-# Hatalar en çok bu noktalarda çıkar: listeboşken, liste çok uzunken, değer tam sınırdayken.
-#"Normal" durumları test etmek kolay. Sağlam bir test seti uç durumları da kapsar.
-
 
 
 def test_shortlist_never_exceeds_max_size():
@@ -92,18 +61,26 @@ def test_shortlist_never_exceeds_max_size():
     shortlist, rejected, _ = select(ranked(*[0.9] * 10))
     assert len(shortlist) == 5
     assert len(rejected) == 3
-#bu fonksiyonun girdisi 10 tane 0,9
-#tam 5 aday
-#en fazla 5 sınırı
-
 
 
 def test_score_exactly_on_the_limit_is_kept():
     # sınır = 0,3 × 0,5 = 0,15 → tam sınırdaki aday kalır (≥), hemen altındaki atılır
     shortlist, _, _ = select(ranked(0.5, 0.15, 0.149))
     assert len(shortlist) == 2
-#0,5 0,15 0,149
-#2 aday
-#sınırdaki adayın kalması 
 
 
+def test_llm_reranker_thresholds_trim_weak_tail():
+    # Kayıtlı "kullanıcı geri bildirim platformu" brief'inin LLM puanları (onda bir): 9, 7, 5, 4, 3
+    llm = LLMReranker(llm=None)
+    shortlist, rejected, _ = select_shortlist(
+        ranked(0.9, 0.7, 0.5, 0.4, 0.3, 0.3), llm.min_score, llm.relative_ratio, max_size=5, rejected_size=3
+    )
+    assert len(shortlist) == 2 and len(rejected) == 3
+
+
+def test_llm_reranker_reports_no_match_when_best_is_weak():
+    llm = LLMReranker(llm=None)
+    shortlist, rejected, _ = select_shortlist(
+        ranked(0.4, 0.3, 0.2, 0.1), llm.min_score, llm.relative_ratio, max_size=5, rejected_size=3
+    )
+    assert shortlist == [] and len(rejected) == 3
