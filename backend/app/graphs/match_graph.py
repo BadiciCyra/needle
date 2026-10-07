@@ -75,6 +75,44 @@ def _guard_rationales(batch: RationaleBatch, shortlist: list[Candidate]) -> Rati
     return batch
 
 
+def _or(value: float | None, default: float) -> float:
+    return default if value is None else value
+
+
+def select_shortlist(
+    ranked: list[Candidate], min_score: float, ratio: float, max_size: int, rejected_size: int
+) -> tuple[list[Candidate], list[Candidate], str]:
+    """Güven eşiği: kısa listeyi sabit sayıyla değil kaliteyle keser.
+
+    1. Taban: en iyi adayın skoru min_score'un altındaysa kısa liste boştur ("uygun girişim yok").
+    2. Kırpma: en iyinin skorunun en az `ratio` katını alan adaylar kısa listeye girer (en fazla max_size).
+    0. Doğrudan çözüm: sıralayıcı "problemi doğrudan çözmüyor" dediği adayı (direct_fit=False) skoru ne
+       olursa olsun kısa listeye almaz; taban ve oran kalan adaylara uygulanır.
+    Kısa listeye giremeyen en yakın adaylar "yakındı ama" listesine geçer; kısa liste boşken de LLM
+    onlar için "yakındı ama X eksik" gerekçesi yazar. Saf fonksiyon: grafı çalıştırmadan test edilebilir.
+    """
+    if not ranked:
+        return [], [], "Güven eşiği: hiç aday yok → uygun girişim yok"
+
+    eligible = [c for c in ranked if c.direct_fit is not False]
+    indirect = len(ranked) - len(eligible)
+    indirect_note = f" ({indirect} aday problemi doğrudan çözmüyor)" if indirect else ""
+    if not eligible:
+        return [], ranked[:rejected_size], f"Güven eşiği: doğrudan çözen aday yok{indirect_note} → uygun girişim yok"
+
+    top = eligible[0].rerank_score or 0.0
+    if top < min_score:
+        note = f"Güven eşiği: en iyi skor {top:.3f} < taban {min_score}{indirect_note} → uygun girişim yok"
+        return [], ranked[:rejected_size], note
+
+    limit = ratio * top
+    shortlist = [c for c in eligible[:max_size] if (c.rerank_score or 0.0) >= limit]
+    chosen = {id(c) for c in shortlist}
+    rejected = [c for c in ranked if id(c) not in chosen][:rejected_size]
+    note = f"Güven eşiği: sınır {limit:.3f} (= {ratio} × {top:.3f}){indirect_note} → {len(shortlist)} kısa liste"
+    return shortlist, rejected, note
+
+
 def build_match_graph(
     retriever: Retriever,
     embedder: Embedder,
@@ -130,15 +168,22 @@ def build_match_graph(
         # Lokasyon / olgunluk tercihleri yumuşak cezadır: alakalı ama tercih dışı aday yine üst sıraya çıkabilir,
         # yalnızca skoru düşürülür ve notu sonuçta görünür. Alaka düzeyi tercihin önüne geçer.
         for candidate in ranked:
+            candidate.raw_rerank_score = candidate.rerank_score  # ham skor, ceza öncesi (kalibrasyon için saklanır)
             if candidate.filter_notes:
                 candidate.rerank_score = (candidate.rerank_score or 0.0) * PREFERENCE_PENALTY
         ranked.sort(key=lambda c: c.rerank_score or 0.0, reverse=True)
 
-        shortlist = ranked[: settings.shortlist_size]
-        rejected = ranked[settings.shortlist_size : settings.shortlist_size + settings.rejected_size]
-
+        shortlist, rejected, threshold_note = select_shortlist(
+            ranked,
+            # Skor ölçeği sıralayıcıya göre değişir; ayar verilmediyse sıralayıcının kendi eşiği kullanılır
+            min_score=_or(settings.shortlist_min_score, reranker.min_score),
+            ratio=_or(settings.shortlist_relative_ratio, reranker.relative_ratio),
+            max_size=settings.shortlist_size,
+            rejected_size=settings.rejected_size,
+        )
         trace = state["trace"] + [
-            f"Yeniden sıralama ({reranker.name}): {len(ranked)} aday → {len(shortlist)} kısa liste, {len(rejected)} elenen"
+            f"Yeniden sıralama ({reranker.name}): {len(ranked)} aday → {len(shortlist)} kısa liste, {len(rejected)} elenen",
+            threshold_note,
         ]
         return {"shortlist": shortlist, "rejected": rejected, "trace": trace}
 
@@ -170,6 +215,7 @@ def build_match_graph(
                     startup=c.startup,
                     score=score,
                     vector_score=c.vector_score,
+                    rerank_score=c.raw_rerank_score,
                     rejection=rejection,
                     filter_notes=c.filter_notes,
                 )
@@ -181,6 +227,7 @@ def build_match_graph(
                 startup=c.startup,
                 score=score,
                 vector_score=c.vector_score,
+                rerank_score=c.raw_rerank_score,
                 rationale=rationale,
                 filter_notes=c.filter_notes,
             )
@@ -188,6 +235,7 @@ def build_match_graph(
         result = MatchResult(
             shortlist=[item(i + 1, c, False) for i, c in enumerate(state["shortlist"])],
             rejected=[item(i + 1, c, True) for i, c in enumerate(state["rejected"])],
+            no_match=not state["shortlist"],
             retrieval_trace=state["trace"],
         )
         return {"result": result}

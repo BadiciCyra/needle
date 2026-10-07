@@ -19,6 +19,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { api } from '../api'
+import { useAuth } from '../auth'
+import { templatesFor } from '../catalog'
 import { StitchProgress } from '../components/StitchLoader'
 import { PageHeader } from '../components/ui'
 import { useAppData } from '../data'
@@ -57,6 +59,11 @@ const EMPTY_ORG = { name: '', sector: '', author_unit: '', owner_unit: '' }
 export default function NewNeedPage() {
   const navigate = useNavigate()
   const { refresh } = useAppData()
+  const { me, isAdmin } = useAuth()
+  const sector = me?.organization?.profile?.sector
+  const templates = isAdmin
+    ? EXAMPLES.map((e) => ({ label: e.label, text: e.raw_text, meta: `${e.sector} · ${e.org.name}`, org: e.org }))
+    : templatesFor(sector).map((t) => ({ ...t, meta: sector ?? 'Genel', org: undefined }))
   const [rawText, setRawText] = useState('')
   const [org, setOrg] = useState(EMPTY_ORG)
   const [loading, setLoading] = useState(false)
@@ -68,7 +75,7 @@ export default function NewNeedPage() {
     setLoading(true)
     setError(null)
     try {
-      const result = await api.createNeed(rawText.trim(), org.name.trim() ? org : undefined)
+      const result = await api.createNeed(rawText.trim(), isAdmin && org.name.trim() ? org : undefined)
       await refresh()
       navigate(`/ihtiyaclar/${result.brief_id}`)
     } catch (e) {
@@ -121,20 +128,24 @@ export default function NewNeedPage() {
                   inputWrapperOrder={['input', 'description']}
                 />
 
-                <Divider />
+                {isAdmin && (
+                  <>
+                    <Divider />
 
-                <div>
-                  <div className="app-section-title">Kurum</div>
-                  <Text size="sm" c="dimmed">
-                    İsteğe bağlı. İhtiyacı yazan birim ile yaşayan birimi ayırmak, doğru kişiyle pilot kurmayı kolaylaştırır.
-                  </Text>
-                </div>
-                <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                  {field('name', 'Kurum adı', 'Örn. Marmara Otomotiv Parça')}
-                  {field('sector', 'Sektör', 'Örn. otomotiv yan sanayi')}
-                  {field('author_unit', 'İhtiyacı yazan birim', 'Örn. Ar-Ge Müdürlüğü')}
-                  {field('owner_unit', 'İhtiyacı yaşayan birim', 'Örn. Kalite Güvence')}
-                </SimpleGrid>
+                    <div>
+                      <div className="app-section-title">Kurum</div>
+                      <Text size="sm" c="dimmed">
+                        İsteğe bağlı. İhtiyacı yazan birim ile yaşayan birimi ayırmak, doğru kişiyle pilot kurmayı kolaylaştırır.
+                      </Text>
+                    </div>
+                    <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                      {field('name', 'Kurum adı', 'Örn. Marmara Otomotiv Parça')}
+                      {field('sector', 'Sektör', 'Örn. otomotiv yan sanayi')}
+                      {field('author_unit', 'İhtiyacı yazan birim', 'Örn. Ar-Ge Müdürlüğü')}
+                      {field('owner_unit', 'İhtiyacı yaşayan birim', 'Örn. Kalite Güvence')}
+                    </SimpleGrid>
+                  </>
+                )}
 
                 {error && (
                   <Alert color="red" variant="light" icon={<IconAlertCircle size={18} />} title="Brief üretilemedi">
@@ -187,18 +198,18 @@ export default function NewNeedPage() {
 
             <Card padding="md">
               <div className="app-section-title" style={{ marginBottom: 2 }}>
-                Örnekle başlayın
+                {isAdmin ? 'Örnekle başlayın' : 'Sık görülen sorunlar'}
               </div>
               <Text size="sm" c="dimmed" mb="sm">
-                Bir şablon seçin, formu doldurur.
+                {isAdmin ? 'Bir şablon seçin, formu doldurur.' : 'Size en yakın olanı seçin, sonra kendi cümlelerinizle düzenleyin.'}
               </Text>
               <Stack gap={6}>
-                {EXAMPLES.map((example) => (
+                {templates.map((example) => (
                   <UnstyledButton
                     key={example.label}
                     onClick={() => {
-                      setRawText(example.raw_text)
-                      setOrg(example.org)
+                      setRawText(example.text)
+                      if (example.org) setOrg(example.org)
                     }}
                     p="sm"
                     style={{ border: '1px solid var(--app-border)', borderRadius: 2 }}
@@ -208,7 +219,7 @@ export default function NewNeedPage() {
                       {example.label}
                     </Text>
                     <Text size="xs" c="dimmed">
-                      {example.sector} · {example.org.name}
+                      {example.meta}
                     </Text>
                   </UnstyledButton>
                 ))}

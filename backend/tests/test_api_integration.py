@@ -72,7 +72,19 @@ def client(tmp_path, monkeypatch):
         conn.execute(text("SELECT 1"))
 
 
+def register(client, email: str, organization: str):
+    response = client.post("/auth/register", json={
+        "name": "Deneme Kullanıcı", "email": email, "password": "uzun-bir-sifre-123",
+        "organization_name": organization, "kvkk_onay": True,
+    })
+    assert response.status_code == 200, response.text
+    return response.json()
+
+
 def test_full_flow_need_to_pilot(client):
+    assert client.get("/needs").status_code == 401  # oturum olmadan veri yok
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+
     need = client.post("/needs", json={
         "raw_text": "Sahadaki bayilerimizden gelen şikayetleri daha hızlı sınıflandırmak istiyoruz, çok manuel gidiyor.",
         "organization": {"name": "Kuzey Beyaz Eşya", "author_unit": "İnovasyon", "owner_unit": "Bayi Satış"},
@@ -111,6 +123,7 @@ def test_full_flow_need_to_pilot(client):
 
     needs = client.get("/needs").json()
     assert needs[0]["brief_id"] == body["brief_id"] and needs[0]["accepted_count"] == 1
+    assert needs[0]["organization"] == "Kuzey Beyaz Eşya"  # firma kendi kurumu adına girer
 
     saved = client.get(f"/briefs/{body['brief_id']}/match").json()
     by_id = {item["match_id"]: item for item in saved["shortlist"]}
@@ -122,8 +135,73 @@ def test_full_flow_need_to_pilot(client):
     assert pilot["startup"]["id"] == "s01" and pilot["stale"] is False
     pilot = client.post(f"/milestones/{pilot['milestones'][0]['id']}/complete").json()
     assert pilot["milestones"][0]["completed_at"]
-    pilot = client.patch(f"/pilots/{pilot_id}", json={"status": "done", "outcome_score": 8}).json()
-    assert pilot["status"] == "done"
+    pilot = client.patch(f"/pilots/{pilot_id}", json={"status": "done", "result": "kismen"}).json()
+    assert pilot["status"] == "done" and pilot["result"] == "kismen"
     assert [p["id"] for p in client.get("/pilots").json()] == [pilot_id]
 
     assert len(client.get("/startups").json()) == 40
+
+
+def test_firms_only_see_their_own_records(client):
+    from fastapi.testclient import TestClient
+
+    from app.auth import hash_password
+    from app.db import session as db_session
+    from app.db.models import User
+    from app.main import app
+
+    register(client, "a@firma-a.example", "Firma A")
+    created = client.post("/needs", json={"raw_text": "Sahadaki bayilerimizden gelen şikayetleri sınıflandırmak istiyoruz."})
+    brief_id = created.json()["brief_id"]
+
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    assert other.get("/needs").json() == []
+    assert other.get(f"/briefs/{brief_id}").status_code == 404  # 403 değil: kaydın varlığı da sızmaz
+    assert other.post(f"/briefs/{brief_id}/answers", json={"answers": {"scope": "x"}}).status_code == 404
+    assert other.post(f"/briefs/{brief_id}/match").status_code == 404
+    assert other.get("/pilots").json() == []
+
+    with db_session.get_session_factory()() as s:
+        s.add(User(email="yonetici@program.example", password_hash=hash_password("yonetici-sifresi-1"),
+                   name="Program Yöneticisi", role="yonetici"))
+        s.commit()
+    admin = TestClient(app)
+    assert admin.post("/auth/login", json={"email": "yonetici@program.example", "password": "yanlis-sifre"}).status_code == 401
+    assert admin.post("/auth/login", json={"email": "YONETICI@program.example", "password": "yonetici-sifresi-1"}).status_code == 200
+    assert [n["brief_id"] for n in admin.get("/needs").json()] == [brief_id]
+    assert admin.get(f"/briefs/{brief_id}").status_code == 200
+
+    assert other.post("/auth/logout").status_code == 204
+    assert other.get("/needs").status_code == 401
+
+
+def test_register_rejects_duplicates_and_missing_consent(client):
+    register(client, "tek@firma.example", "Firma")
+    duplicate = client.post("/auth/register", json={
+        "name": "Başka", "email": "TEK@firma.example", "password": "uzun-bir-sifre-123",
+        "organization_name": "Başka Firma", "kvkk_onay": True,
+    })
+    assert duplicate.status_code == 409
+    no_consent = client.post("/auth/register", json={
+        "name": "Başka", "email": "yeni@firma.example", "password": "uzun-bir-sifre-123",
+        "organization_name": "Başka Firma", "kvkk_onay": False,
+    })
+    assert no_consent.status_code == 422
+
+
+def test_profile_fills_empty_brief_fields(client):
+    register(client, "profil@firma.example", "Profil Firma")
+    me = client.put("/auth/profile", json={
+        "sector": "perakende", "city": "İstanbul", "employee_range": "250-999", "systems": ["SAP"],
+        "preferred_maturity": "mvp", "startup_location": "ayni_sehir", "pilot_duration": "3 ay",
+    }).json()
+    assert me["organization"]["onboarded"] is True
+
+    body = client.post("/needs", json={"raw_text": "Sahadaki bayilerimizden gelen şikayetleri sınıflandırmak istiyoruz."}).json()
+    brief = body["brief"]
+    assert brief["sector"] == "perakende"
+    assert brief["location_preference"] == "İstanbul"
+    assert brief["min_maturity"] == "mvp"
+    assert brief["timeline"] == "3 ay"  # profilden geldi; artık sorulmuyor
+    assert "timeline" not in {q["field"] for q in body["questions"]}

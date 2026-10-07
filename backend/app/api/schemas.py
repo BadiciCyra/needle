@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.schemas import Brief, FollowUpQuestion, MatchResult, MatchResultItem, StartupProfile
+from app.schemas import Brief, FollowUpQuestion, Maturity, MatchResult, MatchResultItem, StartupProfile
 
 
 class OrganizationIn(BaseModel):
@@ -89,10 +89,13 @@ class MilestoneOut(BaseModel):
     completed_at: datetime | None
 
 
+PilotResult = Literal["evet", "kismen", "hayir"]
+
+
 class PilotUpdate(BaseModel):
     status: Literal["active", "paused", "done", "cancelled"] | None = None
     outcome: str | None = Field(None, description="Pilot sonucu (kapalı döngü için)")
-    outcome_score: float | None = Field(None, ge=0, le=10)
+    result: PilotResult | None = Field(None, description="İşe yaradı mı?")
 
 
 class PilotOut(BaseModel):
@@ -107,5 +110,56 @@ class PilotOut(BaseModel):
     days_inactive: int
     stale: bool = Field(description="Aktif ve pilot_stale_days gündür hareketsiz")
     outcome: str | None
-    outcome_score: float | None
+    result: PilotResult | None
     milestones: list[MilestoneOut]
+    organization: str | None = None
+
+
+# --------------------------------------------------------------------------- #
+# Hesaplar ve firma profili
+# --------------------------------------------------------------------------- #
+
+EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+
+
+class RegisterIn(BaseModel):
+    name: str = Field(min_length=2, max_length=200)
+    email: str = Field(pattern=EMAIL_PATTERN, max_length=254)
+    password: str = Field(min_length=10, max_length=200, description="En az 10 karakter")
+    organization_name: str = Field(min_length=2, max_length=200)
+    kvkk_onay: bool = Field(description="Aydınlatma metninin okunduğunu onaylar")
+
+
+class LoginIn(BaseModel):
+    email: str = Field(max_length=254)
+    password: str = Field(max_length=200)
+
+
+class OrgProfile(BaseModel):
+    """Firma hesabının ilk girişte doldurduğu profil. Brief'in boş alanlarını doldurmak için kullanılır."""
+
+    sector: str = Field(min_length=2, max_length=100)
+    city: str = Field(min_length=2, max_length=100)
+    employee_range: Literal["1-49", "50-249", "250-999", "1000+"]
+    systems: list[str] = Field(default_factory=list, max_length=12, description="Kullanılan sistemler (ERP, CRM…)")
+    preferred_maturity: Maturity | None = Field(None, description="Çalışmak istenen en düşük girişim olgunluğu")
+    startup_location: Literal["ayni_sehir", "fark_etmez"] = "fark_etmez"
+    budget_range: str | None = Field(None, max_length=100)
+    pilot_duration: str | None = Field(None, max_length=100)
+    data_constraints: list[str] = Field(default_factory=list, max_length=8)
+
+
+class OrganizationOut(BaseModel):
+    id: int
+    name: str
+    sector: str | None
+    profile: dict
+    onboarded: bool
+
+
+class MeOut(BaseModel):
+    id: int
+    name: str
+    email: str
+    role: Literal["firma", "yonetici"]
+    organization: OrganizationOut | None

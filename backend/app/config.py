@@ -3,6 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,11 +31,20 @@ class Settings(BaseSettings):
     rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
 
     # Dinamik RAG ayarları
-    retrieve_top_k: int = 20           # ilk aşamada getirilecek aday sayısı
+    retrieve_top_k: int = 40           # yeniden sıralayıcıya giden aday sayısı (282 girişimlik havuzda 20 dar kalıyordu)
     min_candidates: int = 8            # 5 aday + 3 elenen için gereken en az sayı
     max_retrieval_rounds: int = 3      # yetersiz sonuçta en fazla kaç tur genişletilecek
     shortlist_size: int = 5
     rejected_size: int = 3
+
+    # Güven eşiği: kısa liste sabit sayıyla değil kaliteyle kesilir. Boş bırakılırsa sıralayıcının kendi
+    # eşiği kullanılır (skor ölçekleri farklı: LLM 0-10 puanı, cross-encoder sigmoid; bkz. rerank/rerankers.py)
+    shortlist_min_score: float | None = Field(None, ge=0, le=1)       # birincinin skoru bunun altındaysa "uygun girişim yok"
+    shortlist_relative_ratio: float | None = Field(None, ge=0, le=1)  # birincinin skorunun en az bu oranını alan kısa listeye girer
+
+    # Hesaplar
+    session_days: int = 14  # oturum çerezinin geçerlilik süresi
+    cookie_secure: bool = False  # HTTPS arkasında yayına alınınca true olmalı
 
     # Pilot takibi
     pilot_stale_days: int = 10  # bu kadar gün hareketsiz kalan aktif pilot için uyarı
