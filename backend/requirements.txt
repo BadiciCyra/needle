@@ -4,6 +4,9 @@ uvicorn[standard]>=0.30
 pydantic>=2.7
 pydantic-settings>=2.3
 
+# Hesaplar: şifre hash'i
+argon2-cffi>=23.1
+
 # Veritabanı (Postgres + pgvector)
 sqlalchemy>=2.0
 psycopg[binary]>=3.1

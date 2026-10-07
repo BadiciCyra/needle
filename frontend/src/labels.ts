@@ -1,4 +1,4 @@
-import type { Maturity, NeedSummary, PilotStatus } from './types'
+import type { Maturity, NeedSummary, PilotResult, PilotStatus } from './types'
 
 export const MATURITY_LABEL: Record<Maturity, string> = {
   fikir: 'Fikir',
@@ -27,6 +27,8 @@ export const PILOT_STATUS: Record<PilotStatus, { label: string; color: string }>
   done: { label: 'Tamamlandı', color: TAG_COLOR.ink },
   cancelled: { label: 'İptal edildi', color: TAG_COLOR.gray },
 }
+
+export const PILOT_RESULT: Record<PilotResult, string> = { evet: 'Evet', kismen: 'Kısmen', hayir: 'Hayır' }
 
 // İhtiyacın süreçteki aşaması (NeedSummary'den türetilir)
 export type Stage = 'followup' | 'ready' | 'review' | 'pilot'

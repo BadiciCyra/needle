@@ -18,6 +18,9 @@ from app.schemas import Candidate
 
 class Reranker(Protocol):
     name: str
+    # Güven eşiği varsayılanları (match_graph.select_shortlist); her sıralayıcının skor ölçeğine göre
+    min_score: float
+    relative_ratio: float
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
         """rerank_score'u doldurur ve adayları azalan skora göre döndürür (0-1 arası)."""
@@ -26,6 +29,8 @@ class Reranker(Protocol):
 
 class PassthroughReranker:
     name = "none"
+    min_score = 0.0  # kosinüs benzerliği mutlak alaka söylemez; kırpma yapılmaz
+    relative_ratio = 0.0
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
         for candidate in candidates:
@@ -35,6 +40,8 @@ class PassthroughReranker:
 
 class CrossEncoderReranker:
     name = "cross_encoder"
+    min_score = 0.003  # analiz/esik_analizi.py: negatif ihtiyaçlarda birinci bile bunun altında kalıyor
+    relative_ratio = 0.3
 
     def __init__(self, model_name: str):
         self.model_name = model_name
@@ -58,6 +65,9 @@ class CrossEncoderReranker:
 
 class _LLMScore(BaseModel):
     startup_id: str
+    # Gerekçe karardan önce: model önce ne yaptığını söyleyip sonra karar verince teğet adaylara daha az "evet" diyor
+    gerekce: str = Field(description="En fazla 15 kelime: girişimin ürünü bu problemde tam olarak ne yapar?")
+    dogrudan_cozer: bool = Field(description="Ürünü, ihtiyaçtaki problemi bugün olduğu haliyle doğrudan çözüyor mu?")
     score: int = Field(ge=0, le=10, description="0 = alakasız, 10 = ihtiyacı tam karşılıyor")
 
 
@@ -67,6 +77,10 @@ class _LLMScores(BaseModel):
 
 class LLMReranker:
     name = "llm"
+    # 0-10 puanın onda biri: birinci 4/10 veya altındaysa "güçlü eşleşme yok"; birincinin %60'ının
+    # altındakiler kırpılır (ör. 9/10 birinciyken 5/10 ve altı listeye girmez)
+    min_score = 0.5
+    relative_ratio = 0.6
 
     def __init__(self, llm: StructuredLLM):
         self.llm = llm
@@ -79,13 +93,20 @@ class LLMReranker:
             _LLMScores,
             system=(
                 "Bir kurumun ihtiyacına en uygun girişimleri puanlıyorsun. Her girişime 0-10 arası puan ver. "
-                "Sadece girişim profilinde yazan yetkinliklere dayan."
+                "Sadece girişim profilinde yazan yetkinliklere dayan.\n"
+                "dogrudan_cozer: girişimin profilde yazan ürünü, ihtiyaçtaki problemin nesnesiyle/süreciyle/verisiyle "
+                "çalışıyor ve kurum onu bu iş için yeni bir ürün geliştirmeden kullanabiliyorsa true. Yalnızca aynı "
+                "teknoloji alanında olmak (ör. ikisi de IoT, görüntü işleme, kestirimci bakım veya veri analitiği) "
+                "veya 'uyarlanabilir' olmak yetmez; o durumda false. Emin değilsen false."
             ),
             user=f"İhtiyaç:\n{query}\n\nGirişimler:\n{listing}",
         )
-        scores = {s.startup_id: s.score / 10 for s in result.scores}
+        by_id = {s.startup_id: s for s in result.scores}
         for candidate in candidates:
-            candidate.rerank_score = scores.get(candidate.startup.id, 0.0)
+            s = by_id.get(candidate.startup.id)
+            candidate.rerank_score = s.score / 10 if s else 0.0
+            candidate.direct_fit = s.dogrudan_cozer if s else False
+            candidate.direct_fit_reason = s.gerekce if s else None
         return sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
 
 

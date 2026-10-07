@@ -99,6 +99,23 @@ API ilk açılışta girişim tablosu boşsa `STARTUPS_FILE` dosyasındaki giri�
 [kaynaklı gerçek girişimler](backend/seed/startups_gercek.json)) embedding'leriyle yükler. İlk açılışta
 embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
 
+### Hesaplar
+
+İki rol var:
+
+| Rol | Nasıl açılır | Ne görür |
+|---|---|---|
+| **Firma** | Arayüzde "Firma hesabı açın" | Yalnızca kendi kurumunun ihtiyaçları, eşleşmeleri ve pilotları. İlk girişte 3 adımlık firma profili doldurulur; sektör, şehir, olgunluk, bütçe ve süre bilgisi brief'in boş alanlarını tamamlar. |
+| **Program yöneticisi** | Komut satırından (aşağıda) | Bütün kurumların kayıtları |
+
+```bash
+docker compose exec api python -m seed.create_admin yonetici@kurum.org "Ad Soyad"
+```
+
+Şifre ekrandan sorulur (komut geçmişinde kalmaz). Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
+HTTPS arkasında yayına alınırken `.env`'de `COOKIE_SECURE=true` yapılmalı. Kayıt ekranındaki aydınlatma metni
+bir taslaktır ve yayından önce hukuki inceleme gerektirir.
+
 ### Geliştirme (Docker'sız API ve arayüz)
 
 ```bash

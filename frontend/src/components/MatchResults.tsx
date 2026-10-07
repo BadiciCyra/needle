@@ -27,6 +27,15 @@ import type { MatchItem, MatchView, StartupProfile } from '../types'
 import StartupDrawer from './StartupDrawer'
 import { OrgAvatar, Tag } from './ui'
 
+// LLM yeniden sıralayıcının 0-1 skoru (tercih dışı adaylarda 0,85 ile çarpılmış)
+function fitLevel(score: number) {
+  if (score >= 0.7)
+    return { label: 'Güçlü uyum', color: TAG_COLOR.green, bar: 'ink', hint: 'İhtiyacın çekirdeğini doğrudan karşılıyor.' }
+  if (score >= 0.4)
+    return { label: 'Orta uyum', color: TAG_COLOR.ochre, bar: 'gray.6', hint: 'İhtiyacın bir kısmını karşılıyor; görüşmede netleştirin.' }
+  return { label: 'Zayıf uyum', color: TAG_COLOR.gray, bar: 'gray.4', hint: 'Yakın bir alanda çalışıyor ama ihtiyacı tam karşılamıyor.' }
+}
+
 function StatusBadge({ item }: { item: MatchItem }) {
   if (item.status === 'accepted')
     return (
@@ -43,17 +52,15 @@ function StatusBadge({ item }: { item: MatchItem }) {
 
 function CandidateCard({
   item,
-  topScore,
   onOpen,
   onDecide,
 }: {
   item: MatchItem
-  topScore: number
   onOpen: (s: StartupProfile) => void
   onDecide: (item: MatchItem, d: 'accept' | 'decline') => void
 }) {
   const r = item.rationale
-  const relative = topScore > 0 ? Math.round((item.score / topScore) * 100) : 0
+  const fit = fitLevel(item.score)
   const s = item.startup
   return (
     <Card style={item.status === 'declined' ? { opacity: 0.6 } : undefined}>
@@ -92,21 +99,11 @@ function CandidateCard({
               </Group>
             </div>
           </Group>
-          <Tooltip
-            label={`Skor ${item.score.toFixed(3)} · vektör benzerliği ${item.vector_score.toFixed(3)}. Çubuk, listedeki en iyi adaya göre görelidir.`}
-            multiline
-            w={260}
-          >
-            <Stack gap={4} align="flex-end" miw={120}>
-              <Text className="app-label">
-                #{String(item.rank).padStart(2, '0')} · göreli uyum
-              </Text>
-              <Group gap={8} wrap="nowrap">
-                <Progress value={relative} w={72} />
-                <Text size="sm" className="app-num">
-                  {relative}%
-                </Text>
-              </Group>
+          <Tooltip label={`${fit.hint} Skor ${item.score.toFixed(2)}.`} multiline w={260}>
+            <Stack gap={6} align="flex-end" miw={120}>
+              <Text className="app-label">#{String(item.rank).padStart(2, '0')}</Text>
+              <Tag color={fit.color}>{fit.label}</Tag>
+              <Progress value={Math.round(item.score * 100)} w={96} color={fit.bar} />
             </Stack>
           </Tooltip>
         </Group>
@@ -171,7 +168,6 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
   const [drawer, setDrawer] = useState<StartupProfile | null>(null)
-  const topScore = Math.max(0, ...view.shortlist.map((i) => i.score), ...view.rejected.map((i) => i.score))
 
   const decide = async (item: MatchItem, decision: 'accept' | 'decline', why?: string) => {
     setBusy(true)
@@ -213,14 +209,13 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
     <Stack gap="md">
       {view.shortlist.length === 0 && (
         <Alert variant="light" color="gray" icon={<IconInfoCircle size={18} />}>
-          Bu ihtiyaç için yeterince güçlü bir eşleşme bulunamadı. En yakın adaylar aşağıda gerekçeleriyle listeleniyor.
+          Bu ihtiyaç için yeterince güçlü bir eşleşme bulunamadı. Havuzda uygun girişim olmayabilir ya da arama kaçırmış olabilir; en yakın adaylar aşağıda gerekçeleriyle listeleniyor.
         </Alert>
       )}
       {view.shortlist.map((item) => (
         <CandidateCard
           key={item.match_id}
           item={item}
-          topScore={topScore}
           onOpen={setDrawer}
           onDecide={(i, d) => (d === 'accept' ? decide(i, d) : setDeclining(i))}
         />

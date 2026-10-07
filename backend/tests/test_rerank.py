@@ -23,11 +23,13 @@ def test_passthrough_orders_by_vector_score():
 
 
 def test_llm_reranker_uses_model_scores(tmp_path):
-    backend = ScriptedBackend(['{"scores": [{"startup_id": "s21", "score": 3}, {"startup_id": "s01", "score": 9}]}'])
+    backend = ScriptedBackend(['{"scores": [{"startup_id": "s21", "gerekce": "bayi yönetimi", "dogrudan_cozer": false, "score": 3}, '
+        '{"startup_id": "s01", "gerekce": "şikayet sınıflandırma", "dogrudan_cozer": true, "score": 9}]}'])
     llm = StructuredLLM(backend, Settings(demo_cache_dir=str(tmp_path)))
     ranked = LLMReranker(llm).rerank("bayi şikayetleri", candidates(("s21", 0.9), ("s01", 0.5)))
     assert [c.startup.id for c in ranked] == ["s01", "s21"]
     assert ranked[0].rerank_score == pytest.approx(0.9)
+    assert [c.direct_fit for c in ranked] == [True, False]
 
 
 def test_factory_selects_backend():

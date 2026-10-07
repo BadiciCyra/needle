@@ -17,6 +17,10 @@ def test_real_startups_are_valid_and_sourced():
     assert not {s.id for s in startups} & {s.id for s in load_startups()}  # kurgusal id'lerle çakışmaz
     raw = json.loads((SEED_DIR / "startups_gercek.json").read_text(encoding="utf-8"))
     assert all(item["kaynak"] and all(u.startswith("https://") for u in item["kaynak"]) for item in raw)
+    # Site metninden otomatik çıkarılan girişimlerde her yetkinliğin birebir alıntı kanıtı var
+    for item in (i for i in raw if i.get("otomatik_cikarim")):
+        kanitli = {k["yetkinlik"] for k in item["kanitlar"] if k["alinti"].strip()}
+        assert set(item["capabilities"]) <= kanitli, item["name"]
 
 
 def test_twenty_needs_with_organization_units():

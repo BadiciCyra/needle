@@ -1,0 +1,50 @@
+[
+  {
+    "id": "x01",
+    "organization": {"name": "Doğu Maden İşletmeleri", "sector": "madencilik", "author_unit": "Bilgi Teknolojileri", "owner_unit": "Saha Operasyonları"},
+    "raw_text": "Uzak maden sahalarımızda internet yok. Uydu üzerinden düşük gecikmeli bağlantı kurup sahadaki ekiplerin görüntülü görüşme yapabilmesini istiyoruz.",
+    "neden_negatif": "Havuzda haberleşme altyapısı kuran girişim yok."
+  },
+  {
+    "id": "x02",
+    "organization": {"name": "Volt Otomotiv", "sector": "otomotiv", "author_unit": "Ar-Ge", "owner_unit": "Sürdürülebilirlik"},
+    "raw_text": "Ömrünü doldurmuş elektrikli araç bataryalarından lityum ve kobaltı geri kazanmak için kimyasal ayrıştırma prosesi arıyoruz.",
+    "neden_negatif": "Havuzda kimya / malzeme geri dönüşümü yapan girişim yok."
+  },
+  {
+    "id": "x03",
+    "organization": {"name": "Anadolu Gıda", "sector": "gıda", "author_unit": "İnovasyon Ofisi", "owner_unit": "Ürün Geliştirme"},
+    "raw_text": "Bitkisel bazlı et alternatifi ürünümüzün dokusunu iyileştirmek için yeni bir protein dokulandırma tekniği geliştirmek istiyoruz.",
+    "neden_negatif": "Havuzda gıda teknolojisi girişimi yok."
+  },
+  {
+    "id": "x04",
+    "organization": {"name": "Yapıtaş İnşaat", "sector": "inşaat", "author_unit": "Teknik Ofis", "owner_unit": "Şantiye Yönetimi"},
+    "raw_text": "Şantiyede beton 3D yazıcıyla doğrudan duvar basabilecek bir sistem kurmak istiyoruz, kalıp maliyetini düşürmek amacıyla.",
+    "neden_negatif": "Havuzda inşaat robotiği / 3D baskı girişimi yok."
+  },
+  {
+    "id": "x05",
+    "organization": {"name": "Moda Atölyesi", "sector": "tekstil", "author_unit": "Tasarım", "owner_unit": "Koleksiyon Ekibi"},
+    "raw_text": "Yeni sezon koleksiyonu için kumaş desenlerini üretken yapay zekayla tasarlamak istiyoruz, tasarımcılarımıza fikir üretsin.",
+    "neden_negatif": "Yakın ama değil: Kusursuz Tekstil kumaş HATA TESPİTİ yapıyor, desen tasarımı yapmıyor."
+  },
+  {
+    "id": "x06",
+    "organization": {"name": "Ege Ecza Deposu", "sector": "sağlık", "author_unit": "Dijital Dönüşüm", "owner_unit": "Dağıtım"},
+    "raw_text": "Adalardaki eczanelere acil ilaçları otonom drone ile taşıyacak bir teslimat sistemi kurmak istiyoruz.",
+    "neden_negatif": "Yakın ama değil: PanelBakım drone ile görüntüleme, RotaPlan kara aracı rotası yapıyor; drone teslimatı yapan yok."
+  },
+  {
+    "id": "x07",
+    "organization": {"name": "Güven Bankası", "sector": "finans", "author_unit": "Bilgi Güvenliği", "owner_unit": "Altyapı"},
+    "raw_text": "Müşteri verilerini koruyan şifreleme altyapımızı kuantum sonrası (post-quantum) şifreleme algoritmalarına geçirmek istiyoruz.",
+    "neden_negatif": "Yakın ama değil: SiberKalkan log analizi ve anomali tespiti yapıyor, kriptografi yapmıyor."
+  },
+  {
+    "id": "x08",
+    "organization": {"name": "Reklamhane", "sector": "medya", "author_unit": "Yaratıcı Ekip", "owner_unit": "Prodüksiyon"},
+    "raw_text": "Reklam filmlerimiz için telif sorunu olmayan, sahneye uygun fon müziğini yapay zekayla üretmek istiyoruz.",
+    "neden_negatif": "Havuzda ses / müzik üretimi yapan girişim yok."
+  }
+]

@@ -109,6 +109,7 @@ export interface Milestone {
 }
 
 export type PilotStatus = 'active' | 'paused' | 'done' | 'cancelled'
+export type PilotResult = 'evet' | 'kismen' | 'hayir'
 
 export interface Pilot {
   id: number
@@ -122,8 +123,9 @@ export interface Pilot {
   days_inactive: number
   stale: boolean
   outcome: string | null
-  outcome_score: number | null
+  result: PilotResult | null
   milestones: Milestone[]
+  organization: string | null
 }
 
 export interface Health {
@@ -131,4 +133,33 @@ export interface Health {
   llm_model: string
   demo_mode: string
   rerank_backend: string
+}
+
+// Hesaplar ve firma profili (backend/app/api/schemas.py)
+export type Role = 'firma' | 'yonetici'
+
+export interface OrgProfile {
+  sector: string
+  city: string
+  employee_range: '1-49' | '50-249' | '250-999' | '1000+'
+  systems: string[]
+  preferred_maturity: Maturity | null
+  startup_location: 'ayni_sehir' | 'fark_etmez'
+  budget_range: string | null
+  pilot_duration: string | null
+  data_constraints: string[]
+}
+
+export interface Me {
+  id: number
+  name: string
+  email: string
+  role: Role
+  organization: {
+    id: number
+    name: string
+    sector: string | null
+    profile: Partial<OrgProfile>
+    onboarded: boolean
+  } | null
 }
