@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     # eşiği kullanılır (skor ölçekleri farklı: LLM 0-10 puanı, cross-encoder sigmoid; bkz. rerank/rerankers.py)
     shortlist_min_score: float | None = Field(None, ge=0, le=1)       # birincinin skoru bunun altındaysa "uygun girişim yok"
     shortlist_relative_ratio: float | None = Field(None, ge=0, le=1)  # birincinin skorunun en az bu oranını alan kısa listeye girer
+    # Gerekçe izindeki ifade ile yetkinlik en az bu kadar benzer olmalı. analiz/kanit_esigi.py: 0,25 doğru
+    # bağların 13/14'ünü koruyup rastgele bağların hepsini atıyor; "aynı kelime, farklı iş" tuzaklarını ayıramıyor
+    evidence_min_similarity: float = Field(0.25, ge=0, le=1)
 
     # Hesaplar
     session_days: int = 14  # oturum çerezinin geçerlilik süresi
