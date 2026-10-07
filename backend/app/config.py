@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
 
     # Dinamik RAG ayarları
-    retrieve_top_k: int = 20           # ilk aşamada getirilecek aday sayısı
+    retrieve_top_k: int = 40           # yeniden sıralayıcıya giden aday sayısı (282 girişimlik havuzda 20 dar kalıyordu)
     min_candidates: int = 8            # 5 aday + 3 elenen için gereken en az sayı
     max_retrieval_rounds: int = 3      # yetersiz sonuçta en fazla kaç tur genişletilecek
     shortlist_size: int = 5
