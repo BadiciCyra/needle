@@ -86,21 +86,30 @@ def select_shortlist(
 
     1. Taban: en iyi adayın skoru min_score'un altındaysa kısa liste boştur ("uygun girişim yok").
     2. Kırpma: en iyinin skorunun en az `ratio` katını alan adaylar kısa listeye girer (en fazla max_size).
+    0. Doğrudan çözüm: sıralayıcı "problemi doğrudan çözmüyor" dediği adayı (direct_fit=False) skoru ne
+       olursa olsun kısa listeye almaz; taban ve oran kalan adaylara uygulanır.
     Kısa listeye giremeyen en yakın adaylar "yakındı ama" listesine geçer; kısa liste boşken de LLM
     onlar için "yakındı ama X eksik" gerekçesi yazar. Saf fonksiyon: grafı çalıştırmadan test edilebilir.
     """
     if not ranked:
         return [], [], "Güven eşiği: hiç aday yok → uygun girişim yok"
 
-    top = ranked[0].rerank_score or 0.0
+    eligible = [c for c in ranked if c.direct_fit is not False]
+    indirect = len(ranked) - len(eligible)
+    indirect_note = f" ({indirect} aday problemi doğrudan çözmüyor)" if indirect else ""
+    if not eligible:
+        return [], ranked[:rejected_size], f"Güven eşiği: doğrudan çözen aday yok{indirect_note} → uygun girişim yok"
+
+    top = eligible[0].rerank_score or 0.0
     if top < min_score:
-        note = f"Güven eşiği: en iyi skor {top:.3f} < taban {min_score} → uygun girişim yok"
+        note = f"Güven eşiği: en iyi skor {top:.3f} < taban {min_score}{indirect_note} → uygun girişim yok"
         return [], ranked[:rejected_size], note
 
     limit = ratio * top
-    shortlist = [c for c in ranked[:max_size] if (c.rerank_score or 0.0) >= limit]
-    rejected = ranked[len(shortlist) : len(shortlist) + rejected_size]
-    note = f"Güven eşiği: sınır {limit:.3f} (= {ratio} × {top:.3f}) → {len(shortlist)} kısa liste"
+    shortlist = [c for c in eligible[:max_size] if (c.rerank_score or 0.0) >= limit]
+    chosen = {id(c) for c in shortlist}
+    rejected = [c for c in ranked if id(c) not in chosen][:rejected_size]
+    note = f"Güven eşiği: sınır {limit:.3f} (= {ratio} × {top:.3f}){indirect_note} → {len(shortlist)} kısa liste"
     return shortlist, rejected, note
 
 

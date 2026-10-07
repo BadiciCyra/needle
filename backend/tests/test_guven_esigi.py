@@ -84,3 +84,23 @@ def test_llm_reranker_reports_no_match_when_best_is_weak():
         ranked(0.4, 0.3, 0.2, 0.1), llm.min_score, llm.relative_ratio, max_size=5, rejected_size=3
     )
     assert shortlist == [] and len(rejected) == 3
+
+
+def test_indirect_candidates_never_enter_shortlist_even_with_high_scores():
+    # Su kaçağı örneği: teğet adaylar 9/10 alsa da "doğrudan çözmüyor" dendiyse kısa listeye girmez
+    candidates = ranked(0.9, 0.9, 0.8, 0.7)
+    for c, direct in zip(candidates, (False, True, False, True)):
+        c.direct_fit = direct
+    shortlist, rejected, note = select(candidates)
+    assert ids(shortlist) == ids([candidates[1], candidates[3]])
+    assert ids(rejected) == ids([candidates[0], candidates[2]])  # en yakın teğet adaylar "yakındı ama"
+    assert "2 aday problemi doğrudan çözmüyor" in note
+
+
+def test_no_direct_solver_means_no_match():
+    candidates = ranked(0.9, 0.8, 0.8, 0.6)
+    for c in candidates:
+        c.direct_fit = False
+    shortlist, rejected, note = select(candidates)
+    assert shortlist == [] and len(rejected) == 3
+    assert "doğrudan çözen aday yok" in note
