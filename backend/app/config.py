@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,10 +37,10 @@ class Settings(BaseSettings):
     shortlist_size: int = 5
     rejected_size: int = 3
 
-    # Güven eşiği (Fikir 1): kısa liste sabit sayıyla değil kaliteyle kesilir
-    shortlist_min_score: float = Field(0.003, ge=0, le=1)       # birincinin skoru bunun altındaysa "uygun girişim yok"
-    shortlist_relative_ratio: float = Field(0.3, ge=0, le=1)    # birincinin skorunun en az bu oranını alan kısa listeye girer
-
+    # Güven eşiği: kısa liste sabit sayıyla değil kaliteyle kesilir. Boş bırakılırsa sıralayıcının kendi
+    # eşiği kullanılır (skor ölçekleri farklı: LLM 0-10 puanı, cross-encoder sigmoid; bkz. rerank/rerankers.py)
+    shortlist_min_score: float | None = Field(None, ge=0, le=1)       # birincinin skoru bunun altındaysa "uygun girişim yok"
+    shortlist_relative_ratio: float | None = Field(None, ge=0, le=1)  # birincinin skorunun en az bu oranını alan kısa listeye girer
 
     # Hesaplar
     session_days: int = 14  # oturum çerezinin geçerlilik süresi
