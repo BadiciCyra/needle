@@ -65,6 +65,9 @@ class CrossEncoderReranker:
 
 class _LLMScore(BaseModel):
     startup_id: str
+    # Gerekçe karardan önce: model önce ne yaptığını söyleyip sonra karar verince teğet adaylara daha az "evet" diyor
+    gerekce: str = Field(description="En fazla 15 kelime: girişimin ürünü bu problemde tam olarak ne yapar?")
+    dogrudan_cozer: bool = Field(description="Ürünü, ihtiyaçtaki problemi bugün olduğu haliyle doğrudan çözüyor mu?")
     score: int = Field(ge=0, le=10, description="0 = alakasız, 10 = ihtiyacı tam karşılıyor")
 
 
@@ -90,13 +93,20 @@ class LLMReranker:
             _LLMScores,
             system=(
                 "Bir kurumun ihtiyacına en uygun girişimleri puanlıyorsun. Her girişime 0-10 arası puan ver. "
-                "Sadece girişim profilinde yazan yetkinliklere dayan."
+                "Sadece girişim profilinde yazan yetkinliklere dayan.\n"
+                "dogrudan_cozer: girişimin profilde yazan ürünü, ihtiyaçtaki problemin nesnesiyle/süreciyle/verisiyle "
+                "çalışıyor ve kurum onu bu iş için yeni bir ürün geliştirmeden kullanabiliyorsa true. Yalnızca aynı "
+                "teknoloji alanında olmak (ör. ikisi de IoT, görüntü işleme, kestirimci bakım veya veri analitiği) "
+                "veya 'uyarlanabilir' olmak yetmez; o durumda false. Emin değilsen false."
             ),
             user=f"İhtiyaç:\n{query}\n\nGirişimler:\n{listing}",
         )
-        scores = {s.startup_id: s.score / 10 for s in result.scores}
+        by_id = {s.startup_id: s for s in result.scores}
         for candidate in candidates:
-            candidate.rerank_score = scores.get(candidate.startup.id, 0.0)
+            s = by_id.get(candidate.startup.id)
+            candidate.rerank_score = s.score / 10 if s else 0.0
+            candidate.direct_fit = s.dogrudan_cozer if s else False
+            candidate.direct_fit_reason = s.gerekce if s else None
         return sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
 
 

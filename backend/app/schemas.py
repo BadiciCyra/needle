@@ -114,6 +114,8 @@ class Candidate(BaseModel):
     vector_score: float = 0.0
     rerank_score: float | None = None
     raw_rerank_score: float | None = Field(None, description="Reranker'ın ham skoru, tercih cezası uygulanmadan önce")
+    direct_fit: bool | None = Field(None, description="Ürünü bu problemi doğrudan çözüyor mu (LLM sıralayıcı); None = bilinmiyor")
+    direct_fit_reason: str | None = None
     filter_notes: list[str] = Field(default_factory=list, description="Hangi filtreye takıldı / hangisi gevşetildi")
 
 
