@@ -40,7 +40,9 @@ class EchoRationaleBackend:
 
 
 def run(brief: Brief, tmp_path, **settings_overrides):
-    settings = Settings(demo_cache_dir=str(tmp_path), **settings_overrides)
+    # Sahte embedder anlam bilmez; graf testlerinde benzerlik kontrolü varsayılan olarak kapalı.
+    # Kanıt doğrulamayı sınayan testler (test_gorunur_gerekce.py) bu ayarı kendileri verir.
+    settings = Settings(**{"demo_cache_dir": str(tmp_path), "evidence_min_similarity": 0.0, **settings_overrides})
     graph = build_match_graph(
         retriever=InMemoryRetriever(STARTUPS, EMBEDDER),
         embedder=EMBEDDER,

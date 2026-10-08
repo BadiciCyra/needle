@@ -19,7 +19,7 @@ from app.llm.client import StructuredLLM
 from app.rerank.rerankers import Reranker
 from app.retrieval.base import Retriever
 from app.retrieval.pgvector import to_profile
-from app.schemas import Brief, FollowUpQuestion, StartupProfile
+from app.schemas import Brief, FollowUpQuestion, StartupProfile, TraceStep
 
 router = APIRouter()
 
@@ -195,8 +195,15 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
                 declined_reason=(match.rejection or {}).get("declined_reason"),
             )
         )
+    # match_runs.trace eski kayıtlarda düz metin listesi, yenilerde TraceStep sözlükleri
     return api.SavedMatchOut(
-        brief_id=brief_id, run_id=run.id, created_at=run.created_at, retrieval_trace=run.trace, **items
+        brief_id=brief_id,
+        run_id=run.id,
+        created_at=run.created_at,
+        no_match=not items["shortlist"],
+        retrieval_trace=[s["message"] if isinstance(s, dict) else s for s in run.trace],
+        trace_steps=[TraceStep.model_validate(s) for s in run.trace if isinstance(s, dict)],
+        **items,
     )
 
 
@@ -218,7 +225,7 @@ def match_brief(
     graph = build_match_graph(retriever, embedder, reranker, llm, settings)
     result = graph.invoke({"brief": record.data})["result"]
 
-    run = MatchRun(brief_id=brief_id, trace=result.retrieval_trace)
+    run = MatchRun(brief_id=brief_id, trace=[step.model_dump(exclude_none=True) for step in result.trace_steps])
     session.add(run)
     session.flush()
 
