@@ -8,6 +8,7 @@ import {
   List,
   Modal,
   PasswordInput,
+  SegmentedControl,
   SimpleGrid,
   Stack,
   Text,
@@ -102,7 +103,7 @@ export function LoginPage() {
         <>
           Hesabınız yok mu?{' '}
           <Anchor component={Link} to="/kayit" c="var(--app-ink)" td="underline">
-            Firma hesabı açın
+            Hesap açın
           </Anchor>
         </>
       }
@@ -134,7 +135,12 @@ function KvkkText() {
         <List.Item>Ad soyad ve e-posta adresi (hesap ve iletişim)</List.Item>
         <List.Item>Kurum adı ve firma profili (eşleştirmenin isabeti)</List.Item>
         <List.Item>Girdiğiniz ihtiyaç metinleri ve verdiğiniz kararlar (eşleştirme ve pilot takibi)</List.Item>
+        <List.Item>Girişim hesaplarında şirket profili, başvuru notları ve tanıştırma cevapları</List.Item>
       </List>
+      <Text size="sm">
+        Tanıştırma kabul edildiğinde ihtiyacın özeti ve tarafların notları karşı tarafla paylaşılır. Açık çağrılarda
+        kurum adı, kurum isterse gizlenir.
+      </Text>
       <Text size="sm">
         İhtiyaç metinleri, yapılandırılmış brief ve gerekçe üretmek için bir yapay zeka hizmet sağlayıcısına (Google
         Gemini) gönderilir. Şifreniz geri döndürülemez biçimde (argon2) saklanır. Verilerinizin silinmesini veya bir
@@ -147,6 +153,8 @@ function KvkkText() {
 export function RegisterPage() {
   const { register } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '', organization_name: '' })
+  const [accountType, setAccountType] = useState<'firma' | 'girisim'>('firma')
+  const isStartup = accountType === 'girisim'
   const [consent, setConsent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -158,7 +166,12 @@ export function RegisterPage() {
     setBusy(true)
     setError(null)
     try {
-      await register({ ...form, kvkk_onay: consent })
+      await register({
+        ...form,
+        account_type: accountType,
+        organization_name: isStartup ? null : form.organization_name,
+        kvkk_onay: consent,
+      })
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -168,7 +181,7 @@ export function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Firma hesabı açın"
+      title={isStartup ? 'Girişim hesabı açın' : 'Firma hesabı açın'}
       subtitle={
         <>
           Zaten hesabınız var mı?{' '}
@@ -180,9 +193,25 @@ export function RegisterPage() {
     >
       <form onSubmit={submit}>
         <Stack>
-          <TextInput label="Kurum adı" required value={form.organization_name} onChange={set('organization_name')} />
+          <SegmentedControl
+            fullWidth
+            value={accountType}
+            onChange={(v) => setAccountType(v as 'firma' | 'girisim')}
+            data={[
+              { value: 'firma', label: 'Çözüm arıyorum (firma)' },
+              { value: 'girisim', label: 'Çözüm sunuyorum (girişim)' },
+            ]}
+          />
+          {isStartup ? (
+            <Text size="xs" c="dimmed" lh={1.5}>
+              Hesabı açtıktan sonra havuzdaki profilinizi sahiplenir ya da yeni profil oluşturursunuz. Şirket e-postanız
+              sitenizin alan adıyla eşleşirse profiliniz hemen doğrulanır.
+            </Text>
+          ) : (
+            <TextInput label="Kurum adı" required value={form.organization_name} onChange={set('organization_name')} />
+          )}
           <TextInput label="Adınız soyadınız" autoComplete="name" required value={form.name} onChange={set('name')} />
-          <TextInput label="İş e-postası" type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
+          <TextInput label={isStartup ? 'Şirket e-postası' : 'İş e-postası'} type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
           <PasswordInput
             label="Şifre"
             description="En az 10 karakter"

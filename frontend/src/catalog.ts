@@ -19,6 +19,13 @@ export const SECTORS = [
   'Diğer',
 ]
 
+// Girişim havuzundaki sektör adları (backend seed ile aynı)
+export const STARTUP_SECTORS = [
+  'yazılım', 'üretim', 'endüstriyel IoT', 'iş güvenliği', 'enerji', 'akıllı şehir', 'lojistik', 'sağlık', 'finans',
+  'sigorta', 'tarım', 'perakende', 'insan kaynakları', 'hukuk', 'eğitim', 'medya', 'siber güvenlik', 'turizm',
+  'inşaat', 'savunma', 'telekom',
+]
+
 export const CITIES = ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Kocaeli', 'Antalya', 'Konya', 'Gaziantep', 'Kayseri', 'Eskişehir', 'Diğer']
 
 export const EMPLOYEE_RANGES = [

@@ -1,14 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-import { api, ApiError, setUnauthorizedHandler } from './api'
+import { api, ApiError, setUnauthorizedHandler, type RegisterBody } from './api'
 import type { Me, OrgProfile } from './types'
 
 interface AuthState {
   me: Me | null
   loading: boolean
   isAdmin: boolean
+  isStartup: boolean
+  setMe: (me: Me) => void
   login: (email: string, password: string) => Promise<void>
-  register: (body: { name: string; email: string; password: string; organization_name: string; kvkk_onay: boolean }) => Promise<void>
+  register: (body: RegisterBody) => Promise<void>
   logout: () => Promise<void>
   saveProfile: (profile: OrgProfile) => Promise<void>
 }
@@ -33,11 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (email: string, password: string) => setMe(await api.login(email, password)), [])
-  const register = useCallback(
-    async (body: { name: string; email: string; password: string; organization_name: string; kvkk_onay: boolean }) =>
-      setMe(await api.register(body)),
-    [],
-  )
+  const register = useCallback(async (body: RegisterBody) => setMe(await api.register(body)), [])
   const logout = useCallback(async () => {
     await api.logout().catch(() => undefined)
     setMe(null)
@@ -45,7 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const saveProfile = useCallback(async (profile: OrgProfile) => setMe(await api.saveProfile(profile)), [])
 
   const value = useMemo(
-    () => ({ me, loading, isAdmin: me?.role === 'yonetici', login, register, logout, saveProfile }),
+    () => ({
+      me,
+      loading,
+      isAdmin: me?.role === 'yonetici',
+      isStartup: me?.role === 'girisim',
+      setMe,
+      login,
+      register,
+      logout,
+      saveProfile,
+    }),
     [me, loading, login, register, logout, saveProfile],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

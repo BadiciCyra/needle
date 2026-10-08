@@ -133,7 +133,7 @@ export default function BriefPage() {
           <Stepper.Step label="İhtiyaç" description="Serbest metin" />
           <Stepper.Step label="Brief" description={brief.status === 'needs_input' ? 'Bilgi bekleniyor' : 'Tamamlandı'} />
           <Stepper.Step label="Eşleştirme" description={match ? `${match.shortlist.length} aday` : 'Yapılmadı'} />
-          <Stepper.Step label="Pilot" description={piloted ? 'Başladı' : pending ? `${pending} karar bekliyor` : '—'} />
+          <Stepper.Step label="Tanıştırma" description={piloted ? 'İstek gönderildi' : pending ? `${pending} karar bekliyor` : '—'} />
         </Stepper>
       </Card>
 
@@ -219,7 +219,7 @@ export default function BriefPage() {
               description="Girişim havuzunda anlamsal arama yapılıyor, adaylar yeniden sıralanıyor ve her biri için gerekçe yazılıyor. Bu işlem bir dakika kadar sürebilir."
             />
           ) : match ? (
-            <MatchResults view={match} onChange={setMatch} />
+            <MatchResults view={match} brief={brief.brief} onChange={setMatch} />
           ) : (
             <Card py={48}>
               <Stack align="center" gap="xs" maw={440} mx="auto" ta="center">

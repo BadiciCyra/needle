@@ -1,4 +1,6 @@
-import type { Maturity, NeedSummary, PilotResult, PilotStatus } from './types'
+import type { ComboboxItem, OptionsFilter } from '@mantine/core'
+
+import type { IntroStatus, Maturity, NeedSummary, PilotResult, PilotStatus } from './types'
 
 export const MATURITY_LABEL: Record<Maturity, string> = {
   fikir: 'Fikir',
@@ -28,6 +30,12 @@ export const PILOT_STATUS: Record<PilotStatus, { label: string; color: string }>
   cancelled: { label: 'İptal edildi', color: TAG_COLOR.gray },
 }
 
+export const INTRO_STATUS: Record<IntroStatus, { label: string; color: string }> = {
+  bekliyor: { label: 'Girişimin cevabı bekleniyor', color: TAG_COLOR.ochre },
+  kabul: { label: 'Tanıştırma kabul edildi', color: TAG_COLOR.green },
+  ret: { label: 'Girişim reddetti', color: TAG_COLOR.gray },
+}
+
 export const PILOT_RESULT: Record<PilotResult, string> = { evet: 'Evet', kismen: 'Kısmen', hayir: 'Hayır' }
 
 // İhtiyacın süreçteki aşaması (NeedSummary'den türetilir)
@@ -37,7 +45,7 @@ export const STAGE: Record<Stage, { label: string; color: string; hint: string }
   followup: { label: 'Bilgi bekliyor', color: TAG_COLOR.ochre, hint: 'Takip sorularının cevaplanması gerekiyor' },
   ready: { label: 'Eşleştirmeye hazır', color: TAG_COLOR.slate, hint: 'Brief tamam, aday aranmadı' },
   review: { label: 'Karar bekliyor', color: TAG_COLOR.thread, hint: 'Kısa liste hazır, kabul/ret bekleniyor' },
-  pilot: { label: 'Pilotta', color: TAG_COLOR.green, hint: 'En az bir aday kabul edildi' },
+  pilot: { label: 'Aday seçildi', color: TAG_COLOR.green, hint: 'En az bir adaya tanıştırma isteği gönderildi' },
 }
 
 export function stageOf(need: NeedSummary): Stage {
@@ -82,3 +90,11 @@ export const initials = (name: string) =>
     .slice(0, 2)
     .map((w) => w[0]!.toLocaleUpperCase('tr-TR'))
     .join('')
+
+// Mantine'in varsayılan araması toLowerCase kullanır: "İzmir" → "i̇zmir" olur ve "izm" eşleşmez. Türkçe küçültme ile ara.
+export const trLower = (s: string) => s.toLocaleLowerCase('tr-TR')
+
+export const trFilter: OptionsFilter = ({ options, search }) => {
+  const q = trLower(search.trim())
+  return (options as ComboboxItem[]).filter((o) => trLower(o.label).includes(q))
+}
