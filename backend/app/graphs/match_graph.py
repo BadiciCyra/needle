@@ -7,7 +7,9 @@ Akış:
 - retrieve: brief + her yetkinlik için ayrı sorgu, sonuçlar RRF ile birleşir, turlar arasında havuz büyür.
 - assess: havuz yeterli mi (min_candidates)? değilse filtre gevşetilir (lokasyon → olgunluk).
 - rerank: çok dilli cross-encoder (ya da LLM) ile yeniden sıralama; kısa liste + "yakın ama değil" seçimi.
-- explain: LLM gerekçe yazar; profilde olmayan yetkinliğe dayanan gerekçe izleri atılır.
+- explain: LLM gerekçe yazar; her gerekçe izi üç kontrolden geçer (bkz. _guard_rationales).
+
+Her düğüm ize hem düz metin (retrieval_trace) hem yapılandırılmış adım (trace_steps) yazar.
 """
 
 import json
@@ -16,7 +18,7 @@ from typing import TypedDict
 from langgraph.graph import END, StateGraph
 
 from app.config import Settings, get_settings
-from app.embeddings import Embedder
+from app.embeddings import Embedder, cosine
 from app.llm.client import StructuredLLM
 from app.prompts import match as prompts
 from app.rerank.rerankers import Reranker
@@ -30,6 +32,7 @@ from app.schemas import (
     MatchResultItem,
     RationaleBatch,
     RejectionRationale,
+    TraceStep,
 )
 
 
@@ -43,6 +46,7 @@ class MatchState(TypedDict, total=False):
     pool: dict[str, Candidate]        # startup_id → en iyi aday (turlar arasında birikir)
     round: int
     trace: list[str]
+    steps: list[dict]                 # yapılandırılmış iz (TraceStep sözlükleri)
     shortlist: list[Candidate]
     rejected: list[Candidate]
     rationales: RationaleBatch
@@ -61,18 +65,69 @@ def _describe(candidate: Candidate) -> str:
     return "\n".join(lines)
 
 
-def _guard_rationales(batch: RationaleBatch, shortlist: list[Candidate]) -> RationaleBatch:
-    """Profilde olmayan yetkinliğe dayanan gerekçe izlerini atar (uydurma gerekçe koruması)."""
-    capabilities = {c.startup.id: {cap.lower() for cap in c.startup.capabilities} for c in shortlist}
+def _log(state: MatchState, stage: str, message: str, **fields) -> dict:
+    """İze bir adım ekler: hem düz metin satırı (trace) hem yapılandırılmış adım (steps); ikisi hiç ayrışmaz."""
+    step = TraceStep(stage=stage, message=message, **fields)
+    return {
+        "trace": state.get("trace", []) + [message],
+        "steps": state.get("steps", []) + [step.model_dump(exclude_none=True)],
+    }
+
+
+def _normalize(text: str) -> str:
+    """Türkçe uyumlu küçük harf + boşluk sadeleştirme ("İ".lower() Python'da "i̇" verir, "i" değil)."""
+    text = text.replace("İ", "i").replace("I", "ı").lower()
+    return " ".join(text.split())
+
+
+def _brief_haystack(brief: dict) -> str:
+    """Brief'teki bütün metin alanlarını tek metinde toplar; brief_phrase bunun içinde aranır."""
+    parts = []
+    for value in brief.values():
+        if isinstance(value, str):
+            parts.append(value)
+        elif isinstance(value, list):
+            parts.extend(v for v in value if isinstance(v, str))
+    return _normalize(" \n ".join(parts))
+
+
+def _guard_rationales(
+    batch: RationaleBatch, shortlist: list[Candidate], brief_text: str, embedder: Embedder, min_similarity: float
+) -> tuple[RationaleBatch, int, int]:
+    """Dayanaksız gerekçe izlerini atar. Bir iz üç kontrolün üçünü de geçmeli:
+
+    1. startup_capability girişimin profilinde birebir var mı   (uydurma yetkinlik)
+    2. brief_phrase brief metninde gerçekten geçiyor mu        (uydurma ifade)
+    3. ifade ile yetkinlik anlamca yeterince yakın mı           (alakasız bağ)
+    Ucuz kontroller önce, model çağrısı en son. Gerekçe kartı (fit_summary) izleri boşalsa bile kalır.
+    Dönüş: (temizlenmiş batch, kalan iz, toplam iz).
+    """
+    capabilities = {c.startup.id: {_normalize(cap) for cap in c.startup.capabilities} for c in shortlist}
     cleaned = []
+    kept = total = 0
     for rationale in batch.matches:
         allowed = capabilities.get(rationale.startup_id)
         if allowed is None:
             continue
-        rationale.evidence = [e for e in rationale.evidence if e.startup_capability.lower() in allowed]
+        good = []
+        for e in rationale.evidence:
+            total += 1
+            if _normalize(e.startup_capability) not in allowed:
+                continue
+            phrase = _normalize(e.brief_phrase)
+            if not phrase or phrase not in brief_text:  # boş metin her metnin "içinde" sayılır
+                continue
+            phrase_vec, cap_vec = embedder.embed_documents([e.brief_phrase, e.startup_capability])
+            score = cosine(phrase_vec, cap_vec)
+            if score < min_similarity:
+                continue
+            e.support_score = round(score, 3)
+            good.append(e)
+        rationale.evidence = good
+        kept += len(good)
         cleaned.append(rationale)
     batch.matches = cleaned
-    return batch
+    return batch, kept, total
 
 
 def _or(value: float | None, default: float) -> float:
@@ -126,8 +181,9 @@ def build_match_graph(
         brief = Brief.model_validate(state["brief"])
         filters = initial_filters(brief)
         queries = build_queries(brief, embedder, filters, settings.retrieve_top_k)
-        trace = [f"Plan: {len(queries)} sorgu (brief + {len(queries) - 1} yetkinlik), filtreler: {filters.describe()}"]
-        return {"filters": filters, "queries": queries, "pool": {}, "round": 0, "trace": trace}
+        message = f"Plan: {len(queries)} sorgu (brief + {len(queries) - 1} yetkinlik), filtreler: {filters.describe()}"
+        log = _log({}, "plan", message, queries=len(queries), filters=filters.describe())
+        return {"filters": filters, "queries": queries, "pool": {}, "round": 0, **log}
 
     def retrieve(state: MatchState) -> MatchState:
         queries = [
@@ -144,10 +200,12 @@ def build_match_graph(
             elif candidate.vector_score > existing.vector_score:
                 pool[candidate.startup.id] = candidate
         round_no = state["round"] + 1
-        trace = state["trace"] + [
-            f"Tur {round_no}: filtreler ({state['filters'].describe()}) → {new} yeni aday, havuz {len(pool)}"
-        ]
-        return {"pool": pool, "round": round_no, "trace": trace}
+        message = f"Tur {round_no}: filtreler ({state['filters'].describe()}) → {new} yeni aday, havuz {len(pool)}"
+        log = _log(
+            state, "retrieve", message,
+            round=round_no, filters=state["filters"].describe(), new_candidates=new, pool_size=len(pool),
+        )
+        return {"pool": pool, "round": round_no, **log}
 
     def route_after_retrieve(state: MatchState) -> str:
         enough = len(state["pool"]) >= settings.min_candidates
@@ -157,7 +215,8 @@ def build_match_graph(
 
     def relax_filters(state: MatchState) -> MatchState:
         new_filters, note = relax(state["filters"])
-        return {"filters": new_filters, "trace": state["trace"] + [f"Yetersiz aday → {note}"]}
+        log = _log(state, "relax", f"Yetersiz aday → {note}", filters=new_filters.describe())
+        return {"filters": new_filters, **log}
 
     def rerank(state: MatchState) -> MatchState:
         brief = Brief.model_validate(state["brief"])
@@ -181,11 +240,17 @@ def build_match_graph(
             max_size=settings.shortlist_size,
             rejected_size=settings.rejected_size,
         )
-        trace = state["trace"] + [
+        log = _log(
+            state, "rerank",
             f"Yeniden sıralama ({reranker.name}): {len(ranked)} aday → {len(shortlist)} kısa liste, {len(rejected)} elenen",
-            threshold_note,
-        ]
-        return {"shortlist": shortlist, "rejected": rejected, "trace": trace}
+            candidates=len(ranked),
+        )
+        indirect = sum(c.direct_fit is False for c in ranked)
+        log = _log(  # ikinci adım, ilk adımın eklendiği güncel izi görmeli
+            {**state, **log}, "threshold", threshold_note,
+            indirect=indirect or None, shortlist_size=len(shortlist), rejected_size=len(rejected),
+        )
+        return {"shortlist": shortlist, "rejected": rejected, **log}
 
     def explain(state: MatchState) -> MatchState:
         batch = llm.invoke(
@@ -197,7 +262,19 @@ def build_match_graph(
                 rejected="\n\n".join(_describe(c) for c in state["rejected"]) or "(yok)",
             ),
         )
-        return {"rationales": _guard_rationales(batch, state["shortlist"])}
+        guarded, kept, total = _guard_rationales(
+            batch,
+            state["shortlist"],
+            brief_text=_brief_haystack(state["brief"]),
+            embedder=embedder,
+            min_similarity=settings.evidence_min_similarity,
+        )
+        log = _log(
+            state, "evidence",
+            f"Gerekçe doğrulama: {total} izden {kept} tanesi geçti (benzerlik eşiği {settings.evidence_min_similarity})",
+            evidence_kept=kept, evidence_total=total,
+        )
+        return {"rationales": guarded, **log}
 
     def assemble(state: MatchState) -> MatchState:
         matches = {r.startup_id: r for r in state["rationales"].matches}
@@ -237,6 +314,7 @@ def build_match_graph(
             rejected=[item(i + 1, c, True) for i, c in enumerate(state["rejected"])],
             no_match=not state["shortlist"],
             retrieval_trace=state["trace"],
+            trace_steps=[TraceStep(**step) for step in state["steps"]],
         )
         return {"result": result}
 

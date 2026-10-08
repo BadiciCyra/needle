@@ -23,9 +23,32 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { useAppData } from '../data'
 import { MATURITY_LABEL, TAG_COLOR } from '../labels'
-import type { MatchItem, MatchView, StartupProfile } from '../types'
+import type { MatchItem, MatchView, StartupProfile, TraceStep } from '../types'
 import StartupDrawer from './StartupDrawer'
 import { OrgAvatar, Tag } from './ui'
+
+// Yapılandırılmış iz adımı → zaman çizelgesi başlığı ve özeti
+function describeStep(s: TraceStep): { title: string; detail: string } {
+  switch (s.stage) {
+    case 'plan':
+      return { title: 'Arama planı', detail: `${s.queries} sorgu · ${s.filters}` }
+    case 'retrieve':
+      return { title: `Tur ${s.round}`, detail: `+${s.new_candidates} aday · havuz ${s.pool_size}` }
+    case 'relax':
+      return { title: 'Filtre gevşetildi', detail: s.message.replace(/^Yetersiz aday → /, '') }
+    case 'rerank':
+      return { title: 'Yeniden sıralama', detail: `${s.candidates} aday puanlandı` }
+    case 'threshold':
+      return {
+        title: 'Güven eşiği',
+        detail:
+          (s.shortlist_size ? `${s.shortlist_size} kısa liste · ${s.rejected_size} yakındı ama` : 'Güçlü eşleşme yok') +
+          (s.indirect ? ` · ${s.indirect} aday problemi doğrudan çözmüyor` : ''),
+      }
+    case 'evidence':
+      return { title: 'Gerekçe doğrulama', detail: `${s.evidence_kept}/${s.evidence_total} iz doğrulandı` }
+  }
+}
 
 // LLM yeniden sıralayıcının 0-1 skoru (tercih dışı adaylarda 0,85 ile çarpılmış)
 function fitLevel(score: number) {
@@ -131,9 +154,15 @@ function CandidateCard({
                 </Text>
                 <Text size="xs" c="dimmed" mt={2}>
                   {e.explanation}
+                  {e.support_score != null && ` · benzerlik ${e.support_score.toFixed(2)}`}
                 </Text>
               </div>
             ))}
+            {r.evidence.length === 0 && (
+              <Text size="xs" c="dimmed">
+                Bu öneri için doğrulanabilir bir gerekçe izi bulunamadı.
+              </Text>
+            )}
           </Stack>
         ) : (
           <Text size="sm" c="dimmed" lineClamp={2}>
@@ -269,13 +298,30 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
             </Text>
           </Accordion.Control>
           <Accordion.Panel>
-            <Timeline bulletSize={10} lineWidth={1} active={view.retrieval_trace.length}>
-              {view.retrieval_trace.map((line, i) => (
-                <Timeline.Item key={i}>
-                  <Text size="sm">{line}</Text>
-                </Timeline.Item>
-              ))}
-            </Timeline>
+            {view.trace_steps?.length ? (
+              <Timeline bulletSize={10} lineWidth={1} active={view.trace_steps.length}>
+                {view.trace_steps.map((step, i) => {
+                  const { title, detail } = describeStep(step)
+                  return (
+                    <Timeline.Item key={i} title={<Text size="sm" fw={600}>{title}</Text>}>
+                      <Tooltip label={step.message} multiline w={360} openDelay={300}>
+                        <Text size="sm" c="dimmed">
+                          {detail}
+                        </Text>
+                      </Tooltip>
+                    </Timeline.Item>
+                  )
+                })}
+              </Timeline>
+            ) : (
+              <Timeline bulletSize={10} lineWidth={1} active={view.retrieval_trace.length}>
+                {view.retrieval_trace.map((line, i) => (
+                  <Timeline.Item key={i}>
+                    <Text size="sm">{line}</Text>
+                  </Timeline.Item>
+                ))}
+              </Timeline>
+            )}
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

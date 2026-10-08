@@ -4,6 +4,7 @@ LLM çıktıları da bu şemalarla doğrulanır: şemaya uymayan cevap reddedili
 """
 
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -125,6 +126,9 @@ class EvidenceLink(BaseModel):
     brief_phrase: str = Field(description="Brief'ten birebir alınmış kısa ifade")
     startup_capability: str = Field(description="Girişim profilinden birebir alınmış yetkinlik")
     explanation: str = Field(description="Neden örtüştüğü, tek cümle")
+    support_score: float | None = Field(
+        None, description="Bu alanı boş bırak (null). İfade ile yetkinlik arasındaki benzerliği kod hesaplar."
+    )
 
 
 class MatchRationale(BaseModel):
@@ -144,6 +148,24 @@ class RejectionRationale(BaseModel):
 class RationaleBatch(BaseModel):
     matches: list[MatchRationale]
     rejections: list[RejectionRationale]
+
+
+class TraceStep(BaseModel):
+    """Eşleştirme izinin tek bir adımı. Arayüz zaman çizelgesini bu alanlardan çizer."""
+
+    stage: Literal["plan", "retrieve", "relax", "rerank", "threshold", "evidence"]
+    message: str = Field(description="İnsan okuyacak tek satırlık özet (retrieval_trace ile aynı metin)")
+    round: int | None = Field(None, description="Kaçıncı arama turu (retrieve)")
+    filters: str | None = Field(None, description="O adımda geçerli filtreler")
+    queries: int | None = Field(None, description="Kaç sorgu planlandı (plan)")
+    new_candidates: int | None = Field(None, description="Bu turda havuza giren yeni aday (retrieve)")
+    pool_size: int | None = Field(None, description="Turdan sonra havuzdaki toplam aday (retrieve)")
+    candidates: int | None = Field(None, description="Yeniden sıralanan aday sayısı (rerank)")
+    indirect: int | None = Field(None, description="Problemi doğrudan çözmediği söylenen aday (threshold)")
+    shortlist_size: int | None = Field(None, description="Kısa listeye giren aday (threshold)")
+    rejected_size: int | None = Field(None, description="'Yakındı ama' listesine giren aday (threshold)")
+    evidence_kept: int | None = Field(None, description="Doğrulamadan geçen gerekçe izi (evidence)")
+    evidence_total: int | None = Field(None, description="LLM'in yazdığı toplam gerekçe izi (evidence)")
 
 
 class MatchResultItem(BaseModel):
@@ -168,6 +190,9 @@ class MatchResult(BaseModel):
     )
     retrieval_trace: list[str] = Field(
         default_factory=list, description="Dinamik RAG'in hangi turda ne yaptığının kaydı (şeffaflık için)"
+    )
+    trace_steps: list[TraceStep] = Field(
+        default_factory=list, description="Aynı iz, arayüzün çizebileceği yapılandırılmış adımlar halinde"
     )
 
 
