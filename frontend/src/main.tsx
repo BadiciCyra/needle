@@ -22,8 +22,9 @@ import { theme } from './theme'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme} defaultColorScheme="light">
-      <Notifications position="bottom-right" />
       <BrowserRouter>
+        {/* Bildirimler router içinde: mesajdaki <Link> bağlantıları yönlendirici bağlamına ihtiyaç duyar */}
+        <Notifications position="bottom-right" />
         <App />
       </BrowserRouter>
     </MantineProvider>

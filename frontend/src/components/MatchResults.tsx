@@ -16,14 +16,15 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconCheck, IconInfoCircle, IconMapPin, IconRoute, IconX } from '@tabler/icons-react'
+import { IconCheck, IconInfoCircle, IconMapPin, IconRoute, IconSpeakerphone, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { api } from '../api'
 import { useAppData } from '../data'
-import { MATURITY_LABEL, TAG_COLOR } from '../labels'
-import type { MatchItem, MatchView, StartupProfile, TraceStep } from '../types'
+import { INTRO_STATUS, MATURITY_LABEL, TAG_COLOR } from '../labels'
+import type { Brief, MatchItem, MatchView, StartupProfile, TraceStep } from '../types'
+import OpenCallModal from './OpenCallModal'
 import StartupDrawer from './StartupDrawer'
 import { OrgAvatar, Tag } from './ui'
 
@@ -60,10 +61,16 @@ function fitLevel(score: number) {
 }
 
 function StatusBadge({ item }: { item: MatchItem }) {
-  if (item.status === 'accepted')
+  if (item.status === 'accepted') {
+    const intro = item.introduction
+    if (!intro) return <Tag color={TAG_COLOR.green}>Kabul edildi</Tag> // tanıştırma akışından önceki kayıt
+    const s = INTRO_STATUS[intro.status]
     return (
-      <Tag color={TAG_COLOR.green}>Pilot açıldı</Tag>
+      <Tag color={s.color} tooltip={intro.startup_note ?? undefined}>
+        {s.label}
+      </Tag>
     )
+  }
   if (item.status === 'declined')
     return (
       <Tag color={TAG_COLOR.gray} tooltip={item.declined_reason ?? 'Sebep yazılmadı'}>
@@ -182,7 +189,7 @@ function CandidateCard({
               Reddet
             </Button>
             <Button size="xs" leftSection={<IconCheck size={14} />} onClick={() => onDecide(item, 'accept')}>
-              Kabul et ve pilot aç
+              Tanıştırma iste
             </Button>
           </Group>
         )}
@@ -191,34 +198,41 @@ function CandidateCard({
   )
 }
 
-export default function MatchResults({ view, onChange }: { view: MatchView; onChange: (v: MatchView) => void }) {
+export default function MatchResults({
+  view,
+  brief,
+  onChange,
+}: {
+  view: MatchView
+  brief: Brief
+  onChange: (v: MatchView) => void
+}) {
   const { refresh } = useAppData()
   const [declining, setDeclining] = useState<MatchItem | null>(null)
+  const [accepting, setAccepting] = useState<MatchItem | null>(null)
   const [reason, setReason] = useState('')
+  const [introNote, setIntroNote] = useState('')
+  const [callOpen, setCallOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [drawer, setDrawer] = useState<StartupProfile | null>(null)
 
-  const decide = async (item: MatchItem, decision: 'accept' | 'decline', why?: string) => {
+  const decide = async (item: MatchItem, decision: 'accept' | 'decline', why?: string, note?: string) => {
     setBusy(true)
     try {
-      await api.decide(item.match_id, decision, why)
-      onChange({
-        ...view,
-        shortlist: view.shortlist.map((i) =>
-          i.match_id === item.match_id ? { ...i, status: decision === 'accept' ? 'accepted' : 'declined', declined_reason: why } : i,
-        ),
-      })
+      await api.decide(item.match_id, decision, why, note)
+      // Tanıştırmanın durumu sunucuda oluştuğu için kayıtlı sonuç yeniden okunur
+      onChange(await api.latestMatch(view.brief_id))
       refresh()
       notifications.show(
         decision === 'accept'
           ? {
               color: 'teal',
-              title: 'Pilot açıldı',
+              title: 'Tanıştırma isteği gönderildi',
               message: (
                 <>
-                  {item.startup.name} için pilot kartı oluşturuldu.{' '}
-                  <Anchor component={Link} to="/pilotlar" size="sm">
-                    Pilotlara git
+                  {item.startup.name} kabul edince pilot kartı açılır.{' '}
+                  <Anchor component={Link} to="/tanistirmalar" size="sm">
+                    Tanıştırmalar
                   </Anchor>
                 </>
               ),
@@ -230,23 +244,42 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
     } finally {
       setBusy(false)
       setDeclining(null)
+      setAccepting(null)
       setReason('')
+      setIntroNote('')
     }
   }
 
   return (
     <Stack gap="md">
-      {view.shortlist.length === 0 && (
-        <Alert variant="light" color="gray" icon={<IconInfoCircle size={18} />}>
-          Bu ihtiyaç için yeterince güçlü bir eşleşme bulunamadı. Havuzda uygun girişim olmayabilir ya da arama kaçırmış olabilir; en yakın adaylar aşağıda gerekçeleriyle listeleniyor.
+      {view.open_call_id ? (
+        <Alert variant="light" color="gray" icon={<IconSpeakerphone size={18} />}>
+          Bu ihtiyaç girişimlere açık çağrı olarak duyuruldu.{' '}
+          <Anchor component={Link} to={`/cagrilar/${view.open_call_id}`} size="sm">
+            Başvuruları gör
+          </Anchor>
         </Alert>
+      ) : (
+        view.shortlist.length === 0 && (
+          <Alert variant="light" color="gray" icon={<IconInfoCircle size={18} />} title="Havuzda bu problemi doğrudan çözen girişim bulunamadı">
+            <Stack gap="xs" align="flex-start">
+              <Text size="sm">
+                Arama kaçırmış da olabilir; en yakın adaylar aşağıda gerekçeleriyle listeleniyor. İhtiyacı girişimlere açık
+                çağrı olarak duyurabilirsiniz: çözümü olan girişimler size başvurur.
+              </Text>
+              <Button size="xs" leftSection={<IconSpeakerphone size={14} />} onClick={() => setCallOpen(true)}>
+                Açık çağrı aç
+              </Button>
+            </Stack>
+          </Alert>
+        )
       )}
       {view.shortlist.map((item) => (
         <CandidateCard
           key={item.match_id}
           item={item}
           onOpen={setDrawer}
-          onDecide={(i, d) => (d === 'accept' ? decide(i, d) : setDeclining(i))}
+          onDecide={(i, d) => (d === 'accept' ? setAccepting(i) : setDeclining(i))}
         />
       ))}
 
@@ -327,6 +360,33 @@ export default function MatchResults({ view, onChange }: { view: MatchView; onCh
       </Accordion>
 
       <StartupDrawer startup={drawer} onClose={() => setDrawer(null)} />
+
+      <OpenCallModal briefId={view.brief_id} brief={brief} opened={callOpen} onClose={() => setCallOpen(false)} />
+
+      <Modal opened={accepting !== null} onClose={() => setAccepting(null)} title={<Text fw={600}>{accepting?.startup.name} ile tanışın</Text>}>
+        <Stack>
+          <Text size="sm" c="dimmed">
+            Girişime ihtiyacınızın özetiyle bir tanıştırma isteği gider. Kabul ederse pilot kartı iki taraf için de açılır.
+            Girişimin Needle hesabı yoksa program yöneticisi aracılık eder.
+          </Text>
+          <Textarea
+            label="Girişime not (isteğe bağlı)"
+            placeholder="Örn. Önce 30 dakikalık bir görüşme yapalım; iletişim: ad.soyad@kurum.com"
+            autosize
+            minRows={3}
+            value={introNote}
+            onChange={(e) => setIntroNote(e.currentTarget.value)}
+          />
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setAccepting(null)}>
+              Vazgeç
+            </Button>
+            <Button loading={busy} onClick={() => accepting && decide(accepting, 'accept', undefined, introNote.trim() || undefined)}>
+              İsteği gönder
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       <Modal opened={declining !== null} onClose={() => setDeclining(null)} title={<Text fw={600}>{declining?.startup.name} adayını reddet</Text>}>
         <Stack>

@@ -39,6 +39,7 @@ export interface StartupProfile {
   capabilities: string[]
   description: string
   past_pilots: string[]
+  website?: string | null
 }
 
 export interface EvidenceLink {
@@ -73,6 +74,7 @@ export interface MatchItem {
   match_id: number
   status: MatchStatus
   declined_reason?: string | null
+  introduction?: Introduction | null
 }
 
 export interface MatchView {
@@ -82,6 +84,7 @@ export interface MatchView {
   rejected: MatchItem[]
   retrieval_trace: string[]
   trace_steps?: TraceStep[] // eski kayıtlarda boş
+  open_call_id?: number | null
 }
 
 export interface TraceStep {
@@ -132,7 +135,7 @@ export type PilotResult = 'evet' | 'kismen' | 'hayir'
 export interface Pilot {
   id: number
   status: PilotStatus
-  match_id: number
+  match_id: number | null
   brief_id: number
   brief_title: string
   startup: StartupProfile
@@ -154,7 +157,7 @@ export interface Health {
 }
 
 // Hesaplar ve firma profili (backend/app/api/schemas.py)
-export type Role = 'firma' | 'yonetici'
+export type Role = 'firma' | 'yonetici' | 'girisim'
 
 export interface OrgProfile {
   sector: string
@@ -180,4 +183,119 @@ export interface Me {
     profile: Partial<OrgProfile>
     onboarded: boolean
   } | null
+  startup: StartupAccount | null
+}
+
+export interface StartupAccount {
+  id: string
+  name: string
+  status: 'aktif' | 'onay_bekliyor' | 'reddedildi'
+  verified: boolean
+}
+
+// Girişimin kendi profili (oluşturma / düzenleme)
+export interface StartupProfileInput {
+  name: string
+  sector: string
+  maturity: Maturity
+  location: string
+  website: string | null
+  description: string
+  capabilities: string[]
+  past_pilots: string[]
+}
+
+export type IntroStatus = 'bekliyor' | 'kabul' | 'ret'
+
+export interface Introduction {
+  id: number
+  status: IntroStatus
+  brief_id: number
+  brief: {
+    title: string
+    problem: string | null
+    scope: string | null
+    required_capabilities: string[]
+    success_criteria: string | null
+    timeline: string | null
+  }
+  organization: string | null
+  startup: StartupProfile
+  startup_has_account: boolean
+  source: 'eslestirme' | 'cagri'
+  firm_note: string | null
+  startup_note: string | null
+  responded_by: 'girisim' | 'yonetici' | null
+  created_at: string
+  responded_at: string | null
+  pilot_id: number | null
+}
+
+export interface Application {
+  id: number
+  call_id: number
+  startup: StartupProfile
+  note: string
+  status: 'yeni' | 'kabul' | 'ret'
+  decision_note: string | null
+  created_at: string
+  pilot_id: number | null
+}
+
+export interface OpenCall {
+  id: number
+  brief_id: number
+  title: string
+  summary: string
+  organization: string | null
+  sector: string | null
+  required_capabilities: string[]
+  deadline: string | null
+  status: 'acik' | 'kapali'
+  created_at: string
+  hide_organization: boolean
+  application_count: number
+  my_application: Application | null
+  applications: Application[]
+}
+
+export interface Claim {
+  user_id: number
+  user_name: string
+  email: string
+  startup: StartupProfile
+  startup_status: string
+  kind: 'sahiplenme' | 'yeni_profil'
+  domain_match: boolean
+  created_at: string
+}
+
+// Program yöneticisi raporu (backend/app/api/report_routes.py)
+export interface Report {
+  generated_at: string
+  funnel: { needs: number; briefed: number; matched: number; no_match: number; introduced: number; piloted: number; worked: number }
+  introductions: {
+    total: number
+    waiting: number
+    accepted: number
+    declined: number
+    acceptance_rate: number | null
+    avg_response_days: number | null
+    via_admin: number
+  }
+  pilots: { total: number; active: number; stale: number; done: number; result_evet: number; result_kismen: number; result_hayir: number }
+  sectors: { sector: string; needs: number; no_match: number; introduced: number; pilots: number; worked: number }[]
+  missing_capabilities: { capability: string; needs: number; variants: string[]; need_titles: string[] }[]
+  unmet_needs: {
+    brief_id: number
+    title: string
+    organization: string | null
+    sector: string
+    required_capabilities: string[]
+    open_call_id: number | null
+    applications: number
+  }[]
+  pool: { sector: string; startups: number; with_account: number }[]
+  open_calls: number
+  applications: number
 }

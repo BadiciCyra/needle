@@ -16,6 +16,9 @@ def test_all_tables_are_defined():
         "milestones",
         "users",
         "auth_sessions",
+        "introductions",
+        "open_calls",
+        "call_applications",
     }
 
 

@@ -1,4 +1,9 @@
 import type {
+  Claim,
+  Report,
+  Introduction,
+  OpenCall,
+  StartupProfileInput,
   BriefOut,
   Health,
   Me,
@@ -58,8 +63,7 @@ export const api = {
   health: () => request<Health>('/health'),
   me: () => request<Me>('/auth/me'),
   login: (email: string, password: string) => post<Me>('/auth/login', { email, password }),
-  register: (body: { name: string; email: string; password: string; organization_name: string; kvkk_onay: boolean }) =>
-    post<Me>('/auth/register', body),
+  register: (body: RegisterBody) => post<Me>('/auth/register', body),
   logout: () => post<void>('/auth/logout'),
   saveProfile: (profile: OrgProfile) => request<Me>('/auth/profile', { method: 'PUT', body: JSON.stringify(profile) }),
   createNeed: (raw_text: string, organization?: { name: string; sector?: string; author_unit?: string; owner_unit?: string }) =>
@@ -69,8 +73,12 @@ export const api = {
   answer: (briefId: number, answers: Record<string, string>) => post<BriefOut>(`/briefs/${briefId}/answers`, { answers }),
   runMatch: (briefId: number) => post<MatchOut>(`/briefs/${briefId}/match`),
   latestMatch: (briefId: number) => request<MatchView>(`/briefs/${briefId}/match`),
-  decide: (matchId: number, decision: 'accept' | 'decline', reason?: string) =>
-    post<{ match_id: number; status: string; pilot_id: number | null }>(`/matches/${matchId}/decision`, { decision, reason }),
+  decide: (matchId: number, decision: 'accept' | 'decline', reason?: string, note?: string) =>
+    post<{ match_id: number; status: string; introduction_id: number | null }>(`/matches/${matchId}/decision`, {
+      decision,
+      reason,
+      note,
+    }),
   startups: () => request<StartupProfile[]>('/startups'),
   pilots: () => request<Pilot[]>('/pilots'),
   updatePilot: (pilotId: number, body: { status?: PilotStatus; outcome?: string; result?: PilotResult }) =>
@@ -78,6 +86,46 @@ export const api = {
   addMilestone: (pilotId: number, title: string, due_date?: string) =>
     post<Pilot>(`/pilots/${pilotId}/milestones`, { title, due_date: due_date || null }),
   completeMilestone: (milestoneId: number) => post<Pilot>(`/milestones/${milestoneId}/complete`),
+
+  // Girişim hesabı
+  claimStartup: (startup_id: string) => post<Me>('/startup-account/claim', { startup_id }),
+  createStartupProfile: (profile: StartupProfileInput) => post<Me>('/startup-account/new', profile),
+  myStartupProfile: () => request<StartupProfile>('/startup-account/profile'),
+  updateStartupProfile: (profile: StartupProfileInput) =>
+    request<StartupProfile>('/startup-account/profile', { method: 'PUT', body: JSON.stringify(profile) }),
+
+  // Yönetici onayları
+  claims: () => request<Claim[]>('/admin/claims'),
+  approveClaim: (userId: number) => post<void>(`/admin/claims/${userId}/approve`),
+  rejectClaim: (userId: number) => post<void>(`/admin/claims/${userId}/reject`),
+
+  // Program yöneticisi raporu
+  report: () => request<Report>('/admin/report'),
+
+  // Tanıştırmalar
+  introductions: () => request<Introduction[]>('/introductions'),
+  respondIntroduction: (id: number, decision: 'kabul' | 'ret', note?: string) =>
+    post<Introduction>(`/introductions/${id}/respond`, { decision, note }),
+
+  // Açık çağrılar
+  calls: () => request<OpenCall[]>('/calls'),
+  call: (id: number) => request<OpenCall>(`/calls/${id}`),
+  createCall: (body: { brief_id: number; title: string; summary: string; hide_organization: boolean; deadline: string | null }) =>
+    post<OpenCall>('/calls', body),
+  setCallStatus: (id: number, status: 'acik' | 'kapali') =>
+    request<OpenCall>(`/calls/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  apply: (callId: number, note: string) => post<OpenCall>(`/calls/${callId}/applications`, { note }),
+  decideApplication: (applicationId: number, decision: 'kabul' | 'ret', note?: string) =>
+    post<OpenCall>(`/applications/${applicationId}/decision`, { decision, note }),
+}
+
+export interface RegisterBody {
+  name: string
+  email: string
+  password: string
+  account_type: 'firma' | 'girisim'
+  organization_name: string | null
+  kvkk_onay: boolean
 }
 
 // POST /match cevabını kayıtlı sonuç biçimine çevirir (yeni koşuda herkes "suggested")

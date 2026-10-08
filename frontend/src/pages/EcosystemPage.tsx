@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom'
 import StartupDrawer from '../components/StartupDrawer'
 import { OrgAvatar, PageHeader, PageLoader } from '../components/ui'
 import { useAppData } from '../data'
-import { MATURITY_LABEL, MATURITY_ORDER } from '../labels'
+import { MATURITY_LABEL, MATURITY_ORDER, trFilter } from '../labels'
 import type { StartupProfile } from '../types'
 
 const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
@@ -77,6 +77,7 @@ export default function EcosystemPage() {
             onChange={setSectors}
             clearable
             searchable
+            filter={trFilter}
             style={{ flex: '1 1 160px' }}
           />
           <MultiSelect
@@ -86,6 +87,7 @@ export default function EcosystemPage() {
             onChange={setCities}
             clearable
             searchable
+            filter={trFilter}
             style={{ flex: '1 1 160px' }}
           />
           <MultiSelect
