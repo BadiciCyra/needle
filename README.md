@@ -132,6 +132,21 @@ sıfırlanınca ya da değiştirilince diğer cihazlardaki oturumlar kapanır.
 HTTPS arkasında yayına alınırken `.env`'de `COOKIE_SECURE=true` yapılmalı. Kayıt ekranındaki aydınlatma metni
 bir taslaktır ve yayından önce hukuki inceleme gerektirir.
 
+### Yayına alma (Dokploy + VPS)
+
+Sunucuda en az 4 GB RAM gerekir (embedding modeli yüklüyken API ~1,2 GB kullanır). Dokploy'da **Compose** servisi
+açılır, repo bağlanır ve compose yolu olarak `docker-compose.dokploy.yml` seçilir. Environment sekmesine:
+
+```
+POSTGRES_PASSWORD=<uzun rastgele şifre>
+LLM_API_KEY=<Gemini anahtarı>
+APP_BASE_URL=https://<domain>
+COOKIE_SECURE=true
+```
+
+Domains sekmesinde `web` servisine, 80 numaralı porta domain bağlanır. İlk deploy imajları derler ve 282 girişimi
+yükler (10–15 dk). Yönetici hesabı api konteynerinde `python -m seed.create_admin <e-posta> "<Ad>"` ile açılır.
+
 ### Geliştirme (Docker'sız API ve arayüz)
 
 ```bash
