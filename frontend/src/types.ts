@@ -45,6 +45,7 @@ export interface EvidenceLink {
   brief_phrase: string
   startup_capability: string
   explanation: string
+  support_score?: number | null // ifade–yetkinlik benzerliği (0-1), kod hesaplar
 }
 
 export interface MatchRationale {
@@ -80,6 +81,23 @@ export interface MatchView {
   shortlist: MatchItem[]
   rejected: MatchItem[]
   retrieval_trace: string[]
+  trace_steps?: TraceStep[] // eski kayıtlarda boş
+}
+
+export interface TraceStep {
+  stage: 'plan' | 'retrieve' | 'relax' | 'rerank' | 'threshold' | 'evidence'
+  message: string
+  round?: number
+  filters?: string
+  queries?: number
+  new_candidates?: number
+  pool_size?: number
+  candidates?: number
+  indirect?: number
+  shortlist_size?: number
+  rejected_size?: number
+  evidence_kept?: number
+  evidence_total?: number
 }
 
 // POST /briefs/{id}/match cevabı: durumlar ayrı bir sözlükte gelir

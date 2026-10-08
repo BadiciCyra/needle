@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.schemas import Brief, FollowUpQuestion, Maturity, MatchResult, MatchResultItem, StartupProfile
+from app.schemas import Brief, FollowUpQuestion, Maturity, MatchResult, MatchResultItem, StartupProfile, TraceStep
 
 
 class OrganizationIn(BaseModel):
@@ -74,7 +74,9 @@ class SavedMatchOut(BaseModel):
     created_at: datetime
     shortlist: list[SavedMatchItem]
     rejected: list[SavedMatchItem]
+    no_match: bool = False
     retrieval_trace: list[str]
+    trace_steps: list[TraceStep] = Field(default_factory=list, description="Eski kayıtlarda boş (iz düz metindi)")
 
 
 class MilestoneIn(BaseModel):

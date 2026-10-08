@@ -7,7 +7,8 @@ Kısa listedeki (matches) her girişim için:
 - fit_summary: neden uygun, en fazla 2 cümle.
 - evidence: 1-3 gerekçe izi. brief_phrase alanına brief'ten BİREBİR bir ifade,
   startup_capability alanına girişimin yetkinlik listesinden BİREBİR bir yetkinlik yaz.
-  Listede olmayan bir yetkinlik yazma.
+  Listede olmayan bir yetkinlik yazma. Bu iki alan kodla doğrulanır; birebir olmayan iz atılır.
+- support_score alanını boş bırak (null); kod hesaplar.
 
 Elenenlerdeki (rejections) her girişim için:
 - near_miss_reason: "Yakındı ama ..., çünkü ..." kalıbında tek cümle. Neden yakın olduğunu ve
