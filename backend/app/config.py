@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     embedding_dim: int = 384
     rerank_backend: Literal["cross_encoder", "llm", "none"] = "llm"  # cross_encoder Türkçe briefte ilgisiz adayları öne alıyordu
     rerank_model: str = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
+    rerank_verify_top_n: int = 8   # LLM sıralayıcıda "doğrudan çözüyor mu?" denetimine giren en iyi aday sayısı
+    rerank_verify_votes: int = 3   # denetim kaç kez paralel çalışır (çoğunluk oyu; tek sayı olmalı)
 
     # Dinamik RAG ayarları
     retrieve_top_k: int = 40           # yeniden sıralayıcıya giden aday sayısı (282 girişimlik havuzda 20 dar kalıyordu)
