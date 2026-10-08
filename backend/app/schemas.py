@@ -92,6 +92,7 @@ class StartupProfile(BaseModel):
     capabilities: list[str]
     description: str
     past_pilots: list[str] = Field(default_factory=list)
+    website: str | None = None
 
     def to_search_text(self) -> str:
         return "\n".join(

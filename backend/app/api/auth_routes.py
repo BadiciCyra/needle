@@ -27,10 +27,18 @@ def me_out(user: User) -> api.MeOut:
         )
         if org
         else None,
+        startup=api.StartupAccountOut(
+            id=user.startup.id,
+            name=user.startup.name,
+            status=user.startup.status,
+            verified=user.startup_verified_at is not None,
+        )
+        if user.startup
+        else None,
     )
 
 
-@router.post("/register", response_model=api.MeOut, summary="Firma hesabı aç")
+@router.post("/register", response_model=api.MeOut, summary="Firma ya da girişim hesabı aç")
 def register(
     payload: api.RegisterIn,
     response: Response,
@@ -43,15 +51,21 @@ def register(
     if session.scalar(select(User.id).where(User.email == email)):
         raise HTTPException(409, "Bu e-posta ile bir hesap zaten var")
 
-    organization = Organization(name=payload.organization_name.strip(), profile={})
-    session.add(organization)
-    session.flush()
+    organization_id = None
+    if payload.account_type == "firma":
+        if not payload.organization_name:
+            raise HTTPException(422, "Kurum adı gerekli")
+        organization = Organization(name=payload.organization_name.strip(), profile={})
+        session.add(organization)
+        session.flush()
+        organization_id = organization.id
+    # Girişim hesabı burada profilsiz açılır; ardından havuzdaki profilini sahiplenir ya da yenisini açar
     user = User(
         email=email,
         password_hash=hash_password(payload.password),
         name=payload.name.strip(),
-        role="firma",
-        organization_id=organization.id,
+        role=payload.account_type,
+        organization_id=organization_id,
     )
     session.add(user)
     session.flush()

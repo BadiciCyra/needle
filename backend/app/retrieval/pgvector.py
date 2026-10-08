@@ -31,6 +31,7 @@ def to_profile(row: Startup) -> StartupProfile:
         capabilities=row.capabilities,
         description=row.description,
         past_pilots=row.past_pilots or [],
+        website=row.website,
     )
 
 

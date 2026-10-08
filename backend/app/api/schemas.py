@@ -40,11 +40,13 @@ class MatchOut(MatchResult):
 class DecisionIn(BaseModel):
     decision: Literal["accept", "decline"]
     reason: str | None = Field(None, description="Ret sebebi (negatif eşleşme kaydı için)")
+    note: str | None = Field(None, max_length=2000, description="Kabulde girişime giden tanıştırma notu")
 
 
 class DecisionOut(BaseModel):
     match_id: int
     status: str
+    introduction_id: int | None = None
     pilot_id: int | None = None
 
 
@@ -60,10 +62,47 @@ class NeedSummary(BaseModel):
     accepted_count: int = 0
 
 
+IntroStatus = Literal["bekliyor", "kabul", "ret"]
+
+
+class IntroBrief(BaseModel):
+    """Tanıştırmada girişimle paylaşılan brief özeti."""
+
+    title: str
+    problem: str | None = None
+    scope: str | None = None
+    required_capabilities: list[str] = Field(default_factory=list)
+    success_criteria: str | None = None
+    timeline: str | None = None
+
+
+class IntroductionOut(BaseModel):
+    id: int
+    status: IntroStatus
+    brief_id: int
+    brief: IntroBrief
+    organization: str | None
+    startup: StartupProfile
+    startup_has_account: bool = Field(description="Girişimin doğrulanmış hesabı var mı (yoksa yönetici aracılık eder)")
+    source: Literal["eslestirme", "cagri"]
+    firm_note: str | None
+    startup_note: str | None
+    responded_by: str | None
+    created_at: datetime
+    responded_at: datetime | None
+    pilot_id: int | None = None
+
+
+class IntroResponseIn(BaseModel):
+    decision: Literal["kabul", "ret"]
+    note: str | None = Field(None, max_length=2000)
+
+
 class SavedMatchItem(MatchResultItem):
     match_id: int
     status: Literal["suggested", "accepted", "declined"]
     declined_reason: str | None = None
+    introduction: IntroductionOut | None = None
 
 
 class SavedMatchOut(BaseModel):
@@ -77,6 +116,7 @@ class SavedMatchOut(BaseModel):
     no_match: bool = False
     retrieval_trace: list[str]
     trace_steps: list[TraceStep] = Field(default_factory=list, description="Eski kayıtlarda boş (iz düz metindi)")
+    open_call_id: int | None = Field(None, description="Bu ihtiyaç için açılmış çağrı")
 
 
 class MilestoneIn(BaseModel):
@@ -103,7 +143,7 @@ class PilotUpdate(BaseModel):
 class PilotOut(BaseModel):
     id: int
     status: str
-    match_id: int
+    match_id: int | None
     brief_id: int
     brief_title: str
     startup: StartupProfile
@@ -128,7 +168,8 @@ class RegisterIn(BaseModel):
     name: str = Field(min_length=2, max_length=200)
     email: str = Field(pattern=EMAIL_PATTERN, max_length=254)
     password: str = Field(min_length=10, max_length=200, description="En az 10 karakter")
-    organization_name: str = Field(min_length=2, max_length=200)
+    account_type: Literal["firma", "girisim"] = "firma"
+    organization_name: str | None = Field(None, min_length=2, max_length=200, description="Firma hesabında zorunlu")
     kvkk_onay: bool = Field(description="Aydınlatma metninin okunduğunu onaylar")
 
 
@@ -159,9 +200,104 @@ class OrganizationOut(BaseModel):
     onboarded: bool
 
 
+class StartupAccountOut(BaseModel):
+    id: str
+    name: str
+    status: Literal["aktif", "onay_bekliyor", "reddedildi"]
+    verified: bool = Field(description="Hesap bu profilin sahibi olarak doğrulandı mı")
+
+
 class MeOut(BaseModel):
     id: int
     name: str
     email: str
-    role: Literal["firma", "yonetici"]
+    role: Literal["firma", "yonetici", "girisim"]
     organization: OrganizationOut | None
+    startup: StartupAccountOut | None = None
+
+
+# --------------------------------------------------------------------------- #
+# Girişim hesabı
+# --------------------------------------------------------------------------- #
+
+class ClaimIn(BaseModel):
+    startup_id: str
+
+
+class StartupProfileIn(BaseModel):
+    """Girişimin kendi profili: yeni açarken ve düzenlerken."""
+
+    name: str = Field(min_length=2, max_length=200)
+    sector: str = Field(min_length=2, max_length=100)
+    maturity: Maturity
+    location: str = Field(min_length=2, max_length=100)
+    website: str | None = Field(None, max_length=300, pattern=r"^https?://")
+    description: str = Field(min_length=20, max_length=1500)
+    capabilities: list[str] = Field(min_length=2, max_length=10, description="Kurumlara sunulan somut yetkinlikler")
+    past_pilots: list[str] = Field(default_factory=list, max_length=10)
+
+
+class ClaimOut(BaseModel):
+    """Yöneticinin onay listesi: sahiplenme isteği ya da yeni profil."""
+
+    user_id: int
+    user_name: str
+    email: str
+    startup: StartupProfile
+    startup_status: str
+    kind: Literal["sahiplenme", "yeni_profil"]
+    domain_match: bool
+    created_at: datetime
+
+
+# --------------------------------------------------------------------------- #
+# Açık çağrılar
+# --------------------------------------------------------------------------- #
+
+class OpenCallIn(BaseModel):
+    brief_id: int
+    title: str = Field(min_length=5, max_length=200)
+    summary: str = Field(min_length=20, max_length=3000, description="Girişimlerin göreceği metin")
+    hide_organization: bool = False
+    deadline: date | None = None
+
+
+class OpenCallUpdate(BaseModel):
+    status: Literal["acik", "kapali"]
+
+
+class ApplicationIn(BaseModel):
+    note: str = Field(min_length=20, max_length=3000, description="Bu problemi nasıl çözüyorsunuz?")
+
+
+class ApplicationOut(BaseModel):
+    id: int
+    call_id: int
+    startup: StartupProfile
+    note: str
+    status: Literal["yeni", "kabul", "ret"]
+    decision_note: str | None
+    created_at: datetime
+    pilot_id: int | None = None
+
+
+class ApplicationDecisionIn(BaseModel):
+    decision: Literal["kabul", "ret"]
+    note: str | None = Field(None, max_length=2000)
+
+
+class OpenCallOut(BaseModel):
+    id: int
+    brief_id: int
+    title: str
+    summary: str
+    organization: str | None = Field(description="Kurum adı gizlendiyse girişime None döner")
+    sector: str | None
+    required_capabilities: list[str]
+    deadline: date | None
+    status: Literal["acik", "kapali"]
+    created_at: datetime
+    hide_organization: bool
+    application_count: int = 0
+    my_application: ApplicationOut | None = Field(None, description="Girişim hesabı için kendi başvurusu")
+    applications: list[ApplicationOut] = Field(default_factory=list, description="Firma ve yönetici için başvurular")

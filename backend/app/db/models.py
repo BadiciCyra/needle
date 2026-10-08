@@ -4,10 +4,10 @@
 burada hazır duruyor; sunumda söylenenler veri modelinde karşılık buluyor.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -41,11 +41,16 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(254), unique=True, index=True)  # küçük harfe çevrilmiş
     password_hash: Mapped[str] = mapped_column(String(255))  # argon2id
     name: Mapped[str] = mapped_column(String(200))
-    role: Mapped[str] = mapped_column(String(20), default="firma")  # firma | yonetici
+    role: Mapped[str] = mapped_column(String(20), default="firma")  # firma | yonetici | girisim
     organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
+    # Girişim hesabı: sahiplendiği profil. Doğrulanana kadar (alan adı eşleşmesi ya da yönetici onayı)
+    # davetleri göremez, profili düzenleyemez.
+    startup_id: Mapped[str | None] = mapped_column(ForeignKey("startups.id"))
+    startup_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     organization: Mapped[Organization | None] = relationship()
+    startup: Mapped["Startup | None"] = relationship()
 
 
 class AuthSession(Base):
@@ -101,7 +106,12 @@ class Startup(Base):
     capabilities: Mapped[list] = mapped_column(JSONB)
     description: Mapped[str] = mapped_column(Text)
     past_pilots: Mapped[list] = mapped_column(JSONB, default=list)
+    # Embedding yalnızca aktif profilde var: onay bekleyen yeni profil aramaya hiç girmez
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    website: Mapped[str | None] = mapped_column(String(300))  # sahiplenmede e-posta alan adıyla karşılaştırılır
+    status: Mapped[str] = mapped_column(String(20), default="aktif")  # aktif | onay_bekliyor | reddedildi
+    source: Mapped[str] = mapped_column(String(20), default="havuz")  # havuz (seed) | girisim (kendisi açtı)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class MatchRun(Base):
@@ -134,11 +144,64 @@ class Match(Base):
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class OpenCall(Base):
+    """Açık çağrı: havuzda uygun girişim bulunamayan ihtiyaç, girişimlerin başvurusuna açılır."""
+
+    __tablename__ = "open_calls"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), unique=True)
+    organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"), index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    summary: Mapped[str] = mapped_column(Text)  # girişimlerin göreceği metin (brief'in kendisi değil)
+    hide_organization: Mapped[bool] = mapped_column(Boolean, default=False)
+    deadline: Mapped[date | None] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(20), default="acik")  # acik | kapali
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Application(Base):
+    __tablename__ = "call_applications"
+    __table_args__ = (UniqueConstraint("call_id", "startup_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    call_id: Mapped[int] = mapped_column(ForeignKey("open_calls.id"), index=True)
+    startup_id: Mapped[str] = mapped_column(ForeignKey("startups.id"), index=True)
+    note: Mapped[str] = mapped_column(Text)  # "bu problemi şöyle çözüyoruz"
+    status: Mapped[str] = mapped_column(String(20), default="yeni")  # yeni | kabul | ret
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Introduction(Base):
+    """Tanıştırma: firma bir eşleşmeyi kabul edince girişime giden istek. Girişim kabul ederse pilot açılır."""
+
+    __tablename__ = "introductions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), index=True)
+    startup_id: Mapped[str] = mapped_column(ForeignKey("startups.id"), index=True)
+    match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.id"), unique=True)  # eşleştirmeden geldiyse
+    application_id: Mapped[int | None] = mapped_column(ForeignKey("call_applications.id"), unique=True)  # çağrıdan
+    status: Mapped[str] = mapped_column(String(20), default="bekliyor")  # bekliyor | kabul | ret
+    firm_note: Mapped[str | None] = mapped_column(Text)
+    startup_note: Mapped[str | None] = mapped_column(Text)
+    # Girişimin hesabı yoksa yönetici onun adına cevap verir ("telefonla görüştüm"); kim cevapladı izlenir
+    responded_by: Mapped[str | None] = mapped_column(String(20))  # girisim | yonetici
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class Pilot(Base):
     __tablename__ = "pilots"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    match_id: Mapped[int] = mapped_column(ForeignKey("matches.id"), unique=True)
+    # Pilot ya bir eşleşmeden ya da açık çağrı başvurusundan doğar; brief ve girişim her iki durumda da doğrudan tutulur
+    match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.id"), unique=True)
+    brief_id: Mapped[int | None] = mapped_column(ForeignKey("briefs.id"), index=True)
+    startup_id: Mapped[str | None] = mapped_column(ForeignKey("startups.id"), index=True)
+    introduction_id: Mapped[int | None] = mapped_column(ForeignKey("introductions.id"), unique=True)
     status: Mapped[str] = mapped_column(String(20), default="active")  # active | paused | done | cancelled
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_activity_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -3,7 +3,8 @@
 - Şifreler argon2id ile hash'lenir (argon2-cffi varsayılanları).
 - Oturum anahtarı rastgele üretilir ve httpOnly çerezde taşınır; veritabanında yalnızca SHA-256 özeti durur,
   böylece veritabanı sızsa bile geçerli oturum anahtarı ele geçmez.
-- Roller: firma (yalnızca kendi kurumunun kayıtları) ve yonetici (hepsi).
+- Roller: firma (yalnızca kendi kurumunun kayıtları), girisim (kendisine gelen davetler, açık çağrılar ve
+  kendi pilotları) ve yonetici (hepsi).
 """
 
 import hashlib
@@ -89,7 +90,13 @@ def require_admin(user: User = Depends(current_user)) -> User:
 
 
 def org_scope(user: User) -> int | None:
-    """Firma kullanıcısı için kurum id'si; yönetici için None (kısıt yok)."""
+    """Firma kullanıcısı için kurum id'si; yönetici için None (kısıt yok).
+
+    Girişim hesabı kurum kayıtlarına (ihtiyaç, brief, eşleşme) hiç erişemez. Bu kontrol burada olmalı:
+    girişimin organization_id'si boş olduğu için aksi halde yönetici gibi "kısıtsız" sayılırdı.
+    """
+    if user.role == "girisim":
+        raise HTTPException(403, "Bu sayfa firma hesaplarına açık")
     return None if user.role == "yonetici" else user.organization_id
 
 
@@ -98,3 +105,35 @@ def ensure_visible(user: User, organization_id: int | None) -> None:
     scope = org_scope(user)
     if scope is not None and organization_id != scope:
         raise HTTPException(404, "Kayıt bulunamadı")
+
+
+def startup_scope(user: User) -> str:
+    """Girişim hesabının doğrulanmış profil id'si; doğrulanmamışsa 403."""
+    if user.role != "girisim":
+        raise HTTPException(403, "Bu işlem girişim hesaplarına açık")
+    if not user.startup_id or user.startup_verified_at is None:
+        raise HTTPException(403, "Girişim profiliniz henüz doğrulanmadı")
+    return user.startup_id
+
+
+# Kişisel e-posta servisleri alan adı doğrulamasında kullanılmaz (herkes gmail adresi alabilir)
+_FREE_MAIL = {
+    "gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com", "yahoo.com", "yandex.com",
+    "yandex.com.tr", "icloud.com", "me.com", "proton.me", "protonmail.com", "msn.com", "mail.com", "aol.com",
+}
+
+
+def site_domain(url: str | None) -> str | None:
+    if not url:
+        return None
+    host = url.split("//")[-1].split("/")[0].split(":")[0].lower()
+    return host.removeprefix("www.") or None
+
+
+def email_matches_site(email: str, website: str | None) -> bool:
+    """E-posta alan adı girişimin sitesiyle aynı (ya da alt alan adı) mı? Kişisel e-posta servisleri sayılmaz."""
+    domain = email.rsplit("@", 1)[-1].lower()
+    site = site_domain(website)
+    if not site or domain in _FREE_MAIL:
+        return False
+    return domain == site or domain.endswith("." + site) or site.endswith("." + domain)
