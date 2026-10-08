@@ -132,6 +132,9 @@ class Startup(Base):
     # Embedding yalnızca aktif profilde var: onay bekleyen yeni profil aramaya hiç girmez
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
     website: Mapped[str | None] = mapped_column(String(300))  # sahiplenmede e-posta alan adıyla karşılaştırılır
+    # Sitesinden toplanan iletişim adresi (seed/iletisim_topla.py); tanıştırma e-postası taslağının alıcısı
+    contact_email: Mapped[str | None] = mapped_column(String(254))
+    contact_source: Mapped[str | None] = mapped_column(String(300))
     status: Mapped[str] = mapped_column(String(20), default="aktif")  # aktif | onay_bekliyor | reddedildi
     source: Mapped[str] = mapped_column(String(20), default="havuz")  # havuz (seed) | girisim (kendisi açtı)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -212,6 +215,13 @@ class Introduction(Base):
     startup_note: Mapped[str | None] = mapped_column(Text)
     # Girişimin hesabı yoksa yönetici onun adına cevap verir ("telefonla görüştüm"); kim cevapladı izlenir
     responded_by: Mapped[str | None] = mapped_column(String(20))  # girisim | yonetici
+    # Hesabı olmayan girişime gidecek e-postanın taslağı. Uygulama göndermez: firma ya da yönetici düzenleyip
+    # kendi e-postasından gönderir, sonra "gönderildi" diye işaretler
+    email_to: Mapped[str | None] = mapped_column(String(254))
+    email_subject: Mapped[str | None] = mapped_column(String(300))
+    email_body: Mapped[str | None] = mapped_column(Text)
+    email_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    email_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

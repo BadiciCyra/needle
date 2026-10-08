@@ -7,6 +7,7 @@ Açık çağrı: havuzda uygun girişim bulunamayan ihtiyaç girişimlerin başv
 zaten ilgisini bildirmiş olduğu için firmanın kabulü tanıştırmayı da tamamlar ve pilot doğrudan açılır.
 """
 
+import re
 from datetime import date, datetime, timezone
 from uuid import uuid4
 
@@ -25,17 +26,18 @@ from app.auth import (
     require_admin,
     startup_scope,
 )
+from app.config import Settings, get_settings
 from app.db.models import (
     Application,
     BriefRecord,
     Introduction,
+    Match,
     Need,
     OpenCall,
     Pilot,
     Startup,
     User,
 )
-from app.config import Settings, get_settings
 from app.db.session import get_db
 from app.embeddings import Embedder
 from app.retrieval.pgvector import to_profile
@@ -67,7 +69,57 @@ def create_pilot(session: Session, intro: Introduction) -> Pilot:
     return pilot
 
 
-def intro_out(session: Session, intro: Introduction) -> api.IntroductionOut:
+def intro_email_draft(session: Session, intro: Introduction, sender: User, settings: Settings) -> None:
+    """Hesabı olmayan girişime gidecek tanıştırma e-postasının taslağını yazar (göndermez).
+
+    Gövde şablondan kurulur, ek LLM çağrısı yok: ihtiyacın özeti, eşleştirmenin "neden uygun" gerekçesi,
+    firmanın notu ve profili sahiplenme bağlantısı. Firma ya da yönetici düzenleyip kendi e-postasından gönderir.
+    """
+    record = session.get(BriefRecord, intro.brief_id)
+    startup = session.get(Startup, intro.startup_id)
+    data = record.data or {}
+    organization = record.need.organization.name if record.need.organization else "Kurumumuz"
+    title = data.get("title") or record.need.raw_text[:60]
+    match = session.get(Match, intro.match_id) if intro.match_id else None
+    why = ((match.rationale or {}).get("fit_summary") if match else None) or ""
+
+    lines = [
+        f"Merhaba {startup.name} ekibi,",
+        "",
+        f"{organization} olarak “{title}” ihtiyacımız için Needle üzerinden yaptığımız eşleştirmede sizi uygun bulduk "
+        "ve tanışmak istiyoruz.",
+        "",
+    ]
+    for label, value in (
+        ("İhtiyaç", data.get("problem")),
+        ("Kapsam", data.get("scope")),
+        ("Aranan yetkinlikler", ", ".join(data.get("required_capabilities") or [])),
+        ("Başarı kriteri", data.get("success_criteria")),
+        ("Süre", data.get("timeline")),
+    ):
+        if value:
+            lines.append(f"{label}: {value}")
+    if why:
+        lines += ["", f"Neden sizi düşündük: {why}"]
+    if intro.firm_note:
+        lines += ["", intro.firm_note]
+    lines += [
+        "",
+        "İlgilenirseniz bu e-postayı yanıtlamanız yeterli. Dilerseniz Needle'da girişim profilinizi sahiplenip "
+        f"tanıştırma isteğini oradan da kabul edebilirsiniz: {settings.app_base_url.rstrip('/')}/kayit",
+        "",
+        "Saygılarımızla,",
+        sender.name,
+        organization if sender.role == "firma" else "Needle program ekibi",
+    ]
+    intro.email_to = startup.contact_email
+    intro.email_subject = f"{organization} sizinle tanışmak istiyor: {title}"
+    intro.email_body = "\n".join(lines)
+    intro.email_updated_at = _now()
+    intro.email_sent_at = None
+
+
+def intro_out(session: Session, intro: Introduction, viewer: User | None = None) -> api.IntroductionOut:
     record = session.get(BriefRecord, intro.brief_id)
     data = record.data or {}
     pilot_id = session.scalar(select(Pilot.id).where(Pilot.introduction_id == intro.id))
@@ -94,6 +146,17 @@ def intro_out(session: Session, intro: Introduction) -> api.IntroductionOut:
         created_at=intro.created_at,
         responded_at=intro.responded_at,
         pilot_id=pilot_id,
+        # Taslak firmanın iç yazışması: girişime gösterilmez
+        email=api.IntroEmail(
+            to=intro.email_to,
+            subject=intro.email_subject,
+            body=intro.email_body,
+            contact_source=session.get(Startup, intro.startup_id).contact_source,
+            updated_at=intro.email_updated_at,
+            sent_at=intro.email_sent_at,
+        )
+        if intro.email_body and viewer is not None and viewer.role != "girisim"
+        else None,
     )
 
 
@@ -281,7 +344,7 @@ def list_introductions(session: Session = Depends(get_db), user: User = Depends(
             .join(Need, BriefRecord.need_id == Need.id)
             .where(Need.organization_id == scope)
         )
-    return [intro_out(session, i) for i in session.scalars(query).all()]
+    return [intro_out(session, i, user) for i in session.scalars(query).all()]
 
 
 @router.post("/introductions/{intro_id}/respond", response_model=api.IntroductionOut, summary="Tanıştırmaya cevap ver")
@@ -306,7 +369,59 @@ def respond_introduction(
     if payload.decision == "kabul":
         create_pilot(session, intro)
     session.commit()
-    return intro_out(session, intro)
+    return intro_out(session, intro, user)
+
+
+def _editable_intro(session: Session, intro_id: int, user: User) -> Introduction:
+    """E-posta taslağını yalnızca isteği yapan firma ve yönetici görür ve değiştirir."""
+    intro = session.get(Introduction, intro_id)
+    if intro is None or user.role == "girisim":
+        raise HTTPException(404, "Tanıştırma bulunamadı")
+    ensure_visible(user, _brief_org(session, intro.brief_id))
+    return intro
+
+
+@router.post("/introductions/{intro_id}/email/draft", response_model=api.IntroductionOut, summary="E-posta taslağı oluştur")
+def create_intro_email(
+    intro_id: int,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
+):
+    intro = _editable_intro(session, intro_id, user)
+    if intro.email_sent_at:
+        raise HTTPException(409, "Bu e-posta gönderildi olarak işaretli")
+    intro_email_draft(session, intro, user, settings)
+    session.commit()
+    return intro_out(session, intro, user)
+
+
+@router.put("/introductions/{intro_id}/email", response_model=api.IntroductionOut, summary="E-posta taslağını kaydet")
+def save_intro_email(
+    intro_id: int, payload: api.IntroEmailIn, session: Session = Depends(get_db), user: User = Depends(current_user)
+):
+    intro = _editable_intro(session, intro_id, user)
+    if intro.email_sent_at:
+        raise HTTPException(409, "Bu e-posta gönderildi olarak işaretli; düzenlemek için işareti kaldırın")
+    to = (payload.to or "").strip() or None
+    if to and not re.fullmatch(api.EMAIL_PATTERN, to):
+        raise HTTPException(422, "Alıcı e-posta adresi geçersiz")
+    intro.email_to, intro.email_subject, intro.email_body = to, payload.subject.strip(), payload.body.strip()
+    intro.email_updated_at = _now()
+    session.commit()
+    return intro_out(session, intro, user)
+
+
+@router.post("/introductions/{intro_id}/email/sent", response_model=api.IntroductionOut, summary="Gönderildi olarak işaretle")
+def mark_intro_email_sent(
+    intro_id: int, payload: api.IntroEmailSentIn, session: Session = Depends(get_db), user: User = Depends(current_user)
+):
+    intro = _editable_intro(session, intro_id, user)
+    if not intro.email_body:
+        raise HTTPException(409, "Önce bir e-posta taslağı oluşturun")
+    intro.email_sent_at = _now() if payload.sent else None
+    session.commit()
+    return intro_out(session, intro, user)
 
 
 # --------------------------------------------------------------------------- #

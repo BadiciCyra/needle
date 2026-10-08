@@ -229,6 +229,16 @@ export interface Introduction {
   created_at: string
   responded_at: string | null
   pilot_id: number | null
+  email?: IntroEmail | null // yalnızca firma ve yönetici görür
+}
+
+export interface IntroEmail {
+  to: string | null
+  subject: string
+  body: string
+  contact_source: string | null
+  updated_at: string | null
+  sent_at: string | null
 }
 
 export interface Application {
