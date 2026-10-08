@@ -14,11 +14,11 @@ from datetime import datetime, timedelta, timezone
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 from fastapi import Depends, HTTPException, Request, Response
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
-from app.db.models import AuthSession, User
+from app.db.models import AuthSession, LoginAttempt, PasswordResetToken, User
 from app.db.session import get_db
 
 COOKIE_NAME = "needle_session"
@@ -50,9 +50,68 @@ def authenticate(session: Session, email: str, password: str) -> User | None:
     return user if verify_password(user.password_hash, password) else None
 
 
+def client_ip(request: Request) -> str | None:
+    """nginx'in eklediği X-Real-IP (istemcinin gönderdiğini ezer); doğrudan erişimde bağlantının adresi.
+
+    API portu yalnızca 127.0.0.1'e açık olduğundan başlığı nginx dışında kimse yazamaz.
+    """
+    return request.headers.get("x-real-ip") or (request.client.host if request.client else None)
+
+
+def login_blocked(session: Session, email: str, ip: str | None, settings: Settings) -> bool:
+    since = datetime.now(timezone.utc) - timedelta(minutes=settings.login_window_minutes)
+    session.execute(delete(LoginAttempt).where(LoginAttempt.created_at < since))
+    by_email = session.scalar(select(func.count()).select_from(LoginAttempt).where(LoginAttempt.email == email))
+    by_ip = (
+        session.scalar(select(func.count()).select_from(LoginAttempt).where(LoginAttempt.ip == ip)) if ip else 0
+    )
+    return by_email >= settings.login_max_failures_per_email or by_ip >= settings.login_max_failures_per_ip
+
+
+def record_failed_login(session: Session, email: str, ip: str | None) -> None:
+    session.add(LoginAttempt(email=email, ip=ip))
+
+
+def clear_failed_logins(session: Session, email: str) -> None:
+    session.execute(delete(LoginAttempt).where(LoginAttempt.email == email))
+
+
+def end_all_sessions(session: Session, user: User, keep_token: str | None = None) -> None:
+    """Şifre değişince diğer cihazlardaki oturumlar düşer (çalınmış oturum da)."""
+    query = delete(AuthSession).where(AuthSession.user_id == user.id)
+    if keep_token:
+        query = query.where(AuthSession.token_hash != _token_hash(keep_token))
+    session.execute(query)
+
+
+def create_reset_token(session: Session, user: User, settings: Settings) -> str:
+    token = secrets.token_urlsafe(32)
+    # Önceki kullanılmamış bağlantılar geçersiz olur: yalnızca son gönderilen çalışır
+    session.execute(delete(PasswordResetToken).where(PasswordResetToken.user_id == user.id))
+    session.add(
+        PasswordResetToken(
+            token_hash=_token_hash(token),
+            user_id=user.id,
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.password_reset_minutes),
+        )
+    )
+    return token
+
+
+def consume_reset_token(session: Session, token: str) -> User | None:
+    record = session.get(PasswordResetToken, _token_hash(token))
+    now = datetime.now(timezone.utc)
+    if record is None or record.used_at is not None or record.expires_at < now:
+        return None
+    record.used_at = now
+    return session.get(User, record.user_id)
+
+
 def start_session(session: Session, response: Response, user: User, settings: Settings) -> None:
     token = secrets.token_urlsafe(32)
-    expires = datetime.now(timezone.utc) + timedelta(days=settings.session_days)
+    now = datetime.now(timezone.utc)
+    expires = now + timedelta(days=settings.session_days)
+    session.execute(delete(AuthSession).where(AuthSession.user_id == user.id, AuthSession.expires_at < now))
     session.add(AuthSession(token_hash=_token_hash(token), user_id=user.id, expires_at=expires))
     response.set_cookie(
         COOKIE_NAME,

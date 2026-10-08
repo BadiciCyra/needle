@@ -178,6 +178,20 @@ class LoginIn(BaseModel):
     password: str = Field(max_length=200)
 
 
+class ResetRequestIn(BaseModel):
+    email: str = Field(max_length=254)
+
+
+class ResetConfirmIn(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    password: str = Field(min_length=10, max_length=200, description="En az 10 karakter")
+
+
+class PasswordChangeIn(BaseModel):
+    current_password: str = Field(max_length=200)
+    new_password: str = Field(min_length=10, max_length=200, description="En az 10 karakter")
+
+
 class OrgProfile(BaseModel):
     """Firma hesabının ilk girişte doldurduğu profil. Brief'in boş alanlarını doldurmak için kullanılır."""
 
