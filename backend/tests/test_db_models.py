@@ -19,6 +19,8 @@ def test_all_tables_are_defined():
         "introductions",
         "open_calls",
         "call_applications",
+        "login_attempts",
+        "password_reset_tokens",
     }
 
 
