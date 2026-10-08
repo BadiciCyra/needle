@@ -21,7 +21,11 @@
    "https://turkiye.ai/portfolio/sestek/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede Beko vakası ve yurt dışı ofisler (Dubai) yer alıyor."
+  "olgunluk_notu": "Sitede Beko vakası ve yurt dışı ofisler (Dubai) yer alıyor.",
+  "iletisim": {
+   "email": "info@sestek.com",
+   "kaynak": "https://www.sestek.com/"
+  }
  },
  {
   "id": "g002",
@@ -42,7 +46,11 @@
    "https://turkiye.ai/portfolio/kronnika/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede referanslar ve başarı hikayeleri bölümü var."
+  "olgunluk_notu": "Sitede referanslar ve başarı hikayeleri bölümü var.",
+  "iletisim": {
+   "email": "info@kronnika.com",
+   "kaynak": "https://kronnika.com/tr/anasayfa"
+  }
  },
  {
   "id": "g003",
@@ -62,7 +70,11 @@
    "https://turkiye.ai/portfolio/voiser/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede fiyatlandırma ve müşteriler sayfası var."
+  "olgunluk_notu": "Sitede fiyatlandırma ve müşteriler sayfası var.",
+  "iletisim": {
+   "email": "bilgi@voiser.net",
+   "kaynak": "https://www.voiser.net/iletisim"
+  }
  },
  {
   "id": "g004",
@@ -83,7 +95,11 @@
    "https://turkiye.ai/portfolio/apilex/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kayıt ve demo akışı açık; müşteri sayısı belirtilmemiş."
+  "olgunluk_notu": "Kayıt ve demo akışı açık; müşteri sayısı belirtilmemiş.",
+  "iletisim": {
+   "email": "info@apilex.ai",
+   "kaynak": "https://www.apilex.ai/tr/iletisim"
+  }
  },
  {
   "id": "g005",
@@ -104,7 +120,11 @@
    "https://turkiye.ai/portfolio/lextum/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Paketler ve ücretsiz deneme sunuluyor."
+  "olgunluk_notu": "Paketler ve ücretsiz deneme sunuluyor.",
+  "iletisim": {
+   "email": "info@lextum.ai",
+   "kaynak": "https://lextum.ai/"
+  }
  },
  {
   "id": "g006",
@@ -125,7 +145,11 @@
    "https://turkiye.ai/portfolio/leagle/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma ve iş birlikleri sayfası var."
+  "olgunluk_notu": "Fiyatlandırma ve iş birlikleri sayfası var.",
+  "iletisim": {
+   "email": "info@leagleapp.com",
+   "kaynak": "https://www.leagleapp.com/tr/contact"
+  }
  },
  {
   "id": "g007",
@@ -146,7 +170,11 @@
    "https://turkiye.ai/portfolio/nisusai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "UiPath akredite çözüm ortağı; İTÜ BigBang 2025 ilk 50."
+  "olgunluk_notu": "UiPath akredite çözüm ortağı; İTÜ BigBang 2025 ilk 50.",
+  "iletisim": {
+   "email": "info@nisus-ai.com",
+   "kaynak": "https://nisus-ai.com/en/contact/"
+  }
  },
  {
   "id": "g008",
@@ -188,7 +216,11 @@
    "https://turkiye.ai/portfolio/etkin-ai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma ve başarı hikayeleri sayfası var."
+  "olgunluk_notu": "Fiyatlandırma ve başarı hikayeleri sayfası var.",
+  "iletisim": {
+   "email": "info@etkin.ai",
+   "kaynak": "https://www.etkin.ai"
+  }
  },
  {
   "id": "g010",
@@ -209,7 +241,11 @@
    "https://turkiye.ai/portfolio/ai-agent-tr/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "14 günlük deneme ve referanslar sayfası var."
+  "olgunluk_notu": "14 günlük deneme ve referanslar sayfası var.",
+  "iletisim": {
+   "email": "info@aiagenttr.com",
+   "kaynak": "https://aiagenttr.com"
+  }
  },
  {
   "id": "g011",
@@ -253,7 +289,11 @@
    "https://turkiye.ai/portfolio/novaforge/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "7 günlük deneme var; müşteri referansı görülmedi."
+  "olgunluk_notu": "7 günlük deneme var; müşteri referansı görülmedi.",
+  "iletisim": {
+   "email": "contact@novaforge.tech",
+   "kaynak": "https://www.novaforge.tech"
+  }
  },
  {
   "id": "g013",
@@ -274,7 +314,11 @@
    "https://turkiye.ai/portfolio/robomotion/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede dünya genelinde 20.000+ kullanıcı belirtiliyor."
+  "olgunluk_notu": "Sitede dünya genelinde 20.000+ kullanıcı belirtiliyor.",
+  "iletisim": {
+   "email": "support@robomotion.io",
+   "kaynak": "https://www.robomotion.io"
+  }
  },
  {
   "id": "g014",
@@ -294,7 +338,11 @@
    "https://turkiye.ai/portfolio/voodoo-rpa/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlar, iş ortakları ve vaka çalışmaları sayfası var."
+  "olgunluk_notu": "Fiyatlar, iş ortakları ve vaka çalışmaları sayfası var.",
+  "iletisim": {
+   "email": "info@onezeroi.com",
+   "kaynak": "https://www.voodoorpa.com/voodoo-robotic-process-automation-contact-headquarter-office/"
+  }
  },
  {
   "id": "g015",
@@ -336,7 +384,11 @@
    "https://turkiye.ai/portfolio/ono/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Demo akışı ve geniş ürün yelpazesi; müşteri sayısı belirtilmemiş."
+  "olgunluk_notu": "Demo akışı ve geniş ürün yelpazesi; müşteri sayısı belirtilmemiş.",
+  "iletisim": {
+   "email": "info@onenewone.com",
+   "kaynak": "https://onenewone.com/kurumsal/hakkimizda/"
+  }
  },
  {
   "id": "g017",
@@ -357,7 +409,11 @@
    "https://turkiye.ai/portfolio/meetgate/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede 500+ şirket verisine dayalı karşılaştırma var."
+  "olgunluk_notu": "Sitede 500+ şirket verisine dayalı karşılaştırma var.",
+  "iletisim": {
+   "email": "info@meetgate.ai",
+   "kaynak": "https://meetgate.ai/contact/"
+  }
  },
  {
   "id": "g018",
@@ -378,7 +434,11 @@
    "https://turkiye.ai/portfolio/t4-people-analytics/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürün paketleri ve kullanım senaryoları var."
+  "olgunluk_notu": "Ürün paketleri ve kullanım senaryoları var.",
+  "iletisim": {
+   "email": "t4essentials@t4analytics.com",
+   "kaynak": "https://t4peopleanalytics.com"
+  }
  },
  {
   "id": "g019",
@@ -420,7 +480,11 @@
    "https://turkiye.ai/portfolio/ollang/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kurumsal sektör sayfaları var; müşteri sayısı belirtilmemiş."
+  "olgunluk_notu": "Kurumsal sektör sayfaları var; müşteri sayısı belirtilmemiş.",
+  "iletisim": {
+   "email": "info@ollang.com",
+   "kaynak": "https://www.ollang.com/about"
+  }
  },
  {
   "id": "g021",
@@ -462,7 +526,11 @@
    "https://turkiye.ai/portfolio/skymod/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "700+ hazır uygulama ve Sky AI Summit etkinliği."
+  "olgunluk_notu": "700+ hazır uygulama ve Sky AI Summit etkinliği.",
+  "iletisim": {
+   "email": "hello@skymod.tech",
+   "kaynak": "https://skymod.tech/contact-us"
+  }
  },
  {
   "id": "g023",
@@ -503,7 +571,11 @@
    "https://turkiye.ai/portfolio/exairon/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma ve ücretsiz deneme var."
+  "olgunluk_notu": "Fiyatlandırma ve ücretsiz deneme var.",
+  "iletisim": {
+   "email": "info@exairon.com",
+   "kaynak": "https://exairon.com/contact/"
+  }
  },
  {
   "id": "g025",
@@ -524,7 +596,11 @@
    "https://turkiye.ai/portfolio/usersdot/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Demo akışı var; müşteri sayısı belirtilmemiş."
+  "olgunluk_notu": "Demo akışı var; müşteri sayısı belirtilmemiş.",
+  "iletisim": {
+   "email": "support@usersdot.com",
+   "kaynak": "https://usersdot.com"
+  }
  },
  {
   "id": "g026",
@@ -546,7 +622,11 @@
    "https://turkiye.ai/portfolio/pi-robotik/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Mühendislik ve kurulum hizmetleri veriyor."
+  "olgunluk_notu": "Mühendislik ve kurulum hizmetleri veriyor.",
+  "iletisim": {
+   "email": "info@pirobotik.com",
+   "kaynak": "https://www.pirobotik.com/iletisim"
+  }
  },
  {
   "id": "g027",
@@ -566,7 +646,11 @@
    "https://turkiye.ai/portfolio/arche-robotics/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürün detayı sınırlı."
+  "olgunluk_notu": "Ürün detayı sınırlı.",
+  "iletisim": {
+   "email": "info@archerobotics.com",
+   "kaynak": "https://archerobotics.com/"
+  }
  },
  {
   "id": "g028",
@@ -586,7 +670,11 @@
    "https://turkiye.ai/portfolio/gitek-vision/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Satılan ürünleri (sayma makineleri) var."
+  "olgunluk_notu": "Satılan ürünleri (sayma makineleri) var.",
+  "iletisim": {
+   "email": "info@gitekvision.com",
+   "kaynak": "https://www.gitekvision.com/hakkimizda/"
+  }
  },
  {
   "id": "g029",
@@ -608,7 +696,11 @@
    "https://turkiye.ai/portfolio/konzek/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Almanya ofisleri ve referanslar sayfası var."
+  "olgunluk_notu": "Almanya ofisleri ve referanslar sayfası var.",
+  "iletisim": {
+   "email": "info@konzek.com",
+   "kaynak": "https://www.konzek.com"
+  }
  },
  {
   "id": "g030",
@@ -629,7 +721,11 @@
    "https://turkiye.ai/portfolio/spechtlab/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürün kataloğu ve sektör uygulamaları var."
+  "olgunluk_notu": "Ürün kataloğu ve sektör uygulamaları var.",
+  "iletisim": {
+   "email": "info@spechtlab.com",
+   "kaynak": "https://spechtlab.com/iletisim"
+  }
  },
  {
   "id": "g031",
@@ -650,7 +746,11 @@
    "https://turkiye.ai/portfolio/cognitiwe/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Vaka çalışmaları ve yurt dışı ofisler (Estonya, İtalya)."
+  "olgunluk_notu": "Vaka çalışmaları ve yurt dışı ofisler (Estonya, İtalya).",
+  "iletisim": {
+   "email": "info@cognitiwe.com",
+   "kaynak": "https://cognitiwe.ai/about-us"
+  }
  },
  {
   "id": "g032",
@@ -671,7 +771,11 @@
    "https://turkiye.ai/portfolio/visio-mex/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede 200+ tamamlanmış proje ve 40+ referans."
+  "olgunluk_notu": "Sitede 200+ tamamlanmış proje ve 40+ referans.",
+  "iletisim": {
+   "email": "info@visiomex.com",
+   "kaynak": "https://visiomex.com"
+  }
  },
  {
   "id": "g033",
@@ -693,7 +797,11 @@
    "https://turkiye.ai/portfolio/dataguess-teknoloji/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Birden fazla ürün (Inspector, Predictor)."
+  "olgunluk_notu": "Birden fazla ürün (Inspector, Predictor).",
+  "iletisim": {
+   "email": "info@dataguess.com",
+   "kaynak": "https://www.dataguess.com/"
+  }
  },
  {
   "id": "g034",
@@ -757,7 +865,11 @@
    "https://turkiye.ai/portfolio/airgemba/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Demo ve uygulama sunuluyor."
+  "olgunluk_notu": "Demo ve uygulama sunuluyor.",
+  "iletisim": {
+   "email": "hello@airgemba.com",
+   "kaynak": "https://airgemba.com/contact"
+  }
  },
  {
   "id": "g037",
@@ -778,7 +890,11 @@
    "https://turkiye.ai/portfolio/pdmechanics/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma sayfası var."
+  "olgunluk_notu": "Fiyatlandırma sayfası var.",
+  "iletisim": {
+   "email": "info@pdmechanics.com",
+   "kaynak": "https://pdmechanics.com/"
+  }
  },
  {
   "id": "g038",
@@ -819,7 +935,11 @@
    "https://turkiye.ai/portfolio/intenseye/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kendi donanım ailesi ve küresel müşteri tabanı."
+  "olgunluk_notu": "Kendi donanım ailesi ve küresel müşteri tabanı.",
+  "iletisim": {
+   "email": "info@intenseye.com",
+   "kaynak": "https://www.intenseye.com/contact-us"
+  }
  },
  {
   "id": "g040",
@@ -839,7 +959,11 @@
    "https://turkiye.ai/portfolio/time-reactor-ai-systems/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kuluçka merkezinde (DEPARK Bambu); demo aşaması."
+  "olgunluk_notu": "Kuluçka merkezinde (DEPARK Bambu); demo aşaması.",
+  "iletisim": {
+   "email": "info@timereactor.ai",
+   "kaynak": "https://timereactor.ai/iletisim"
+  }
  },
  {
   "id": "g041",
@@ -860,7 +984,11 @@
    "https://turkiye.ai/portfolio/algi-ai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "500+ hazır kural ve mobil/masaüstü uygulamalar."
+  "olgunluk_notu": "500+ hazır kural ve mobil/masaüstü uygulamalar.",
+  "iletisim": {
+   "email": "algi@algi.ai",
+   "kaynak": "https://algi.ai/hakkimizda"
+  }
  },
  {
   "id": "g042",
@@ -885,7 +1013,11 @@
    "https://turkiye.ai/portfolio/maestrohub-yazilim-anonim-sirketi/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitedeki müşteri hikayeleri."
+  "olgunluk_notu": "Sitedeki müşteri hikayeleri.",
+  "iletisim": {
+   "email": "info@maestrohub.com",
+   "kaynak": "https://maestrohub.com/"
+  }
  },
  {
   "id": "g043",
@@ -906,7 +1038,11 @@
    "https://turkiye.ai/portfolio/teknotam/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Satış ve teknik destek ofisi var."
+  "olgunluk_notu": "Satış ve teknik destek ofisi var.",
+  "iletisim": {
+   "email": "info@teknotam.com.tr",
+   "kaynak": "https://www.teknotam.com.tr"
+  }
  },
  {
   "id": "g044",
@@ -927,7 +1063,11 @@
    "https://turkiye.ai/portfolio/khenda/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "ABD şirketi ve fiyatlandırma sayfası var."
+  "olgunluk_notu": "ABD şirketi ve fiyatlandırma sayfası var.",
+  "iletisim": {
+   "email": "info@khenda.com",
+   "kaynak": "https://www.khenda.com/contact"
+  }
  },
  {
   "id": "g045",
@@ -948,7 +1088,11 @@
    "https://turkiye.ai/portfolio/sensemore/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Vaka çalışmaları ve çimento, demir-çelik, ilaç gibi sektör referansları."
+  "olgunluk_notu": "Vaka çalışmaları ve çimento, demir-çelik, ilaç gibi sektör referansları.",
+  "iletisim": {
+   "email": "hello@sensemore.io",
+   "kaynak": "https://sensemore.io/about-us/"
+  }
  },
  {
   "id": "g046",
@@ -969,7 +1113,11 @@
    "https://turkiye.ai/portfolio/skysens/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ücretsiz plan ve fiyatlandırma var."
+  "olgunluk_notu": "Ücretsiz plan ve fiyatlandırma var.",
+  "iletisim": {
+   "email": "hello@skysens.io",
+   "kaynak": "https://skysens.io"
+  }
  },
  {
   "id": "g047",
@@ -1011,7 +1159,11 @@
    "https://turkiye.ai/portfolio/saha-robotik/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede müşteriler bölümü ve sipariş akışı var."
+  "olgunluk_notu": "Sitede müşteriler bölümü ve sipariş akışı var.",
+  "iletisim": {
+   "email": "info@saharobotik.com",
+   "kaynak": "https://saharobotik.com/"
+  }
  },
  {
   "id": "g049",
@@ -1033,7 +1185,11 @@
    "https://turkiye.ai/portfolio/roltek-teknoloji/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Donanım satışı ve garanti/onarım merkezi var."
+  "olgunluk_notu": "Donanım satışı ve garanti/onarım merkezi var.",
+  "iletisim": {
+   "email": "info@roltek.com.tr",
+   "kaynak": "https://roltek.com.tr/hakkimizda/"
+  }
  },
  {
   "id": "g050",
@@ -1055,7 +1211,11 @@
    "https://turkiye.ai/portfolio/meshine-tech/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kendi drone modelleri ve projeler sayfası."
+  "olgunluk_notu": "Kendi drone modelleri ve projeler sayfası.",
+  "iletisim": {
+   "email": "info@meshine.tech",
+   "kaynak": "https://www.meshine.tech/tr/"
+  }
  },
  {
   "id": "g051",
@@ -1098,7 +1258,11 @@
    "https://turkiye.ai/portfolio/solarify/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ücretli paketler ve müşteri yorumları."
+  "olgunluk_notu": "Ücretli paketler ve müşteri yorumları.",
+  "iletisim": {
+   "email": "info@loggma.com",
+   "kaynak": "https://solarify.io/tr/iletisim/"
+  }
  },
  {
   "id": "g053",
@@ -1139,7 +1303,11 @@
    "https://turkiye.ai/portfolio/areylight-ai-solutions/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Site içeriği sınırlı."
+  "olgunluk_notu": "Site içeriği sınırlı.",
+  "iletisim": {
+   "email": "info@areylight.com",
+   "kaynak": "https://areylight.com/contact"
+  }
  },
  {
   "id": "g055",
@@ -1178,7 +1346,11 @@
    "https://turkiye.ai/portfolio/smart-moles/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Online mağaza ve anahtar teslim kurulum."
+  "olgunluk_notu": "Online mağaza ve anahtar teslim kurulum.",
+  "iletisim": {
+   "email": "info@smartmoles.com",
+   "kaynak": "https://www.smartmoles.com/iletisim"
+  }
  },
  {
   "id": "g057",
@@ -1199,7 +1371,11 @@
    "https://turkiye.ai/portfolio/buluttan/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "ABD, İspanya, İtalya, Fransa pazarları."
+  "olgunluk_notu": "ABD, İspanya, İtalya, Fransa pazarları.",
+  "iletisim": {
+   "email": "contact@buluttanwx.com",
+   "kaynak": "https://www.buluttan.com/company/contact-us"
+  }
  },
  {
   "id": "g058",
@@ -1222,7 +1398,11 @@
    "https://turkiye.ai/portfolio/visiosoft/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede 33 referans."
+  "olgunluk_notu": "Sitede 33 referans.",
+  "iletisim": {
+   "email": "info@visiosoft.com.tr",
+   "kaynak": "https://www.visiosoft.com.tr/"
+  }
  },
  {
   "id": "g059",
@@ -1243,7 +1423,11 @@
    "https://turkiye.ai/portfolio/parabol-yazilim/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ulusal ve uluslararası projeler sayfası."
+  "olgunluk_notu": "Ulusal ve uluslararası projeler sayfası.",
+  "iletisim": {
+   "email": "info@paraboly.com",
+   "kaynak": "https://www.paraboly.com"
+  }
  },
  {
   "id": "g060",
@@ -1264,7 +1448,11 @@
    "https://turkiye.ai/portfolio/optiyol-2/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "ABD ofisi ve ABD müşterileri."
+  "olgunluk_notu": "ABD ofisi ve ABD müşterileri.",
+  "iletisim": {
+   "email": "info@optiyol.com",
+   "kaynak": "https://www.optiyol.com/contact"
+  }
  },
  {
   "id": "g061",
@@ -1286,7 +1474,11 @@
    "https://turkiye.ai/portfolio/smartopt/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "İspanya pazarı ve sektör sayfaları."
+  "olgunluk_notu": "İspanya pazarı ve sektör sayfaları.",
+  "iletisim": {
+   "email": "info@smartopt.com.tr",
+   "kaynak": "https://www.smartopt.com.tr/en/contact"
+  }
  },
  {
   "id": "g062",
@@ -1328,7 +1520,11 @@
    "https://turkiye.ai/portfolio/qdelivery/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma ve vaka çalışmaları."
+  "olgunluk_notu": "Fiyatlandırma ve vaka çalışmaları.",
+  "iletisim": {
+   "email": "sales@qdelivery.app",
+   "kaynak": "https://www.qdelivery.app/tr/hakkimizda"
+  }
  },
  {
   "id": "g064",
@@ -1349,7 +1545,11 @@
    "https://webrazzi.com/2023/04/27/bottobo-robotics-1-75-milyon-dolar-yatirim-aldi/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "1,75 milyon dolar yatırım (Webrazzi, 2023)."
+  "olgunluk_notu": "1,75 milyon dolar yatırım (Webrazzi, 2023).",
+  "iletisim": {
+   "email": "callme@bottobo.com",
+   "kaynak": "https://www.bottobo.com/contact"
+  }
  },
  {
   "id": "g065",
@@ -1432,7 +1632,11 @@
    "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Kayıtlı kullanıcı akışı açık."
+  "olgunluk_notu": "Kayıtlı kullanıcı akışı açık.",
+  "iletisim": {
+   "email": "info@kamyonda.com",
+   "kaynak": "https://www.kamyonda.com/contact"
+  }
  },
  {
   "id": "g069",
@@ -1453,7 +1657,11 @@
    "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Taşıyıcı ağı ve çağrı hattı var."
+  "olgunluk_notu": "Taşıyıcı ağı ve çağrı hattı var.",
+  "iletisim": {
+   "email": "info@nakliyelazim.com",
+   "kaynak": "https://nakliyelazim.com"
+  }
  },
  {
   "id": "g070",
@@ -1474,7 +1682,11 @@
    "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Birden fazla ürün (Logicure, ATOM, ASPN)."
+  "olgunluk_notu": "Birden fazla ürün (Logicure, ATOM, ASPN).",
+  "iletisim": {
+   "email": "info@asnak.com",
+   "kaynak": "https://www.asnak.com/iletisim"
+  }
  },
  {
   "id": "g071",
@@ -1494,7 +1706,11 @@
    "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Referanslar bölümü var."
+  "olgunluk_notu": "Referanslar bölümü var.",
+  "iletisim": {
+   "email": "info@shiptomore.com",
+   "kaynak": "https://shiptomore.com"
+  }
  },
  {
   "id": "g072",
@@ -1514,7 +1730,11 @@
    "https://www.ekonomist.com.tr/makale/lojistikte-dijital-devrim-basladi-17-girisimin-buyume-hedefleri-77096"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Online satış yapıyor (69 ürün)."
+  "olgunluk_notu": "Online satış yapıyor (69 ürün).",
+  "iletisim": {
+   "email": "talep@paketera.com",
+   "kaynak": "https://paketera.com/iletisim"
+  }
  },
  {
   "id": "g073",
@@ -1534,7 +1754,11 @@
    "https://evreka.co"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Hollanda ofisi ve küresel müşteri tabanı."
+  "olgunluk_notu": "Hollanda ofisi ve küresel müşteri tabanı.",
+  "iletisim": {
+   "email": "info@evreka.co",
+   "kaynak": "https://evreka.co"
+  }
  },
  {
   "id": "g074",
@@ -1554,7 +1778,11 @@
    "https://solarvis.co"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fiyatlandırma ve ABD şirketi."
+  "olgunluk_notu": "Fiyatlandırma ve ABD şirketi.",
+  "iletisim": {
+   "email": "info@solarvis.co",
+   "kaynak": "https://solarvis.co"
+  }
  },
  {
   "id": "g075",
@@ -1601,7 +1829,11 @@
    "https://turkiye.ai/portfolio/yesil-science/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürünler ve araştırma bölümü var; müşteri bilgisi yok."
+  "olgunluk_notu": "Ürünler ve araştırma bölümü var; müşteri bilgisi yok.",
+  "iletisim": {
+   "email": "contact@yesilscience.com",
+   "kaynak": "https://www.yesilscience.com/"
+  }
  },
  {
   "id": "g077",
@@ -1642,7 +1874,11 @@
    "https://turkiye.ai/portfolio/heviai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Birden fazla klinik ürün."
+  "olgunluk_notu": "Birden fazla klinik ürün.",
+  "iletisim": {
+   "email": "info@hevi.ai",
+   "kaynak": "https://hevi.ai/contact"
+  }
  },
  {
   "id": "g079",
@@ -1662,7 +1898,11 @@
    "https://turkiye.ai/portfolio/eye-checkup/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Lancet Digital Health ve Nature Eye yayınları; İngiltere şirketi."
+  "olgunluk_notu": "Lancet Digital Health ve Nature Eye yayınları; İngiltere şirketi.",
+  "iletisim": {
+   "email": "info@eye-checkup.com",
+   "kaynak": "https://www.eye-checkup.com/about-us/"
+  }
  },
  {
   "id": "g080",
@@ -1682,7 +1922,11 @@
    "https://turkiye.ai/portfolio/beynex/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Yatırımcı ve iş birlikçiler var; ürün aşaması net değil."
+  "olgunluk_notu": "Yatırımcı ve iş birlikçiler var; ürün aşaması net değil.",
+  "iletisim": {
+   "email": "info@beynex.com",
+   "kaynak": "https://beynex.com/contact-us"
+  }
  },
  {
   "id": "g081",
@@ -1701,7 +1945,11 @@
    "https://smartalpha.ai"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "FDA onaylı ve CE işaretli; seçili cihazlarda mevcut."
+  "olgunluk_notu": "FDA onaylı ve CE işaretli; seçili cihazlarda mevcut.",
+  "iletisim": {
+   "email": "contact@smartalpha.ai",
+   "kaynak": "https://smartalpha.ai/contact/"
+  }
  },
  {
   "id": "g082",
@@ -1723,7 +1971,11 @@
    "https://turkiye.ai/portfolio/farmlabs-tarim-teknolojileri-ve-arge-a-s/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede 200.000+ hektar ve 10.000+ kullanıcı."
+  "olgunluk_notu": "Sitede 200.000+ hektar ve 10.000+ kullanıcı.",
+  "iletisim": {
+   "email": "info@farmlabs.io",
+   "kaynak": "https://www.farmlabs.io/contact"
+  }
  },
  {
   "id": "g083",
@@ -1744,7 +1996,11 @@
    "https://turkiye.ai/portfolio/gorsentam-tarim-teknolojileri/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürün ve hizmet satışı var."
+  "olgunluk_notu": "Ürün ve hizmet satışı var.",
+  "iletisim": {
+   "email": "info@gorsentam.com",
+   "kaynak": "https://www.gorsentam.com"
+  }
  },
  {
   "id": "g084",
@@ -1765,7 +2021,11 @@
    "https://turkiye.ai/portfolio/agrovech/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Türkiye genelinde hizmet veriyor."
+  "olgunluk_notu": "Türkiye genelinde hizmet veriyor.",
+  "iletisim": {
+   "email": "info@agrovech.com",
+   "kaynak": "https://www.agrovech.com/iletisim"
+  }
  },
  {
   "id": "g085",
@@ -1786,7 +2046,11 @@
    "https://turkiye.ai/portfolio/topraq-ai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Saha uygulamaları ve başarı hikayeleri var."
+  "olgunluk_notu": "Saha uygulamaları ve başarı hikayeleri var.",
+  "iletisim": {
+   "email": "info@topraq.ai",
+   "kaynak": "https://www.topraq.ai/"
+  }
  },
  {
   "id": "g086",
@@ -1807,7 +2071,11 @@
    "https://turkiye.ai/portfolio/wicow/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Donanım ürünleri satılıyor."
+  "olgunluk_notu": "Donanım ürünleri satılıyor.",
+  "iletisim": {
+   "email": "info@wicow.io",
+   "kaynak": "https://www.wicow.io/"
+  }
  },
  {
   "id": "g087",
@@ -1828,7 +2096,11 @@
    "https://tracxn.com/d/explore/agritech-startups-in-turkey/__gAet27aG_P3mLBR2qp17PjPpvvyXJslZJm1eVavUny8#top-companies"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Hollanda iletişim hattı ve kurumsal müşteriler."
+  "olgunluk_notu": "Hollanda iletişim hattı ve kurumsal müşteriler.",
+  "iletisim": {
+   "email": "info@doktar.com",
+   "kaynak": "https://doktar.com/contact"
+  }
  },
  {
   "id": "g088",
@@ -1914,7 +2186,11 @@
    "https://turkiye.ai/portfolio/masraff/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede canlı işlem sayaçları var."
+  "olgunluk_notu": "Sitede canlı işlem sayaçları var.",
+  "iletisim": {
+   "email": "info@masraff.co",
+   "kaynak": "https://www.masraff.co/tr/contact/"
+  }
  },
  {
   "id": "g092",
@@ -1976,7 +2252,11 @@
    "https://fintechtime.com/2026/03/turkiye-fintech-sektoru-2025-yilinda-214-milyon-dolar-yatirim-aldi/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Fintechtime'a göre 18 milyon müşteri ve dijital banka lisansı."
+  "olgunluk_notu": "Fintechtime'a göre 18 milyon müşteri ve dijital banka lisansı.",
+  "iletisim": {
+   "email": "info@colendi.com",
+   "kaynak": "https://colendi.com"
+  }
  },
  {
   "id": "g095",
@@ -1997,7 +2277,11 @@
    "https://turkiye.ai/portfolio/bon-intelligence/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Müşteriler ve iş ortakları sayfası."
+  "olgunluk_notu": "Müşteriler ve iş ortakları sayfası.",
+  "iletisim": {
+   "email": "info@bonintel.com",
+   "kaynak": "https://www.bonintel.com/about.html"
+  }
  },
  {
   "id": "g096",
@@ -2017,7 +2301,11 @@
    "https://turkiye.ai/portfolio/rnv-ai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Sitede 167 perakende markası ve 11 ülke."
+  "olgunluk_notu": "Sitede 167 perakende markası ve 11 ülke.",
+  "iletisim": {
+   "email": "info@rnvanalytics.com",
+   "kaynak": "https://www.rnv.ai/about"
+  }
  },
  {
   "id": "g097",
@@ -2038,7 +2326,11 @@
    "https://turkiye.ai/portfolio/bee2-ai/"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Ürün modülleri satılıyor."
+  "olgunluk_notu": "Ürün modülleri satılıyor.",
+  "iletisim": {
+   "email": "huseyin@bee2.ai",
+   "kaynak": "https://bee2.ai/tr/iletisim"
+  }
  },
  {
   "id": "g098",
@@ -2059,7 +2351,11 @@
    "https://www.capital.com.tr/sektorler/teknoloji/teknolojiyle-gelen-stok-devrimi"
   ],
   "olgunluk_tahmini": true,
-  "olgunluk_notu": "Bölgesel pazar veri analitiğinde büyüyor."
+  "olgunluk_notu": "Bölgesel pazar veri analitiğinde büyüyor.",
+  "iletisim": {
+   "email": "info@trendbox.io",
+   "kaynak": "https://trendbox.io/en/contact/"
+  }
  },
  {
   "id": "g099",
@@ -2159,7 +2455,11 @@
     "yetkinlik": "Ford",
     "alinti": "Ford gibi büyük firmaların da yer aldığı referanslarına"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "iletisim@2prodanismanlik.com",
+   "kaynak": "https://www.2prodanismanlik.com"
+  }
  },
  {
   "id": "g102",
@@ -2215,7 +2515,11 @@
     "yetkinlik": "Samsun Büyükşehir Belediyesi",
     "alinti": "Samsun Büyükşehir Belediyesi"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@adapha.com",
+   "kaynak": "https://adapha.com/tr/iletisim"
+  }
  },
  {
   "id": "g103",
@@ -2385,7 +2689,11 @@
     "yetkinlik": "Yapay zeka destekli süreç optimizasyonu",
     "alinti": "Our AI-powered process layer detects defects, delays, and inefficiencies the moment they appear—no manual inspection, no guesswork."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@aiatus.com",
+   "kaynak": "https://aiatus.com"
+  }
  },
  {
   "id": "g107",
@@ -2436,7 +2744,11 @@
     "yetkinlik": "imunify-bot-check",
     "alinti": "Referanslar imunify-bot-check"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@aisofttechnology.com",
+   "kaynak": "https://aisofttechnology.com/"
+  }
  },
  {
   "id": "g108",
@@ -2481,7 +2793,11 @@
     "yetkinlik": "Katalog optimizasyonu",
     "alinti": "optimizes a catalog to be found and recommended by ChatGPT, Gemini, and AI search engines."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@aiterna.tech",
+   "kaynak": "https://www.aiterna.tech/about"
+  }
  },
  {
   "id": "g109",
@@ -2537,7 +2853,11 @@
     "yetkinlik": "Athletic Kings Tennis Club",
     "alinti": "Halbich Sport ve Athletic Kings Tennis Club gibi yeni klinik ve spor performansı ortaklarıyla uluslararası ölçekte büyüme sürüyor."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@aivisiontech.net",
+   "kaynak": "https://www.aivisiontech.net/iletisim/"
+  }
  },
  {
   "id": "g110",
@@ -2582,7 +2902,11 @@
     "yetkinlik": "Tele sağlık danışmanlığı",
     "alinti": "Schedule video consultations with licensed healthcare providers across specialties — fully integrated into your care experience."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@albert.health",
+   "kaynak": "https://albert.health/contact"
+  }
  },
  {
   "id": "g111",
@@ -2648,7 +2972,11 @@
     "yetkinlik": "Zonguldak Valiliği",
     "alinti": "Sağlık Bakanlığı Zonguldak Valiliği"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@algofact.tech",
+   "kaynak": "https://algofact.tech"
+  }
  },
  {
   "id": "g112",
@@ -2683,7 +3011,11 @@
     "yetkinlik": "Yenilenebilir enerji portföy tahmini",
     "alinti": "We increase success in renewable energy operations by accurately forecasting a total energy portfolio of 11 GW."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@algopoly.com",
+   "kaynak": "https://algopoly.com/contact/"
+  }
  },
  {
   "id": "g113",
@@ -2774,7 +3106,11 @@
     "yetkinlik": "Tahmine dayalı analitik",
     "alinti": "Forecast performance problems before they happen and right-size your infrastructure with predictive analytics."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@ambeent.ai",
+   "kaynak": "https://www.ambeent.ai/contact.html"
+  }
  },
  {
   "id": "g115",
@@ -2921,7 +3257,11 @@
     "yetkinlik": "NVIDIA ortaklığı",
     "alinti": "Partnering with ArgosAI is helping us offer a more complete and diversified set of capabilities."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "makaradeniz@argosai.com",
+   "kaynak": "https://www.argosai.com/contact/"
+  }
  },
  {
   "id": "g118",
@@ -2966,7 +3306,11 @@
     "yetkinlik": "Kodlamasız gelişmiş analitik",
     "alinti": "Kodlama becerileri gerektirmeden gelişmiş analitiğin avantajlarından yararlanın."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@artifeye.com",
+   "kaynak": "https://www.artifeye.com/contact"
+  }
  },
  {
   "id": "g119",
@@ -3075,7 +3419,11 @@
     "yetkinlik": "İş akışı otomasyonu",
     "alinti": "Frontier clinical models — lab interpretation, workflow automation, and advanced imaging research such as CT-based brain-damage analysis."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@asklepion.health",
+   "kaynak": "https://asklepion.health"
+  }
  },
  {
   "id": "g121",
@@ -3115,7 +3463,11 @@
     "yetkinlik": "Yapay zeka destekli hukuki iş akışları",
     "alinti": "Turn your firm's review standards, prompts and legal know-how into reusable AI workflows."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@attornaid.com",
+   "kaynak": "https://attornaid.com/contact/"
+  }
  },
  {
   "id": "g122",
@@ -3176,7 +3528,11 @@
     "yetkinlik": "Kodsuz arayüz ile prototipleme",
     "alinti": "The no-code interface makes it incredibly easy to prototype and test different vision algorithms."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@augelab.com",
+   "kaynak": "https://www.augelab.com/about/"
+  }
  },
  {
   "id": "g123",
@@ -3221,7 +3577,11 @@
     "yetkinlik": "GSM destekli uzaktan bağlantı",
     "alinti": "With GSM support, remote connection capability wherever there is network coverage"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@augmency.com",
+   "kaynak": "https://www.augmency.com/contact-us.html"
+  }
  },
  {
   "id": "g124",
@@ -3428,7 +3788,11 @@
     "yetkinlik": "Yapay zeka ajanları ile iş kararlarını otomatikleştirme",
     "alinti": "Automate business decisions via AI agents and Large Action Models."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@base64.ai",
+   "kaynak": "https://base64.ai/contact/"
+  }
  },
  {
   "id": "g128",
@@ -3468,7 +3832,11 @@
     "yetkinlik": "Veri toplama cihazı üretimi",
     "alinti": "veri toplama cihazlarının tedariki, entegrasyonu ve belirli ürün gruplarında yerli imkânlarla üretimi"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@bimetri.com",
+   "kaynak": "https://bimetri.com/kurumsal/hakkimizda/"
+  }
  },
  {
   "id": "g129",
@@ -3524,7 +3892,11 @@
     "yetkinlik": "WeWalk",
     "alinti": "Gamze Sofuoğlu Digital Marketing Manager - WeWalk Binclusive helped us understand the importance of digital accessibility and provided practical solutions to make our digital presence more inclusive for all users."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@binclusive.io",
+   "kaynak": "https://www.binclusive.io/en/contact"
+  }
  },
  {
   "id": "g130",
@@ -3569,7 +3941,11 @@
     "yetkinlik": "Su trend analizi ve anomali tespiti",
     "alinti": "su trend analizleri oluşturuyor ve aynı zamanda anomali durumlarında anında kullanıcıyı bildiriyoruz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@blueitfuture.com",
+   "kaynak": "https://blueitfuture.com/iletisim/"
+  }
  },
  {
   "id": "g131",
@@ -3739,7 +4115,11 @@
     "yetkinlik": "Tahmine dayalı analiz ve anomali tespiti",
     "alinti": "Akıllı öneriler, anomali tespiti ve tahmine dayalı içgörüler"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@carbonsmart.io",
+   "kaynak": "https://carbonsmart.io/hakkimizda/neden-carbonsmart"
+  }
  },
  {
   "id": "g135",
@@ -3784,7 +4164,11 @@
     "yetkinlik": "Yapay zeka destekli FinOps",
     "alinti": "You see a cost anomaly across AWS, Azure, and GCP within days of it starting, not when the invoice arrives, with the spike already attributed to the service that caused it."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@ccb-ai.com",
+   "kaynak": "https://ccb-ai.com/"
+  }
  },
  {
   "id": "g136",
@@ -3869,7 +4253,11 @@
     "yetkinlik": "İş sistemlerine yapay zeka entegrasyonu",
     "alinti": "Connect AI to business systems so it can search, update, create and complete work."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@cognipeer.com",
+   "kaynak": "https://cognipeer.com/contact/"
+  }
  },
  {
   "id": "g138",
@@ -3925,7 +4313,11 @@
     "yetkinlik": "PMS Healthcare Technologies",
     "alinti": "Özgür Güler CEO — PMS Healthcare Technologies"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@complizen.ai",
+   "kaynak": "https://complizen.ai/about"
+  }
  },
  {
   "id": "g139",
@@ -3986,7 +4378,11 @@
     "yetkinlik": "Sabancı University",
     "alinti": "Vision of Sakıp Sabancı Case study — Sabancı University"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@consciouslab.io",
+   "kaynak": "https://consciouslab.io"
+  }
  },
  {
   "id": "g140",
@@ -4082,7 +4478,11 @@
     "yetkinlik": "Corpus Sigorta",
     "alinti": "\"A great tool to open our risks to outside world for the best quotation and placements.\" Murat ŞİŞLİ Deputy General Manager, Corpus Sigorta"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@cosure.co",
+   "kaynak": "https://cosure.co/about-us.html"
+  }
  },
  {
   "id": "g142",
@@ -4143,7 +4543,11 @@
     "yetkinlik": "Guess",
     "alinti": "Counterfake is trusted by industry leaders like Trendyol, Ugg, and Guess to safeguard their digital presence."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@counterfake.ai",
+   "kaynak": "https://counterfake.ai"
+  }
  },
  {
   "id": "g143",
@@ -4188,7 +4592,11 @@
     "yetkinlik": "Diş radyografisi veri seti hazırlama",
     "alinti": "Prepare dental radiograph datasets easily and quickly with advanced labeling tools."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@craniocatch.com",
+   "kaynak": "https://www.craniocatch.com/tr/about"
+  }
  },
  {
   "id": "g144",
@@ -4233,7 +4641,11 @@
     "yetkinlik": "İşletme ve kişi ilişki ağı analizi",
     "alinti": "24 Milyon İlişki İşletmeler ve gerçek kişi arasında görünmeyen bağlantılar"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@crede.com.tr",
+   "kaynak": "https://crededata.com"
+  }
  },
  {
   "id": "g145",
@@ -4339,7 +4751,11 @@
     "yetkinlik": "Esnek veri teslimatı",
     "alinti": "Get your data in the format and through the channel you prefer—whether it’s REST API, S3, email, or any other method."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@datalocal.ai",
+   "kaynak": "https://datalocal.ai/about-us/"
+  }
  },
  {
   "id": "g147",
@@ -4440,7 +4856,11 @@
     "yetkinlik": "Emniyet Genel Müdürlüğü",
     "alinti": "Emniyet Genel Müdürlüğü"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@datateam.com.tr",
+   "kaynak": "https://www.datateam.com.tr/"
+  }
  },
  {
   "id": "g149",
@@ -4480,7 +4900,11 @@
     "yetkinlik": "Sentetik veri doğruluk raporlaması",
     "alinti": "Every generation ships with a fidelity report and privacy checks"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@dataxid.com",
+   "kaynak": "https://www.dataxid.com/"
+  }
  },
  {
   "id": "g150",
@@ -4515,7 +4939,11 @@
     "yetkinlik": "Saha Uygulamaları geliştirme",
     "alinti": "Saha Uygulamaları"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "bilgi@geobilgi.com",
+   "kaynak": "https://www.geobilgi.com/tr/contact"
+  }
  },
  {
   "id": "g151",
@@ -4571,7 +4999,11 @@
     "yetkinlik": "TÜBİTAK proje desteği",
     "alinti": "TÜBİTAK's (The Scientific and Technological Research Council of Turkey) TEYDEB (Technology and Innovation Grant Programs) supports the project."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@deepcloudlabs.com",
+   "kaynak": "https://www.deepcloudlabs.com"
+  }
  },
  {
   "id": "g152",
@@ -4616,7 +5048,11 @@
     "yetkinlik": "Performans trend analizi ve raporlama",
     "alinti": "Kişisel raporlar, sporcu karşılaştırmaları, PDF/CSV dışa aktarım ve trend takibi."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@deepsport.app",
+   "kaynak": "https://deepsportapp.com/contact"
+  }
  },
  {
   "id": "g153",
@@ -4661,7 +5097,11 @@
     "yetkinlik": "Çoklu bulut ortamları güvenliği",
     "alinti": "Security automation, configuration management, and continuous compliance monitoring for multi-cloud environments."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@defansxlabs.com",
+   "kaynak": "https://defansxlabs.com/en/contact.html"
+  }
  },
  {
   "id": "g154",
@@ -4712,7 +5152,11 @@
     "yetkinlik": "MBRIF Mohammed Bin Rashid Innovation Fund",
     "alinti": "Teknoloji Devleri Dünya genelinde önde gelen finansal kuruluşların güvendiği bize güveniyor MBRIF Mohammed Bin Rashid Innovation Fund"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@getdefy.co",
+   "kaynak": "https://getdefy.co/tr/contact"
+  }
  },
  {
   "id": "g155",
@@ -4792,7 +5236,11 @@
     "yetkinlik": "Hesaplamalı deney planlama ve yürütme",
     "alinti": "DeltaWaveOS helps you plan and run computational experiments"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "contact@deltawave.fr",
+   "kaynak": "https://www.deltawave.fr/"
+  }
  },
  {
   "id": "g157",
@@ -4832,7 +5280,11 @@
     "yetkinlik": "Özel yazılım mimarisi tasarımı",
     "alinti": "iş hedeflerinizi ve süreçlerinizi derinlemesine analiz ederek size özel bir yazılım mimarisi tasarlıyoruz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@devition.io",
+   "kaynak": "https://devition.io/about.html"
+  }
  },
  {
   "id": "g158",
@@ -4922,7 +5374,11 @@
     "yetkinlik": "Veri kaynakları ve otomasyon tasarlama",
     "alinti": "Design data sources, automations, and integrations in one place."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@docyrus.com",
+   "kaynak": "https://docyrus.com/contact/"
+  }
  },
  {
   "id": "g160",
@@ -4963,7 +5419,11 @@
     "yetkinlik": "Türk Beyaz Eşya Tedarikçileri",
     "alinti": "How Eluvium Reduced Corrugated Packaging Costs by 29% for Turkish Appliance Suppliers"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "contact@eluvium.ai",
+   "kaynak": "https://eluvium.ai/"
+  }
  },
  {
   "id": "g161",
@@ -4998,7 +5458,11 @@
     "yetkinlik": "Bulut-IoT mühendisliği",
     "alinti": "bulut-IoT mühendislik çözümlerimizle AR-GE ve üretim süreçlerini hızlandırmaya katkı sağlıyoruz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "bilgi@empa.com",
+   "kaynak": "https://empa.com/hakkimizda"
+  }
  },
  {
   "id": "g162",
@@ -5049,7 +5513,11 @@
     "yetkinlik": "İpekyol",
     "alinti": "How İpekyol Achieved 3x Sales with AI Traffic Ads"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@enhencer.com",
+   "kaynak": "https://enhencer.com/contact-form"
+  }
  },
  {
   "id": "g163",
@@ -5089,7 +5557,11 @@
     "yetkinlik": "Gerçek zamanlı veri ve trend analizi",
     "alinti": "Stay ahead of the competition with real-time data and trend analytics."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@epochtechnology.co",
+   "kaynak": "https://epochtechnology.co"
+  }
  },
  {
   "id": "g164",
@@ -5129,7 +5601,11 @@
     "yetkinlik": "Davranış örüntüsü trend analizi",
     "alinti": "Trend analizi Davranış örüntülerini zaman içinde okuyun, uyum düşmeden önce proaktif düzenlemeler yapın."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@ergcontrols.net",
+   "kaynak": "https://ergcontrols.net/"
+  }
  },
  {
   "id": "g165",
@@ -5254,7 +5730,11 @@
     "yetkinlik": "Ortamdaki değişim tespiti",
     "alinti": "EyeQ, ortamınızdaki değişimleri anında tespit eder"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@eyedius.com",
+   "kaynak": "https://eyedius.com/iletisim"
+  }
  },
  {
   "id": "g168",
@@ -5294,7 +5774,11 @@
     "yetkinlik": "Yapay zeka ile veri analizi ve uyarılar",
     "alinti": "Our Data Analytics Pipeline can interrupt any data flow inside the Fieldscope eco-system and provide AI powered analysis or raise alerts based on industry standard machine learning techniques."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@fieldscope.io",
+   "kaynak": "https://fieldscope.io/contact.php"
+  }
  },
  {
   "id": "g169",
@@ -5339,7 +5823,11 @@
     "yetkinlik": "Retroaktif bordro hesaplama",
     "alinti": "Geriye dönük dönemler için retroaktif hesaplama garantisi"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@filika.co",
+   "kaynak": "https://filika.co/contact/"
+  }
  },
  {
   "id": "g170",
@@ -5435,7 +5923,11 @@
     "yetkinlik": "Yüksek hızlı analog tasarım",
     "alinti": "our expertise spans across multiple domains, with a particular focus on high-speed analog design."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "infotr@genexic.com",
+   "kaynak": "https://genexic.com"
+  }
  },
  {
   "id": "g172",
@@ -5525,7 +6017,11 @@
     "yetkinlik": "Veri ambarından otomatik sorgulama",
     "alinti": "It re-runs the same query every hour, straight from the warehouse, with no AI in the loop."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "team@harmona.ai",
+   "kaynak": "https://harmona.ai/about"
+  }
  },
  {
   "id": "g174",
@@ -5570,7 +6066,11 @@
     "yetkinlik": "bulut tabanlı tıbbi görüntü analizi",
     "alinti": "Analyze your patients on demand with our cloud based option"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@healysense.ai",
+   "kaynak": "https://www.healysense.ai/"
+  }
  },
  {
   "id": "g175",
@@ -5636,7 +6136,11 @@
     "yetkinlik": "Jolly Tur",
     "alinti": "Gizem Aryet Uslubaş Digital Marketing and E-commerce Director Jolly Tur"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hey@heybooster.ai",
+   "kaynak": "https://www.heybooster.ai/"
+  }
  },
  {
   "id": "g176",
@@ -5676,7 +6180,11 @@
     "yetkinlik": "Yapay zeka ile satış performansı izleme",
     "alinti": "With using powerful AI models, monitor their performance of how well do they sale"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@hiddenslate.com",
+   "kaynak": "https://hiddenslate.com"
+  }
  },
  {
   "id": "g177",
@@ -5801,7 +6309,11 @@
     "yetkinlik": "PMS sistem entegrasyonu",
     "alinti": "Canlı PMS Entegre Tüm PMS Sistemleriyle %100 Uyumlu"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@hotelai.io",
+   "kaynak": "https://hotelai.io/tr/hakkimizda"
+  }
  },
  {
   "id": "g180",
@@ -5847,7 +6359,11 @@
     "yetkinlik": "LinkedIn Türkiye Gold Partneri",
     "alinti": "HRPeak, LinkedIn’in Türkiye’deki tek resmi partneri olarak kurumların işe alım ve yetenek gelişimi süreçlerine global standartlar kazandırır."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@hrpeak.com",
+   "kaynak": "https://www.hrpeak.com/iletisim/"
+  }
  },
  {
   "id": "g181",
@@ -5892,7 +6408,11 @@
     "yetkinlik": "Çoklu lokasyon yönetimi",
     "alinti": "You can define multiple locations in your Hybrone account and manage the systems in these locations from a single screen."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@hybrone.com",
+   "kaynak": "https://hybrone.com/"
+  }
  },
  {
   "id": "g182",
@@ -6043,7 +6563,11 @@
     "yetkinlik": "karar süreçlerini iyileştiren yapay zeka",
     "alinti": "Karar süreçlerinizi iyileştiren yapay zeka çözümleri sunuyoruz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@integrio.io",
+   "kaynak": "https://integrio.io/page-about/"
+  }
  },
  {
   "id": "g185",
@@ -6088,7 +6612,11 @@
     "yetkinlik": "Yüzey pürüzlülüğü ve sertliği kontrolü",
     "alinti": "Well-ox software can be used to produce smooth and hard surfaces to improve the tribological properties of parts."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "inquires@iyimetal.com",
+   "kaynak": "https://iyimetal.com/"
+  }
  },
  {
   "id": "g186",
@@ -6270,7 +6798,11 @@
     "yetkinlik": "360° müşteri profili",
     "alinti": "Leadgen, bu dağınık temas noktalarını tek bir profilde birleştirir (Merge)."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@useleadgen.io",
+   "kaynak": "https://useleadgen.io/contact.html"
+  }
  },
  {
   "id": "g190",
@@ -6376,7 +6908,11 @@
     "yetkinlik": "Otomatik makine öğrenmesi desteği",
     "alinti": "AutoML desteği gibi unsurlar bulunmaktadır."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "iletisim@lotusaibilisim.com",
+   "kaynak": "https://lotusaibilisim.com/hakkimizda/"
+  }
  },
  {
   "id": "g192",
@@ -6427,7 +6963,11 @@
     "yetkinlik": "Kelebek Mobilya",
     "alinti": "Kelebek Mobilya ile ürün keşfini mağazadan müşterinin yaşam alanına taşıyan bir dijital deneyim."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "spark@lunaarvision.com",
+   "kaynak": "https://lunaarvision.com/tr"
+  }
  },
  {
   "id": "g193",
@@ -6472,7 +7012,11 @@
     "yetkinlik": "Sınav güvenliği ve hile tespiti",
     "alinti": "Göz takibi, ekran kaydı ve yapay zeka kullanım tespiti ile mülakat sürecinin bütünlüğünü ve güvenilirliğini garanti altına alın."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@maatrics.com",
+   "kaynak": "https://maatrics.com/contact-us"
+  }
  },
  {
   "id": "g194",
@@ -6512,7 +7056,11 @@
     "yetkinlik": "Veri toplama ve etiketleme",
     "alinti": "Machinetutors provides a comprehensive AI ecosystem of tools for data collection & annotation"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "contact@machinetutors.com",
+   "kaynak": "https://www.machinetutors.com"
+  }
  },
  {
   "id": "g195",
@@ -6552,7 +7100,11 @@
     "yetkinlik": "Özel simülasyonlar oluşturma",
     "alinti": "you can create custom simulations."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@getmagnus.com",
+   "kaynak": "https://getmagnus.com/"
+  }
  },
  {
   "id": "g196",
@@ -6627,7 +7179,11 @@
     "yetkinlik": "Hızlı ve kapsamlı analiz sonuçları",
     "alinti": "The Mamosis platform is optimized to deliver comprehensive analysis results within minutes, not hours."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@mamosis.com",
+   "kaynak": "https://mamosis.com/"
+  }
  },
  {
   "id": "g198",
@@ -6678,7 +7234,11 @@
     "yetkinlik": "Tav Airports endüstri dinamikleri",
     "alinti": "We needed an agile solution that understands industry dynamics."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@map360.world",
+   "kaynak": "https://www.map360.world/contact"
+  }
  },
  {
   "id": "g199",
@@ -6739,7 +7299,11 @@
     "yetkinlik": "Graf Etiket",
     "alinti": "People find us on Google and order custom products. Markty really supports us with that. ” Aslı K. Founder, Graf Etiket"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@markty.ai",
+   "kaynak": "https://www.markty.ai"
+  }
  },
  {
   "id": "g200",
@@ -6779,7 +7343,11 @@
     "yetkinlik": "Kenar durum senaryoları oluşturma",
     "alinti": "You can create any edge case you want, with virtually unlimited variations."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@mirage.vision",
+   "kaynak": "https://www.mirage.vision/"
+  }
  },
  {
   "id": "g201",
@@ -6819,7 +7387,11 @@
     "yetkinlik": "Gerçek zamanlı hırsızlık tespiti",
     "alinti": "Analysing images from security cameras in real time and sends instant alerts."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@moniteye.com",
+   "kaynak": "https://www.moniteye.com/"
+  }
  },
  {
   "id": "g202",
@@ -6909,7 +7481,11 @@
     "yetkinlik": "Otomatik karar motoru",
     "alinti": "Natively Connected Automated Decision Engine with Rule Engine."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@monopayments.com",
+   "kaynak": "https://monopayments.com"
+  }
  },
  {
   "id": "g204",
@@ -7060,7 +7636,11 @@
     "yetkinlik": "Rakip etkileşim analizi",
     "alinti": "Turn the people engaging with competitors into your next list."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@needle.app",
+   "kaynak": "https://needle-ai.com/about"
+  }
  },
  {
   "id": "g207",
@@ -7130,7 +7710,11 @@
     "yetkinlik": "İdeasoft",
     "alinti": "Actively powering sales for industry leaders like Eczacıbaşı, İş Bankası, Vitra, BigChefs, and İdeasoft."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "contact@nextbig.app",
+   "kaynak": "https://nextbig.app"
+  }
  },
  {
   "id": "g208",
@@ -7165,7 +7749,11 @@
     "yetkinlik": "Mekânsal veri analizi",
     "alinti": "Mekânsal veriyi stratejik karara dönüştürerek rekabet avantajı sağlayın."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@nextgeography.com",
+   "kaynak": "https://nextgeography.com/bize-ulasin/"
+  }
  },
  {
   "id": "g209",
@@ -7276,7 +7864,11 @@
     "yetkinlik": "Enda Enerji",
     "alinti": "Enda Enerji, HES, RES, JES ve GES santrallerinden oluşan çeşitlendirilmiş üretim portföyünün yarattığı analitik karmaşıklığı gerçek zamanlı görünürlüğe dönüştürmek için Novadsa ile iş birliği yaptı."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@novadsa.com",
+   "kaynak": "https://www.novadsa.com/iletisim"
+  }
  },
  {
   "id": "g211",
@@ -7520,7 +8112,11 @@
     "yetkinlik": "Özel bulut çözümleri kurulumu",
     "alinti": "müşterilerimizin kendilerine özel bulut çözümlerini kurmaları yönünde hizmetler sunmaktayız."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@onicorn.com.tr",
+   "kaynak": "https://onicorn.com.tr/hakkimizda-c-1"
+  }
  },
  {
   "id": "g216",
@@ -7555,7 +8151,11 @@
     "yetkinlik": "Müşteri keşfi motorları",
     "alinti": "çapraz satış, yukarı satış ve müşteri keşfi için geliştirilmiş patentli motorlar"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@optiwisdom.com",
+   "kaynak": "https://optiwisdom.com/company/about"
+  }
  },
  {
   "id": "g217",
@@ -7600,7 +8200,11 @@
     "yetkinlik": "Çek işleme ve doğrulama",
     "alinti": "Cheque Processing Every cheque read, verified and locked before it reaches your ERP."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@orbina.ai",
+   "kaynak": "https://www.orbina.ai/"
+  }
  },
  {
   "id": "g218",
@@ -7685,7 +8289,11 @@
     "yetkinlik": "Alt kullanıcı yönetimi",
     "alinti": "Panel üzerinden sınırsız sayıda Alt Kullanıcı oluşturabilir, mağaza ve şubelerinizi de teslimat ağına dahil edebilirsiniz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@packupp.com",
+   "kaynak": "https://packupp.com/contact.html"
+  }
  },
  {
   "id": "g220",
@@ -7775,7 +8383,11 @@
     "yetkinlik": "Önceden eğitilmiş modeller",
     "alinti": "Our AI models have been meticulously trained to understand and interpret diverse document types."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@papirus.ai",
+   "kaynak": "https://papirusdigital.com"
+  }
  },
  {
   "id": "g222",
@@ -7871,7 +8483,11 @@
     "yetkinlik": "MedTech Solutions",
     "alinti": "MedTech Solutions"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@pixldata.com",
+   "kaynak": "https://pixldata.com/tr/hakkimizda"
+  }
  },
  {
   "id": "g224",
@@ -7911,7 +8527,11 @@
     "yetkinlik": "Tahmine dayalı konum yatırımı analizi",
     "alinti": "leveraging predictive analytics and market trend insights that save both time and capital."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@placewiseai.com",
+   "kaynak": "https://placewiseai.com/contact/"
+  }
  },
  {
   "id": "g225",
@@ -7972,7 +8592,11 @@
     "yetkinlik": "Decathlon vaka çalışması",
     "alinti": "Sports Retail Retention Impact Decathlon Digital Sports Coach 55% re-order rate"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@poltio.com",
+   "kaynak": "https://www.poltio.com/iletisim"
+  }
  },
  {
   "id": "g226",
@@ -8007,7 +8631,11 @@
     "yetkinlik": "3D nokta bulutu oluşturma",
     "alinti": "OpticonAI can process streamed video and image data to generate elementary objects, point clouds and depth maps."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@pragmatech.com.tr",
+   "kaynak": "https://pragmatech.com.tr"
+  }
  },
  {
   "id": "g227",
@@ -8052,7 +8680,11 @@
     "yetkinlik": "Dijital olgunluk endeksi ölçümü",
     "alinti": "Digital Maturity Index Measurement of Digital Maturity Index for electricity distribution companies."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@presify.ai",
+   "kaynak": "https://presify.ai/about-us/"
+  }
  },
  {
   "id": "g228",
@@ -8082,7 +8714,11 @@
     "yetkinlik": "Tek sohbetle web sitesi kurulumu",
     "alinti": "Website, domain, payments. All from one chat."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@promake.ai",
+   "kaynak": "https://promake.ai/iletisim"
+  }
  },
  {
   "id": "g229",
@@ -8127,7 +8763,11 @@
     "yetkinlik": "Kamera sağlığı izleme",
     "alinti": "Camera Health Monitoring Automatically track camera uptime, connectivity, and performance across all deployments."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@promiseq.com",
+   "kaynak": "https://www.promiseq.com/"
+  }
  },
  {
   "id": "g230",
@@ -8167,7 +8807,11 @@
     "yetkinlik": "Yapay zeka destekli öneriler",
     "alinti": "AI Generated Recommendations for each Segment"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "product@prowth.co",
+   "kaynak": "https://prowth.co/"
+  }
  },
  {
   "id": "g231",
@@ -8257,7 +8901,11 @@
     "yetkinlik": "Tahmine dayalı bakım",
     "alinti": "PREDICTIVE MAINTENANCE · MANUFACTURING"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@pusula.ai",
+   "kaynak": "https://www.pusula.ai"
+  }
  },
  {
   "id": "g233",
@@ -8338,7 +8986,11 @@
     "yetkinlik": "Istanbul Florence Nightingale Hastanesi",
     "alinti": "Dr. Canan Akman, Istanbul Florence Nightingale Hospital"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@radiologics.ai",
+   "kaynak": "https://www.radiologics.ai/"
+  }
  },
  {
   "id": "g235",
@@ -8408,7 +9060,11 @@
     "yetkinlik": "fmi Baş Eczacısı",
     "alinti": "Enea Martinelli - fmi Chief Pharmacist, Switzerland"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@rebuslabs.com",
+   "kaynak": "https://rebuslabs.com"
+  }
  },
  {
   "id": "g236",
@@ -8453,7 +9109,11 @@
     "yetkinlik": "Yapay zeka ikizleri ile içerik",
     "alinti": "AI twins of executives and KOLs for internal, social, and HCP-facing video."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@reprai.com",
+   "kaynak": "https://www.reprai.com"
+  }
  },
  {
   "id": "g237",
@@ -8498,7 +9158,11 @@
     "yetkinlik": "Ağlar arası bütçe güncelleme",
     "alinti": "Update budgets across networks in a single keystroke."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@roasy.ai",
+   "kaynak": "https://roasy.ai/"
+  }
  },
  {
   "id": "g238",
@@ -8538,7 +9202,11 @@
     "yetkinlik": "Karmaşık süreçleri öğrenme",
     "alinti": "Karmaşık süreçleri bile öğrenir ve geliştirir."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@robbot.com.tr",
+   "kaynak": "https://robbot.com.tr/"
+  }
  },
  {
   "id": "g239",
@@ -8583,7 +9251,11 @@
     "yetkinlik": "Yapay zeka destekli tarım dronları",
     "alinti": "AI drones for agricultural efficiency"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@robfly.com",
+   "kaynak": "https://robfly.com/"
+  }
  },
  {
   "id": "g240",
@@ -8629,7 +9301,11 @@
     "yetkinlik": "DP World Yarımca",
     "alinti": "RPA facility in terminal operation and automation at DP World Yarımca"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@robusta.ai",
+   "kaynak": "https://robusta.ai/contact-us/"
+  }
  },
  {
   "id": "g241",
@@ -8669,7 +9345,11 @@
     "yetkinlik": "İşletme doğrulama (KYB)",
     "alinti": "Verify businesses and uncover ownership before you engage."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@sanctionscanner.com",
+   "kaynak": "https://sanctionscanner.com"
+  }
  },
  {
   "id": "g242",
@@ -8709,7 +9389,11 @@
     "yetkinlik": "Mühendislik düzeyinde şema doğruluğu",
     "alinti": "Engineered for accuracy Shaped by guidance from a Google engineer for long term consistency."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@schemaplus.com",
+   "kaynak": "https://www.schemaplus.io/contact"
+  }
  },
  {
   "id": "g243",
@@ -8749,7 +9433,11 @@
     "yetkinlik": "InSAR ile yer hareketleri izleme",
     "alinti": "Using InSAR data obtained from satellites, we monitor ground movements such as landslides, subsidence, and ground shifts."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@smartcityandpartners.com",
+   "kaynak": "https://www.smartcityandpartners.com/contact/"
+  }
  },
  {
   "id": "g244",
@@ -8800,7 +9488,11 @@
     "yetkinlik": "SSB ana yüklenicisi",
     "alinti": "SSB ana yüklenicisidir."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@selvitechnology.com",
+   "kaynak": "https://www.selvitechnology.com"
+  }
  },
  {
   "id": "g245",
@@ -8856,7 +9548,11 @@
     "yetkinlik": "Eren Perakende",
     "alinti": "Eren Perakende"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@seriai.co",
+   "kaynak": "https://www.seriai.co/"
+  }
  },
  {
   "id": "g246",
@@ -8896,7 +9592,11 @@
     "yetkinlik": "3B geometri ile otomatik hesaplama",
     "alinti": "İster 3B geometri dosyasını yükleyip otomatik hesaplama ile ister verileri elle girerek hedef fiyat hesaplamasını elde edebilirsiniz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@sfmyazilim.com",
+   "kaynak": "https://www.sfmyazilim.com"
+  }
  },
  {
   "id": "g247",
@@ -8952,7 +9652,11 @@
     "yetkinlik": "Northstar Retail",
     "alinti": "Northstar Retail"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@sirdash.ai",
+   "kaynak": "https://sirdash.ai/tr/iletisim"
+  }
  },
  {
   "id": "g248",
@@ -8997,7 +9701,11 @@
     "yetkinlik": "Yatırımcı profil testleri hazırlama",
     "alinti": "yatırımcıların kendilerini daha iyi ve yakından tanımalarına yardımcı olacak farklı yatırımcı profil testleri hazırlanmıştır."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@smartadvice.com.tr",
+   "kaynak": "https://www.smartadvice.com.tr/tr/hakkimizda"
+  }
  },
  {
   "id": "g249",
@@ -9032,7 +9740,11 @@
     "yetkinlik": "Yapay zeka ajan platformları",
     "alinti": "Canlı kurumsal bağlam üzerinde akıl yürüten, bağlantılı sistemlerde eylem alan ve her etkileşimle gelişen amaca yönelik ajan platformları."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@techbros.com.tr",
+   "kaynak": "https://www.techbros.com.tr/"
+  }
  },
  {
   "id": "g250",
@@ -9088,7 +9800,11 @@
     "yetkinlik": "Ford Otosan",
     "alinti": "We have been using the Techsign biometric signature solution at Ford Otosan services since 2019."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@techsign.com.tr",
+   "kaynak": "https://www.techsign.com.tr/en/contact"
+  }
  },
  {
   "id": "g251",
@@ -9128,7 +9844,11 @@
     "yetkinlik": "Görüntü işleme ile anormallik tespiti",
     "alinti": "yapay zekâ ve görüntü işleme ile ineklerdeki anormallikleri tespit etme denemeleri başladı"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@teknosurum.com",
+   "kaynak": "https://www.teknosurum.com"
+  }
  },
  {
   "id": "g252",
@@ -9213,7 +9933,11 @@
     "yetkinlik": "Tahmine dayalı bakım",
     "alinti": "Implement predictive maintenance, optimize supply chain operations, and reduce operational costs with data-driven insights."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@tractus.com.tr",
+   "kaynak": "https://www.tractus.com.tr/tr/hakkimizda/ekibimiz/"
+  }
  },
  {
   "id": "g254",
@@ -9258,7 +9982,11 @@
     "yetkinlik": "Finansal piyasa tahmini",
     "alinti": "A-TRK, bir emtianın gelecek fiyatlandırmasını tahmin ederek kendi finansını sağlayan bir yapay zekâ robotudur."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@trk.technology",
+   "kaynak": "https://trk.technology/"
+  }
  },
  {
   "id": "g255",
@@ -9303,7 +10031,11 @@
     "yetkinlik": "Özel Büyük Dil Modelleri geliştirme",
     "alinti": "Our expertise lies in tailoring these LLMs for applications such as translations, summarizations, chatbots, and personal assistants"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@turkai.com",
+   "kaynak": "https://www.turkai.com"
+  }
  },
  {
   "id": "g256",
@@ -9429,7 +10161,11 @@
     "yetkinlik": "Mühendislik iş akışı otomasyonu",
     "alinti": "automate engineering workflows"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@valven.com",
+   "kaynak": "https://www.valven.com/contact/"
+  }
  },
  {
   "id": "g259",
@@ -9480,7 +10216,11 @@
     "yetkinlik": "Netmera",
     "alinti": "How Netmera puts AI agents into production"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@vdf.ai",
+   "kaynak": "https://vdf.ai/contact/"
+  }
  },
  {
   "id": "g260",
@@ -9525,7 +10265,11 @@
     "yetkinlik": "Sesli AI Agent ile telefon karşılama",
     "alinti": "Sesli AI Agent — telefon karşılama"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@agrovech.com",
+   "kaynak": "https://www.vechurhavacilik.com/hakkimizda"
+  }
  },
  {
   "id": "g261",
@@ -9591,7 +10335,11 @@
     "yetkinlik": "Azer Scientific",
     "alinti": "Virasoft and Azer Scientific Collaborate to Expand Access to Integrated Digital Pathology Demonstrations"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@virasoft.com",
+   "kaynak": "https://www.virasoft.com/en/contact-us/contact-form"
+  }
  },
  {
   "id": "g262",
@@ -9681,7 +10429,11 @@
     "yetkinlik": "PDF sesli anlatım",
     "alinti": "Echo PDF Voice Narration"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@weaccess.ai",
+   "kaynak": "https://www.weaccess.ai/tr/contact"
+  }
  },
  {
   "id": "g264",
@@ -9726,7 +10478,11 @@
     "yetkinlik": "İstatistiksel hasar analizi",
     "alinti": "Kanat yüzeylerinde en çok hangi hangi hasarın meydana geldiğini, ● Türbin marka modeline göre hasar dağılımını, ● Kanatlarda en çok hangi hasar tipinin tespit edildiği gibi istatistiksel grafiklere ulaşabilirsiniz."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@windlar.com",
+   "kaynak": "https://windlar.com/iletisim/"
+  }
  },
  {
   "id": "g265",
@@ -9771,7 +10527,11 @@
     "yetkinlik": "Yapay zeka ile öğrenme planı",
     "alinti": "We’ll create a tailored employee learning plan based on your organisational objectives and priorities — all customised with AI."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hey@wisermedia.com",
+   "kaynak": "https://wisermedia.com/"
+  }
  },
  {
   "id": "g266",
@@ -9811,7 +10571,11 @@
     "yetkinlik": "Sigorta ve otomotiv çözümleri",
     "alinti": "Hasar.AI Insurance, Automotive, Fleet"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@wyseye.com",
+   "kaynak": "https://wyseye.com/Contact"
+  }
  },
  {
   "id": "g267",
@@ -9851,7 +10615,11 @@
     "yetkinlik": "Yan hakları tek platformda yönetme",
     "alinti": "tüm süreci tek bir SuperApp 'te toplayın."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@yanhak.com",
+   "kaynak": "https://www.yanhak.com/iletisim"
+  }
  },
  {
   "id": "g268",
@@ -9969,7 +10737,11 @@
     "yetkinlik": "Tarım finansmanı çözümleri geliştirme",
     "alinti": "tarım girdilerine dayalı sermaye piyasası ürünleri ile yenilikçi finansal çözümlerin geliştirilmesine de öncülük etti."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "destek@tarfin.com",
+   "kaynak": "https://tarfin.com/tr/iletisim"
+  }
  },
  {
   "id": "g271",
@@ -10008,7 +10780,11 @@
     "yetkinlik": "Uydu indeksleri ile arazi takibi",
     "alinti": "Track your field using satellite indices and find problematic areas."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@tarla.io",
+   "kaynak": "https://tarla.io"
+  }
  },
  {
   "id": "g272",
@@ -10121,7 +10897,11 @@
     "yetkinlik": "Yapay zeka ürün geliştirme",
     "alinti": "Develop the AI, web, mobile, and API layers with a team that understands the whole product."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "hello@smartkiwi.ai",
+   "kaynak": "https://smartkiwi.ai/"
+  }
  },
  {
   "id": "g275",
@@ -10177,7 +10957,11 @@
     "yetkinlik": "Anadolu Meraları",
     "alinti": "Gökberk T. , Arazi Uygulama Program Koordinatörü, Anadolu Meraları"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@soilbiom.com",
+   "kaynak": "https://soilbiom.com/iletisim/"
+  }
  },
  {
   "id": "g276",
@@ -10222,7 +11006,11 @@
     "yetkinlik": "Veri güvenliği ve yönetişimi",
     "alinti": "Your data is only used for your company’s agent. We don’t use your data to train models, and we use industry standard best practices to ensure your data is secure."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "contact@sophy.co",
+   "kaynak": "https://sophy.co/contact-us?source=home-final"
+  }
  },
  {
   "id": "g277",
@@ -10262,7 +11050,11 @@
     "yetkinlik": "Trafik kazası tespiti",
     "alinti": "traffic accident detector"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@soundlabai.com",
+   "kaynak": "https://www.soundlabai.com"
+  }
  },
  {
   "id": "g278",
@@ -10307,7 +11099,11 @@
     "yetkinlik": "Satış davranışları rekonstrüksiyonu",
     "alinti": "Spiky reconstructs the multi-step plays behind every outcome, tagged with the calls, emails, and signals it learned them from."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "sales@spiky.ai",
+   "kaynak": "https://www.spiky.ai"
+  }
  },
  {
   "id": "g279",
@@ -10352,7 +11148,11 @@
     "yetkinlik": "Stok fotoğraf oluşturma",
     "alinti": "Generate stock photos in seconds that a stock photographer could never capture!"
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "support@stockimg.ai",
+   "kaynak": "https://stockimg.ai/"
+  }
  },
  {
   "id": "g280",
@@ -10397,7 +11197,11 @@
     "yetkinlik": "Davranışsal sinyallerle müşteri kaybı tahmini",
     "alinti": "Flags at-risk customers before they churn using behavioral signals."
    }
-  ]
+  ],
+  "iletisim": {
+   "email": "info@symetricx.com",
+   "kaynak": "https://www.symetricx.com"
+  }
  },
  {
   "id": "g281",
