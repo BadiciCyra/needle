@@ -1,0 +1,220 @@
+[
+  {
+    "id": "d01",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "bayilerden gelen şikayetleri sınıflandırmak",
+    "startup_capability": "şikayet ve talep kategorizasyonu"
+  },
+  {
+    "id": "d02",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "çağrıların konusunu görmek",
+    "startup_capability": "konu tespiti"
+  },
+  {
+    "id": "d03",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "müşterilerin neden aradığını anlamak",
+    "startup_capability": "çağrı merkezi konuşma analitiği"
+  },
+  {
+    "id": "d04",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "üretim hattındaki hatalı parçaları yakalamak",
+    "startup_capability": "üretim hattı kusur tespiti"
+  },
+  {
+    "id": "d05",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "tarlayı tahmine göre suluyoruz",
+    "startup_capability": "akıllı sulama kontrolü"
+  },
+  {
+    "id": "d06",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "pompaların ne zaman arızalanacağını önceden bilmek",
+    "startup_capability": "motor ve pompa arıza tahmini"
+  },
+  {
+    "id": "d07",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "kargo araçlarının rotasını planlamak",
+    "startup_capability": "araç rota optimizasyonu"
+  },
+  {
+    "id": "d08",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "aşı taşıyan kamyonlarda sıcaklık takibi",
+    "startup_capability": "soğuk zincir sıcaklık takibi"
+  },
+  {
+    "id": "d09",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "faturaları elle sisteme giriyoruz",
+    "startup_capability": "fatura OCR"
+  },
+  {
+    "id": "d10",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "hastaların randevuya gelmemesi",
+    "startup_capability": "randevuya gelmeme tahmini"
+  },
+  {
+    "id": "d11",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "işçilerin baret takıp takmadığını görmek",
+    "startup_capability": "kişisel koruyucu donanım tespiti"
+  },
+  {
+    "id": "d12",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "şebekedeki su kaçaklarını bulmak",
+    "startup_capability": "akustik sensörle su kaçağı tespiti"
+  },
+  {
+    "id": "d13",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "başvuran adayların özgeçmişlerini taramak",
+    "startup_capability": "CV ayrıştırma"
+  },
+  {
+    "id": "d14",
+    "tur": "dogru",
+    "etiket": "dogru",
+    "brief_phrase": "raflarda biten ürünleri fark etmek",
+    "startup_capability": "stoksuz raf tespiti"
+  },
+  {
+    "id": "r01",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "bayilerden gelen şikayetleri sınıflandırmak",
+    "startup_capability": "drone ile termal görüntüleme"
+  },
+  {
+    "id": "r02",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "tarlayı tahmine göre suluyoruz",
+    "startup_capability": "işlem dolandırıcılığı tespiti"
+  },
+  {
+    "id": "r03",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "kargo araçlarının rotasını planlamak",
+    "startup_capability": "radyoloji görüntü analizi"
+  },
+  {
+    "id": "r04",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "faturaları elle sisteme giriyoruz",
+    "startup_capability": "toprak nem sensörü"
+  },
+  {
+    "id": "r05",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "hastaların randevuya gelmemesi",
+    "startup_capability": "kumaş hata tespiti"
+  },
+  {
+    "id": "r06",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "pompaların ne zaman arızalanacağını önceden bilmek",
+    "startup_capability": "müşteri segmentasyonu"
+  },
+  {
+    "id": "r07",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "başvuran adayların özgeçmişlerini taramak",
+    "startup_capability": "akıllı otopark sensörü"
+  },
+  {
+    "id": "r08",
+    "tur": "rastgele",
+    "etiket": "uydurma",
+    "brief_phrase": "raflarda biten ürünleri fark etmek",
+    "startup_capability": "SIEM entegrasyonu"
+  },
+  {
+    "id": "t01",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "bayilerden gelen şikayetleri sınıflandırmak",
+    "startup_capability": "bayi yönetim yazılımı",
+    "not": "Ortak kelime 'bayi'; yazılım şikayet sınıflandırmıyor"
+  },
+  {
+    "id": "t02",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "kumaş desenlerini tasarlamak",
+    "startup_capability": "kumaş hata tespiti",
+    "not": "Ortak kelime 'kumaş'; desen tasarlamak değil hata bulmak"
+  },
+  {
+    "id": "t03",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "pompaların ne zaman arızalanacağını önceden bilmek",
+    "startup_capability": "rüzgar türbini bakım tahmini",
+    "not": "Aynı iş türü (bakım tahmini), farklı makine"
+  },
+  {
+    "id": "t04",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "müşterilerin neden aradığını anlamak",
+    "startup_capability": "müşteri hizmetleri sohbet botu",
+    "not": "Ortak kelime 'müşteri'; bot cevap verir, analiz yapmaz"
+  },
+  {
+    "id": "t05",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "aşı taşıyan kamyonlarda sıcaklık takibi",
+    "startup_capability": "sıcaklık ve nem sensörleri",
+    "not": "Ortak kelime 'sıcaklık'; sera sensörü, araç takibi değil"
+  },
+  {
+    "id": "t06",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "çağrıların konusunu görmek",
+    "startup_capability": "sosyal medya dinleme",
+    "not": "Benzer iş (metin dinleme), farklı kanal"
+  },
+  {
+    "id": "t07",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "ilaçları drone ile taşımak",
+    "startup_capability": "drone ile termal görüntüleme",
+    "not": "Ortak kelime 'drone'; taşıma değil görüntüleme"
+  },
+  {
+    "id": "t08",
+    "tur": "tuzak",
+    "etiket": "uydurma",
+    "brief_phrase": "işçilerin baret takıp takmadığını görmek",
+    "startup_capability": "trafik kamerası ile araç sayımı",
+    "not": "İkisi de kamera analizi, farklı nesne"
+  }
+]
