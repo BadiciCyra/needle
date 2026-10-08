@@ -20,6 +20,9 @@ import {
   IconBuildingCommunity,
   IconBuildingSkyscraper,
   IconFileDescription,
+  IconHeartHandshake,
+  IconSpeakerphone,
+  IconUserCheck,
   IconLayoutDashboard,
   IconLogout,
   IconMoon,
@@ -36,12 +39,19 @@ import { StitchLoader } from './components/StitchLoader'
 import { AppDataProvider, useAppData } from './data'
 import { LoginPage, RegisterPage } from './pages/AuthPages'
 import BriefPage from './pages/BriefPage'
+import CallDetailPage from './pages/CallDetailPage'
+import CallsPage from './pages/CallsPage'
+import ClaimsPage from './pages/ClaimsPage'
 import DashboardPage from './pages/DashboardPage'
+import IntroductionsPage from './pages/IntroductionsPage'
 import EcosystemPage from './pages/EcosystemPage'
 import NeedsPage from './pages/NeedsPage'
 import NewNeedPage from './pages/NewNeedPage'
 import OnboardingPage from './pages/OnboardingPage'
 import PilotsPage from './pages/PilotsPage'
+import StartupHomePage from './pages/StartupHomePage'
+import StartupOnboardingPage from './pages/StartupOnboardingPage'
+import StartupProfilePage from './pages/StartupProfilePage'
 
 function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -65,7 +75,7 @@ function AccountCard() {
       <Group justify="space-between" wrap="nowrap" gap="xs">
         <div style={{ minWidth: 0 }}>
           <Text size="sm" c="#f4f1ea" fw={500} truncate>
-            {me.role === 'yonetici' ? 'Program yöneticisi' : me.organization?.name}
+            {me.role === 'yonetici' ? 'Program yöneticisi' : me.role === 'girisim' ? me.startup?.name : me.organization?.name}
           </Text>
           <Text size="xs" c="#9a958a" truncate>
             {me.name}
@@ -106,11 +116,16 @@ const isActive = (pathname: string, to: string) => (to === '/' ? pathname === '/
 
 function Navigation({ onNavigate }: { onNavigate: () => void }) {
   const { pathname } = useLocation()
-  const { needs, pilots, startups } = useAppData()
-  const { isAdmin } = useAuth()
+  const { needs, pilots, startups, introductions, calls, claims } = useAppData()
+  const { isAdmin, isStartup } = useAuth()
   const openNeeds = needs?.filter((n) => n.accepted_count === 0).length
   const activePilots = pilots?.filter((p) => p.status === 'active').length
   const stale = pilots?.some((p) => p.stale)
+  const waitingIntros = introductions?.filter((i) => i.status === 'bekliyor').length
+  // Girişim için başvurulabilir çağrı; kurum için değerlendirilmeyi bekleyen başvurusu olan açık çağrı
+  const callCount = isStartup
+    ? calls?.filter((c) => c.status === 'acik' && !c.my_application).length
+    : calls?.filter((c) => c.status === 'acik').length
 
   const item = (to: string, label: string, Icon: typeof IconRocket, right?: React.ReactNode) => (
     <NavLink
@@ -132,19 +147,37 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
       </span>
     ) : null
 
+  const pilotItem = item(
+    '/pilotlar',
+    'Pilotlar',
+    IconRocket,
+    stale ? <Tooltip label="Hareketsiz pilot var">{count(activePilots, true)}</Tooltip> : count(activePilots),
+  )
+
+  if (isStartup)
+    return (
+      <>
+        <div className="app-section-label">Çalışma alanı</div>
+        {item('/', 'Genel bakış', IconLayoutDashboard)}
+        {item('/tanistirmalar', 'Tanıştırma istekleri', IconHeartHandshake, count(waitingIntros, true))}
+        {item('/cagrilar', 'Açık çağrılar', IconSpeakerphone, count(callCount))}
+        {pilotItem}
+        <div className="app-section-label">Hesap</div>
+        {item('/profil', 'Girişim profili', IconBuildingSkyscraper)}
+      </>
+    )
+
   return (
     <>
       <div className="app-section-label">Çalışma alanı</div>
       {item('/', 'Genel bakış', IconLayoutDashboard)}
       {item('/ihtiyaclar', 'İhtiyaçlar', IconFileDescription, count(openNeeds))}
-      {item(
-        '/pilotlar',
-        'Pilotlar',
-        IconRocket,
-        stale ? <Tooltip label="Hareketsiz pilot var">{count(activePilots, true)}</Tooltip> : count(activePilots),
-      )}
+      {item('/tanistirmalar', 'Tanıştırmalar', IconHeartHandshake, count(waitingIntros))}
+      {pilotItem}
+      {item('/cagrilar', 'Açık çağrılar', IconSpeakerphone, count(callCount))}
       <div className="app-section-label">Ekosistem</div>
       {item('/ekosistem', 'Girişimler', IconBuildingCommunity, count(startups?.length))}
+      {isAdmin && item('/hesap-onaylari', 'Girişim hesapları', IconUserCheck, count(claims?.length, true))}
       {!isAdmin && (
         <>
           <div className="app-section-label">Hesap</div>
@@ -157,9 +190,34 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
 
 function GlobalSearch() {
   const navigate = useNavigate()
-  const { needs, startups } = useAppData()
+  const { needs, startups, calls } = useAppData()
+  const { isStartup } = useAuth()
   const actions = useMemo<SpotlightActionGroupData[]>(
-    () => [
+    () =>
+      isStartup
+        ? [
+            {
+              group: 'Sayfalar',
+              actions: [
+                { id: 'p-home', label: 'Genel bakış', onClick: () => navigate('/'), leftSection: <IconLayoutDashboard size={18} /> },
+                { id: 'p-intro', label: 'Tanıştırma istekleri', onClick: () => navigate('/tanistirmalar'), leftSection: <IconHeartHandshake size={18} /> },
+                { id: 'p-calls', label: 'Açık çağrılar', onClick: () => navigate('/cagrilar'), leftSection: <IconSpeakerphone size={18} /> },
+                { id: 'p-pilots', label: 'Pilotlar', onClick: () => navigate('/pilotlar'), leftSection: <IconRocket size={18} /> },
+                { id: 'p-profile', label: 'Girişim profili', onClick: () => navigate('/profil'), leftSection: <IconBuildingSkyscraper size={18} /> },
+              ],
+            },
+            {
+              group: 'Açık çağrılar',
+              actions: (calls ?? []).map((c) => ({
+                id: `c-${c.id}`,
+                label: c.title,
+                description: c.organization ?? 'Kurum adı gizli',
+                onClick: () => navigate(`/cagrilar/${c.id}`),
+                leftSection: <IconSpeakerphone size={18} />,
+              })),
+            },
+          ]
+        : [
       {
         group: 'Sayfalar',
         actions: [
@@ -191,7 +249,7 @@ function GlobalSearch() {
         })),
       },
     ],
-    [needs, startups, navigate],
+    [needs, startups, calls, isStartup, navigate],
   )
 
   return (
@@ -208,6 +266,7 @@ function GlobalSearch() {
 
 function Shell() {
   const [opened, { toggle, close }] = useDisclosure()
+  const { isStartup, isAdmin } = useAuth()
   const { setColorScheme } = useMantineColorScheme()
   const scheme = useComputedColorScheme('light')
 
@@ -266,9 +325,11 @@ function Shell() {
                 {scheme === 'dark' ? <IconSun size={19} /> : <IconMoon size={19} />}
               </ActionIcon>
             </Tooltip>
-            <Button component={Link} to="/ihtiyaclar/yeni" leftSection={<IconPlus size={15} />} size="xs" h={32} visibleFrom="xs">
-              Yeni ihtiyaç
-            </Button>
+            {!isStartup && (
+              <Button component={Link} to="/ihtiyaclar/yeni" leftSection={<IconPlus size={15} />} size="xs" h={32} visibleFrom="xs">
+                Yeni ihtiyaç
+              </Button>
+            )}
           </Group>
         </Group>
       </AppShell.Header>
@@ -291,18 +352,34 @@ function Shell() {
 
       <AppShell.Main>
         <Box maw={1280} mx="auto">
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/ihtiyaclar" element={<NeedsPage />} />
-            <Route path="/ihtiyaclar/yeni" element={<NewNeedPage />} />
-            <Route path="/ihtiyaclar/:briefId" element={<BriefPage />} />
-            <Route path="/pilotlar" element={<PilotsPage />} />
-            <Route path="/ekosistem" element={<EcosystemPage />} />
-            <Route path="/profil" element={<OnboardingPage mode="edit" />} />
-            <Route path="/yeni" element={<Navigate to="/ihtiyaclar/yeni" replace />} />
-            <Route path="/girisimler" element={<Navigate to="/ekosistem" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          {isStartup ? (
+            <Routes>
+              <Route path="/" element={<StartupHomePage />} />
+              <Route path="/tanistirmalar" element={<IntroductionsPage />} />
+              <Route path="/cagrilar" element={<CallsPage />} />
+              <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
+              <Route path="/pilotlar" element={<PilotsPage />} />
+              <Route path="/profil" element={<StartupProfilePage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          ) : (
+            <Routes>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/ihtiyaclar" element={<NeedsPage />} />
+              <Route path="/ihtiyaclar/yeni" element={<NewNeedPage />} />
+              <Route path="/ihtiyaclar/:briefId" element={<BriefPage />} />
+              <Route path="/tanistirmalar" element={<IntroductionsPage />} />
+              <Route path="/pilotlar" element={<PilotsPage />} />
+              <Route path="/cagrilar" element={<CallsPage />} />
+              <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
+              <Route path="/ekosistem" element={<EcosystemPage />} />
+              {isAdmin && <Route path="/hesap-onaylari" element={<ClaimsPage />} />}
+              <Route path="/profil" element={<OnboardingPage mode="edit" />} />
+              <Route path="/yeni" element={<Navigate to="/ihtiyaclar/yeni" replace />} />
+              <Route path="/girisimler" element={<Navigate to="/ekosistem" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          )}
         </Box>
       </AppShell.Main>
       <GlobalSearch />
@@ -325,8 +402,9 @@ function Gate() {
         <Route path="*" element={<LoginPage />} />
       </Routes>
     )
-  // Firma ilk girişte profilini doldurur; yönetici doğrudan panele girer
+  // Firma ilk girişte profilini doldurur; girişim profilini bağlar ve doğrulanır; yönetici doğrudan panele girer
   if (me.role === 'firma' && !me.organization?.onboarded) return <OnboardingPage mode="onboarding" />
+  if (me.role === 'girisim' && !me.startup?.verified) return <StartupOnboardingPage />
   return (
     // Hesap değişince (çıkış/giriş) veriler sıfırdan yüklensin
     <AppDataProvider key={me.id}>

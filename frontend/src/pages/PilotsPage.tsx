@@ -38,6 +38,7 @@ const progressOf = (p: Pilot) => {
 }
 
 function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) => void }) {
+  const { isStartup } = useAuth()
   const [title, setTitle] = useState('')
   const [due, setDue] = useState('')
   const [outcome, setOutcome] = useState(pilot.outcome ?? '')
@@ -55,14 +56,20 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
   return (
     <Stack gap="lg">
       <Group gap="md" wrap="nowrap">
-        <OrgAvatar name={pilot.startup.name} size={48} />
+        <OrgAvatar name={isStartup ? pilot.organization ?? 'Kurum' : pilot.startup.name} size={48} />
         <div style={{ minWidth: 0 }}>
           <Title order={2} className="app-display" fw={400} fz={30}>
-            {pilot.startup.name}
+            {isStartup ? pilot.organization ?? 'Kurum' : pilot.startup.name}
           </Title>
-          <Anchor component={Link} to={`/ihtiyaclar/${pilot.brief_id}`} size="sm">
-            {pilot.brief_title}
-          </Anchor>
+          {isStartup ? (
+            <Text size="sm" c="dimmed">
+              {pilot.brief_title}
+            </Text>
+          ) : (
+            <Anchor component={Link} to={`/ihtiyaclar/${pilot.brief_id}`} size="sm">
+              {pilot.brief_title}
+            </Anchor>
+          )}
         </div>
       </Group>
 
@@ -77,6 +84,7 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
       <SimpleGrid cols={2}>
         <Select
           label="Durum"
+          disabled={isStartup}
           size="xs"
           styles={{ label: { fontSize: 12, fontWeight: 400, color: 'var(--app-muted)', marginBottom: 2 } }}
           value={pilot.status}
@@ -152,6 +160,8 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
         </Group>
       </div>
 
+      {!isStartup && (
+        <>
       <Divider />
 
       <div>
@@ -191,13 +201,15 @@ function PilotDetail({ pilot, onChange }: { pilot: Pilot; onChange: (p: Pilot) =
           </Group>
         </Stack>
       </div>
+        </>
+      )}
     </Stack>
   )
 }
 
 export default function PilotsPage() {
   const { pilots, setPilot } = useAppData()
-  const { isAdmin } = useAuth()
+  const { isAdmin, isStartup } = useAuth()
   const [filter, setFilter] = useState('active')
   const [openId, setOpenId] = useState<number | null>(null)
   const open = pilots?.find((p) => p.id === openId) ?? null
@@ -217,7 +229,7 @@ export default function PilotsPage() {
     <>
       <PageHeader
         title="Pilotlar"
-        description="Kabul edilen her eşleşme için otomatik açılır. Uzun süre hareketsiz kalan pilotlar işaretlenir; pilotlar sessizce ölmesin."
+        description="Tanıştırma kabul edilince açılır; kurum ve girişim aynı kartı görür. Uzun süre hareketsiz kalan pilotlar işaretlenir; pilotlar sessizce ölmesin."
       />
 
       <StatStrip
@@ -233,10 +245,10 @@ export default function PilotsPage() {
         <EmptyState
           icon={IconRocket}
           title="Henüz pilot yok"
-          description="Bir ihtiyacın eşleştirme sonucunda bir adayı kabul ettiğinizde pilot kartı otomatik açılır."
+          description="Tanıştırma isteği kabul edildiğinde ya da bir çağrı başvurusunu kabul ettiğinizde pilot kartı açılır."
           action={
-            <Button component={Link} to="/ihtiyaclar" variant="default">
-              İhtiyaçlara git
+            <Button component={Link} to={isStartup ? '/tanistirmalar' : '/ihtiyaclar'} variant="default">
+              {isStartup ? 'Tanıştırma isteklerine git' : 'İhtiyaçlara git'}
             </Button>
           }
         />
@@ -260,7 +272,7 @@ export default function PilotsPage() {
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th pl="lg">Girişim</Table.Th>
+                    <Table.Th pl="lg">{isStartup ? 'Kurum' : 'Girişim'}</Table.Th>
                     <Table.Th w={140}>Durum</Table.Th>
                     <Table.Th w={200}>İlerleme</Table.Th>
                     <Table.Th w={150} style={{ whiteSpace: 'nowrap' }}>
@@ -274,14 +286,16 @@ export default function PilotsPage() {
                 <Table.Tbody>
                   {shown.map((p) => {
                     const { total, done, pct } = progressOf(p)
+                    // Girişim kendi adını değil karşı tarafı (kurumu) görür
+                    const counterpart = isStartup ? p.organization ?? 'Kurum' : p.startup.name
                     return (
                       <Table.Tr key={p.id} className="app-row-link" onClick={() => setOpenId(p.id)}>
                         <Table.Td pl="lg">
                           <Group gap="sm" wrap="nowrap">
-                            <OrgAvatar name={p.startup.name} size={34} />
+                            <OrgAvatar name={counterpart} size={34} />
                             <div style={{ minWidth: 0 }}>
                               <Text size="sm" fw={600}>
-                                {p.startup.name}
+                                {counterpart}
                               </Text>
                               <Text size="xs" c="dimmed" lineClamp={1}>
                                 {isAdmin && p.organization ? `${p.organization} · ` : ''}

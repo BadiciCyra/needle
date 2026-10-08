@@ -1,4 +1,4 @@
-import { Divider, Drawer, Group, List, SimpleGrid, Stack, Text, Title } from '@mantine/core'
+import { Anchor, Divider, Drawer, Group, List, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 
 import { MATURITY_LABEL } from '../labels'
 import type { StartupProfile } from '../types'
@@ -15,6 +15,11 @@ export default function StartupDrawer({ startup, onClose }: { startup: StartupPr
               <Title order={2} className="app-display" fw={400} fz={32} lh={1.05}>
                 {startup.name}
               </Title>
+              {startup.website && (
+                <Anchor href={startup.website} target="_blank" rel="noreferrer" size="sm">
+                  {startup.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </Anchor>
+              )}
             </div>
           </Group>
 
