@@ -65,6 +65,10 @@ export const api = {
   login: (email: string, password: string) => post<Me>('/auth/login', { email, password }),
   register: (body: RegisterBody) => post<Me>('/auth/register', body),
   logout: () => post<void>('/auth/logout'),
+  requestPasswordReset: (email: string) => post<void>('/auth/password-reset/request', { email }),
+  confirmPasswordReset: (token: string, password: string) => post<void>('/auth/password-reset/confirm', { token, password }),
+  changePassword: (current_password: string, new_password: string) =>
+    post<void>('/auth/password', { current_password, new_password }),
   saveProfile: (profile: OrgProfile) => request<Me>('/auth/profile', { method: 'PUT', body: JSON.stringify(profile) }),
   createNeed: (raw_text: string, organization?: { name: string; sector?: string; author_unit?: string; owner_unit?: string }) =>
     post<BriefOut>('/needs', { raw_text, organization }),
