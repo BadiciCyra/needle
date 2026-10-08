@@ -46,6 +46,13 @@ _ADDED_COLUMNS = [
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS startup_id VARCHAR(40) REFERENCES startups(id)",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS introduction_id INTEGER REFERENCES introductions(id)",
     # Eski pilotlar yalnızca match_id taşıyordu: brief ve girişimi eşleşmeden doldur
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS contact_email VARCHAR(254)",
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS contact_source VARCHAR(300)",
+    "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_to VARCHAR(254)",
+    "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_subject VARCHAR(300)",
+    "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_body TEXT",
+    "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_updated_at TIMESTAMPTZ",
+    "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_sent_at TIMESTAMPTZ",
     "UPDATE pilots p SET brief_id = m.brief_id, startup_id = m.startup_id FROM matches m "
     "WHERE p.match_id = m.id AND p.brief_id IS NULL",
 ]

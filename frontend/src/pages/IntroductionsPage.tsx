@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { api } from '../api'
+import IntroEmailDraft from '../components/IntroEmailDraft'
 import { useAuth } from '../auth'
 import { EmptyState, MetaItem, OrgAvatar, PageHeader, PageLoader, Tag } from '../components/ui'
 import { useAppData } from '../data'
@@ -13,7 +14,15 @@ import type { Introduction } from '../types'
 
 const STARTUP_VIEW = { bekliyor: 'Cevabınız bekleniyor', kabul: 'Kabul ettiniz', ret: 'Reddettiniz' }
 
-function IntroCard({ intro, onRespond }: { intro: Introduction; onRespond?: (i: Introduction, d: 'kabul' | 'ret') => void }) {
+function IntroCard({
+  intro,
+  onRespond,
+  onChange,
+}: {
+  intro: Introduction
+  onRespond?: (i: Introduction, d: 'kabul' | 'ret') => void
+  onChange: (i: Introduction) => void
+}) {
   const { isStartup, isAdmin } = useAuth()
   // Girişim kendi bakış açısından okur: "Girişimin cevabı bekleniyor" değil "Cevabınız bekleniyor"
   const status = isStartup ? { ...INTRO_STATUS[intro.status], label: STARTUP_VIEW[intro.status] } : INTRO_STATUS[intro.status]
@@ -71,10 +80,8 @@ function IntroCard({ intro, onRespond }: { intro: Introduction; onRespond?: (i: 
           </div>
         )}
 
-        {intro.status === 'bekliyor' && !isStartup && !intro.startup_has_account && (
-          <Text size="xs" c="dimmed">
-            Girişimin Needle hesabı yok; program yöneticisi girişimle görüşüp sonucu buraya işler.
-          </Text>
+        {!isStartup && !intro.startup_has_account && (intro.email || intro.status === 'bekliyor') && (
+          <IntroEmailDraft intro={intro} onChange={onChange} />
         )}
 
         <Group justify="flex-end" gap="xs">
@@ -177,6 +184,7 @@ export default function IntroductionsPage() {
             <IntroCard
               key={intro.id}
               intro={intro}
+              onChange={() => refresh()}
               onRespond={canRespond ? (i, d) => setResponding({ intro: i, decision: d }) : undefined}
             />
           ))}
