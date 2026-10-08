@@ -441,6 +441,10 @@ def apply_to_call(
         raise HTTPException(409, "Bu çağrı başvuruya kapalı")
     if _applied(session, call, user):
         raise HTTPException(409, "Bu çağrıya zaten başvurdunuz")
+    if session.scalar(
+        select(Introduction.id).where(Introduction.brief_id == call.brief_id, Introduction.startup_id == startup_id)
+    ):
+        raise HTTPException(409, "Bu ihtiyaç için kurumla zaten tanıştırıldınız; Tanıştırmalar sayfasına bakın")
     session.add(Application(call_id=call.id, startup_id=startup_id, note=payload.note.strip()))
     session.commit()
     return _call_out(session, call, user, detail=True)

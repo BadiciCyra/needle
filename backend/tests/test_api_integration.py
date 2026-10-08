@@ -283,6 +283,14 @@ def test_startup_claims_profile_and_answers_introduction(client):
     assert startup.post(f"/pilots/{pilot['id']}/milestones", json={"title": "Örnek veri"}).status_code == 200
     assert startup.patch(f"/pilots/{pilot['id']}", json={"result": "evet"}).status_code == 403
 
+    # Aynı ihtiyaç bir çağrıya açılsa da zaten tanıştırılmış girişim ikinci kez başvuramaz (iki pilot olmasın)
+    call_id = client.post("/calls", json={
+        "brief_id": brief_id, "title": "Şikayet sınıflandırma çağrısı",
+        "summary": "Ayda 3.000 Türkçe şikayet metnini otomatik sınıflandırmak istiyoruz.",
+    }).json()["id"]
+    note = {"note": "Hazır modelimiz var, iki haftada kurarız, referanslarımız mevcut."}
+    assert startup.post(f"/calls/{call_id}/applications", json=note).status_code == 409
+
     # Aynı profili ikinci bir hesap sahiplenemez
     other = TestClient(app)
     register(other, "veli@metinsel.example", account_type="girisim")
