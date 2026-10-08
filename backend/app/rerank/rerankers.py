@@ -1,11 +1,12 @@
 """İkinci aşama sıralama: sorgu ile adayı birlikte okuyup yeniden puanlar.
 
-- cross_encoder: yerel, açık kaynak, çok dilli mMARCO modeli (varsayılan)
-- llm: adayları LLM puanlar (daha yavaş, daha pahalı)
+- llm: adayları LLM puanlar ve en iyilerini "doğrudan çözüyor mu?" diye denetler (varsayılan)
+- cross_encoder: yerel, açık kaynak, çok dilli mMARCO modeli
 - none: sadece vektör / RRF sırası
 """
 
 import math
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from typing import Protocol
 
@@ -65,9 +66,6 @@ class CrossEncoderReranker:
 
 class _LLMScore(BaseModel):
     startup_id: str
-    # Gerekçe karardan önce: model önce ne yaptığını söyleyip sonra karar verince teğet adaylara daha az "evet" diyor
-    gerekce: str = Field(description="En fazla 15 kelime: girişimin ürünü bu problemde tam olarak ne yapar?")
-    dogrudan_cozer: bool = Field(description="Ürünü, ihtiyaçtaki problemi bugün olduğu haliyle doğrudan çözüyor mu?")
     score: int = Field(ge=0, le=10, description="0 = alakasız, 10 = ihtiyacı tam karşılıyor")
 
 
@@ -75,39 +73,96 @@ class _LLMScores(BaseModel):
     scores: list[_LLMScore]
 
 
+class _Check(BaseModel):
+    startup_id: str
+    urun_ne_yapar: str = Field(description="Profile göre ürünün yaptığı iş, en fazla 12 kelime")
+    ayni_nesne: bool = Field(description="Ürün, ihtiyacın nesnesiyle (aynı varlık / sistem / veri) mi çalışıyor?")
+    ayni_is: bool = Field(description="Ürün, ihtiyaçta istenen işi (tespit, sınıflandırma, takip...) mi yapıyor?")
+    uyarlama_gerekir: bool = Field(description="Kurumun kullanabilmesi için ürünün başka bir alana uyarlanması gerekir mi?")
+
+
+class _Checks(BaseModel):
+    ihtiyac_nesnesi: str = Field(description="İhtiyacın üzerinde çalıştığı varlık/sistem/veri, en fazla 8 kelime")
+    istenen_is: str = Field(description="O nesne üzerinde yapılması istenen iş, en fazla 8 kelime")
+    adaylar: list[_Check]
+
+
+_SCORE_SYSTEM = (
+    "Bir kurumun ihtiyacına en uygun girişimleri puanlıyorsun. Her girişime 0-10 arası puan ver. "
+    "Sadece girişim profilinde yazan yetkinliklere dayan."
+)
+
+_CHECK_SYSTEM = """Bir kurumun ihtiyacı için öne çıkan girişimlerin bu problemi DOĞRUDAN çözüp çözmediğini denetliyorsun.
+Önce ihtiyacın nesnesini ve istenen işi GENEL terimlerle yaz: kurumun kendi adlandırmasını değil, veri/varlık
+türünü kullan (ör. "bayi şikayetleri" değil "müşteri şikayet metinleri"; "X belediyesinin boruları" değil
+"su dağıtım şebekesi"). Sonra her girişim için yalnızca profilde yazanlara bakarak üç soruyu ayrı ayrı cevapla:
+- ayni_nesne: ürün bu tür veri/varlıkla mı çalışıyor? Aynı teknoloji alanında olmak (IoT, görüntü işleme,
+  kestirimci bakım, yapay zeka) yetmez; ör. fabrika makinesini izleyen sensör, şebeke borusunu izlemez → false.
+- ayni_is: ürün istenen işin ÇEKİRDEĞİNİ yapıyor mu? İhtiyaç birkaç parçalıysa (ör. toplama + analiz + raporlama)
+  ana parçayı yapması yeter. Benzer ama farklı iş (ör. müşteriye cevap veren sohbet botu ≠ şikayet sınıflandırma) → false.
+- uyarlama_gerekir: ürünün başka bir alan veya nesne için yeniden geliştirilmesi gerekiyorsa true. Kurulum,
+  entegrasyon, kurumun verisiyle eğitme veya ayar yapma uyarlama SAYILMAZ.
+Emin değilsen ayni_nesne için false seç."""
+
+
+def _is_direct(check: _Check) -> bool:
+    # Kararı model değil kod verir: üç somut sorunun üçü de olumlu olmalı
+    return check.ayni_nesne and check.ayni_is and not check.uyarlama_gerekir
+
+
 class LLMReranker:
+    """İki aşama: (1) bütün adaylar 0-10 puanlanır, (2) en iyi `verify_top_n` aday "problemi doğrudan çözüyor mu?"
+    diye ayrı bir çağrıda somut sorularla denetlenir; denetim `votes` kez paralel çalışır, çoğunluk oyu geçerlidir.
+
+    Tek çağrıda 40 adaya tek bir evet/hayır sormak kararsızdı: aynı brief'te dört çalıştırmanın ikisi
+    "uygun yok", ikisi 2-3 aday döndürüyordu (analiz/karar_kararliligi.py).
+    """
+
     name = "llm"
     # 0-10 puanın onda biri: birinci 4/10 veya altındaysa "güçlü eşleşme yok"; birincinin %60'ının
     # altındakiler kırpılır (ör. 9/10 birinciyken 5/10 ve altı listeye girmez)
     min_score = 0.5
     relative_ratio = 0.6
 
-    def __init__(self, llm: StructuredLLM):
+    def __init__(self, llm: StructuredLLM, verify_top_n: int = 8, votes: int = 3):
         self.llm = llm
+        self.verify_top_n = verify_top_n
+        self.votes = votes
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
         if not candidates:
             return []
+        self._score(query, candidates)
+        ranked = sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
+        # Taban puanın altındakiler zaten kısa listeye giremez; denetim çağrısı onlar için harcanmaz
+        to_check = [c for c in ranked[: self.verify_top_n] if c.rerank_score >= self.min_score]
+        checked = {c.startup.id for c in to_check}
+        for candidate in ranked:
+            candidate.direct_fit = False
+            candidate.direct_fit_reason = None if candidate.startup.id in checked else "Denetlenmedi (puanı düşük)"
+        if to_check:
+            self._verify(query, to_check)
+        return ranked
+
+    def _score(self, query: str, candidates: list[Candidate]) -> None:
         listing = "\n\n".join(f"[{c.startup.id}]\n{c.startup.to_search_text()}" for c in candidates)
-        result = self.llm.invoke(
-            _LLMScores,
-            system=(
-                "Bir kurumun ihtiyacına en uygun girişimleri puanlıyorsun. Her girişime 0-10 arası puan ver. "
-                "Sadece girişim profilinde yazan yetkinliklere dayan.\n"
-                "dogrudan_cozer: girişimin profilde yazan ürünü, ihtiyaçtaki problemin nesnesiyle/süreciyle/verisiyle "
-                "çalışıyor ve kurum onu bu iş için yeni bir ürün geliştirmeden kullanabiliyorsa true. Yalnızca aynı "
-                "teknoloji alanında olmak (ör. ikisi de IoT, görüntü işleme, kestirimci bakım veya veri analitiği) "
-                "veya 'uyarlanabilir' olmak yetmez; o durumda false. Emin değilsen false."
-            ),
-            user=f"İhtiyaç:\n{query}\n\nGirişimler:\n{listing}",
-        )
-        by_id = {s.startup_id: s for s in result.scores}
+        result = self.llm.invoke(_LLMScores, system=_SCORE_SYSTEM, user=f"İhtiyaç:\n{query}\n\nGirişimler:\n{listing}")
+        scores = {s.startup_id: s.score / 10 for s in result.scores}
         for candidate in candidates:
-            s = by_id.get(candidate.startup.id)
-            candidate.rerank_score = s.score / 10 if s else 0.0
-            candidate.direct_fit = s.dogrudan_cozer if s else False
-            candidate.direct_fit_reason = s.gerekce if s else None
-        return sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
+            candidate.rerank_score = scores.get(candidate.startup.id, 0.0)
+
+    def _verify(self, query: str, candidates: list[Candidate]) -> None:
+        listing = "\n\n".join(f"[{c.startup.id}]\n{c.startup.to_search_text()}" for c in candidates)
+        user = f"İhtiyaç:\n{query}\n\nGirişimler:\n{listing}"
+        with ThreadPoolExecutor(self.votes) as pool:
+            rounds = list(pool.map(lambda _: self.llm.invoke(_Checks, system=_CHECK_SYSTEM, user=user), range(self.votes)))
+        for candidate in candidates:
+            checks = [c for r in rounds for c in r.adaylar if c.startup_id == candidate.startup.id]
+            yes = [c for c in checks if _is_direct(c)]
+            candidate.direct_fit = len(yes) * 2 > self.votes  # cevap gelmeyen oy "hayır" sayılır
+            winner = (yes if candidate.direct_fit else [c for c in checks if not _is_direct(c)]) or checks
+            if winner:
+                candidate.direct_fit_reason = f"{winner[0].urun_ne_yapar} ({len(yes)}/{self.votes} oy evet)"
 
 
 @lru_cache
@@ -124,5 +179,5 @@ def get_reranker(settings: Settings | None = None, llm: StructuredLLM | None = N
             from app.llm.client import get_structured_llm
 
             llm = get_structured_llm()
-        return LLMReranker(llm)
+        return LLMReranker(llm, settings.rerank_verify_top_n, settings.rerank_verify_votes)
     return PassthroughReranker()
