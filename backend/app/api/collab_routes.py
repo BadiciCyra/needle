@@ -35,6 +35,7 @@ from app.db.models import (
     Startup,
     User,
 )
+from app.config import Settings, get_settings
 from app.db.session import get_db
 from app.embeddings import Embedder
 from app.retrieval.pgvector import to_profile
@@ -113,7 +114,12 @@ def _require_startup_role(user: User) -> None:
 
 
 @router.post("/startup-account/claim", response_model=api.MeOut, summary="Havuzdaki profili sahiplen")
-def claim_startup(payload: api.ClaimIn, session: Session = Depends(get_db), user: User = Depends(current_user)):
+def claim_startup(
+    payload: api.ClaimIn,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
+):
     _require_startup_role(user)
     if user.startup_verified_at is not None:
         raise HTTPException(409, "Hesabınız zaten bir girişim profiline bağlı")
@@ -123,8 +129,10 @@ def claim_startup(payload: api.ClaimIn, session: Session = Depends(get_db), user
     if verified_owner(session, startup.id):
         raise HTTPException(409, "Bu profil başka bir hesap tarafından sahiplenilmiş; program yöneticisine yazın")
     user.startup_id = startup.id
-    # Şirket e-postası sitenin alan adıyla eşleşiyorsa anında doğrulanır; değilse yönetici onayı beklenir
-    user.startup_verified_at = _now() if email_matches_site(user.email, startup.website) else None
+    # Varsayılan: yönetici onaylar (alan adı eşleşmesi onay listesinde ipucu olarak görünür). Anında doğrulama
+    # yalnızca e-posta doğrulaması varken açılmalı (bkz. config.startup_domain_autoverify)
+    autoverify = settings.startup_domain_autoverify and email_matches_site(user.email, startup.website)
+    user.startup_verified_at = _now() if autoverify else None
     session.commit()
     return me_out(user)
 

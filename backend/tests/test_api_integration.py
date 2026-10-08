@@ -266,9 +266,14 @@ def test_startup_claims_profile_and_answers_introduction(client):
     assert startup.get(f"/briefs/{brief_id}/match").status_code == 403
     assert startup.get("/introductions").status_code == 403  # profil doğrulanmadan davet yok
 
-    # Şirket e-postası sitenin alan adıyla eşleşiyor → anında doğrulanır
+    # Alan adı eşleşse de e-posta doğrulaması olmadığı için varsayılan olarak yönetici onaylar
     me = startup.post("/startup-account/claim", json={"startup_id": "s01"}).json()
-    assert me["startup"] == {"id": "s01", "name": me["startup"]["name"], "status": "aktif", "verified": True}
+    assert me["startup"]["verified"] is False
+    admin = admin_client()
+    [claim] = admin.get("/admin/claims").json()
+    assert claim["domain_match"] is True  # onay listesinde ipucu
+    assert admin.post(f"/admin/claims/{claim['user_id']}/approve").status_code == 204
+    assert startup.get("/auth/me").json()["startup"]["verified"] is True
 
     [intro] = startup.get("/introductions").json()
     assert intro["id"] == intro_id and intro["organization"] == "Kuzey Beyaz Eşya"
@@ -352,6 +357,8 @@ def test_open_call_application_becomes_pilot(client):
     startup = TestClient(app)
     register(startup, "ekip@s03.example", account_type="girisim")
     startup.post("/startup-account/claim", json={"startup_id": "s03"})
+    [claim] = admin_client().get("/admin/claims").json()
+    admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
     [listed] = startup.get("/calls").json()
     assert listed["organization"] is None and listed["application_count"] == 0  # kurum adı gizli
     note = {"note": "Türkçe şikayet metinlerini sınıflandıran hazır modelimiz var, iki haftada kurarız."}
@@ -379,3 +386,15 @@ def test_open_call_application_becomes_pilot(client):
     assert client.patch(f"/calls/{call_id}", json={"status": "kapali"}).json()["status"] == "kapali"
     # Kapalı çağrı yeni girişimlere görünmez, başvuran yine görür
     assert [c["id"] for c in startup.get("/calls").json()] == [call_id]
+
+
+def test_domain_autoverify_only_when_enabled(client):
+    from app.api import collab_routes  # noqa: F401  (ayarın uç noktaya ulaştığını sınar)
+    from app.config import get_settings
+    from app.main import app
+
+    set_website("s04", "https://s04.example")
+    enabled = get_settings().model_copy(update={"startup_domain_autoverify": True})
+    app.dependency_overrides[get_settings] = lambda: enabled
+    register(client, "kurucu@s04.example", account_type="girisim")
+    assert client.post("/startup-account/claim", json={"startup_id": "s04"}).json()["startup"]["verified"] is True

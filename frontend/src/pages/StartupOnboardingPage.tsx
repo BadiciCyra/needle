@@ -6,8 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import StartupProfileForm from '../components/StartupProfileForm'
-import { OrgAvatar, Tag } from '../components/ui'
-import { TAG_COLOR } from '../labels'
+import { OrgAvatar } from '../components/ui'
 import type { StartupProfile } from '../types'
 
 const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
@@ -52,7 +51,7 @@ function Pending() {
         <Text c="dimmed" lh={1.6}>
           {isNew
             ? `${startup.name} için açtığınız profil program yöneticisinin onayında. Onaylanınca havuza girer ve eşleştirmelerde görünür.`
-            : `${startup.name} profilini sahiplenme isteğiniz program yöneticisinin onayında. E-posta adresiniz sitenizin alan adıyla eşleşmediği için elle doğrulanıyor.`}{' '}
+            : `${startup.name} profilini sahiplenme isteğiniz program yöneticisinin onayında.`}{' '}
           Onaylanınca davetleri ve açık çağrılara başvuruları buradan yöneteceksiniz.
         </Text>
       )}
@@ -148,8 +147,8 @@ export default function StartupOnboardingPage() {
       </Title>
       <Text c="dimmed" mt={8} mb="xl" lh={1.6}>
         Needle’ın havuzunda Türkiye’deki teknoloji girişimleri kaynaklarıyla birlikte duruyor. Profiliniz varsa sahiplenin;
-        böylece kurumlardan gelen tanıştırma isteklerini görür, profilinizi güncel tutarsınız.{' '}
-        <Tag color={TAG_COLOR.green}>Şirket e-postası sitenizle eşleşirse anında doğrulanır</Tag>
+        böylece kurumlardan gelen tanıştırma isteklerini görür, profilinizi güncel tutarsınız. Program yöneticisi
+        sahipliği onaylar; şirket e-postanız sitenizin alan adıyla eşleşiyorsa onay kolaylaşır.
       </Text>
       <Tabs defaultValue="ara" keepMounted={false}>
         <Tabs.List mb="lg">

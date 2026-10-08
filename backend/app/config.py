@@ -49,6 +49,10 @@ class Settings(BaseSettings):
 
     # Hesaplar
     session_days: int = 14  # oturum çerezinin geçerlilik süresi
+    # Girişim profili sahiplenmede şirket e-postası sitenin alan adıyla eşleşince yönetici onayı beklenmesin mi?
+    # E-posta doğrulaması (adrese gönderilen bağlantı) olmadan açılmamalı: kimse adresin sahibi olduğunu kanıtlamıyor,
+    # "ali@girisim.com" ile kayıt olan biri o girişimin profilini ve kurumların ihtiyaçlarını ele geçirirdi.
+    startup_domain_autoverify: bool = False
     cookie_secure: bool = False  # HTTPS arkasında yayına alınınca true olmalı
 
     # Pilot takibi
