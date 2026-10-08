@@ -101,12 +101,23 @@ embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
 
 ### Hesaplar
 
-İki rol var:
+Üç rol var:
 
 | Rol | Nasıl açılır | Ne görür |
 |---|---|---|
-| **Firma** | Arayüzde "Firma hesabı açın" | Yalnızca kendi kurumunun ihtiyaçları, eşleşmeleri ve pilotları. İlk girişte 3 adımlık firma profili doldurulur; sektör, şehir, olgunluk, bütçe ve süre bilgisi brief'in boş alanlarını tamamlar. |
-| **Program yöneticisi** | Komut satırından (aşağıda) | Bütün kurumların kayıtları |
+| **Firma** | Arayüzde "Hesap açın" → "Çözüm arıyorum" | Yalnızca kendi kurumunun ihtiyaçları, eşleşmeleri, tanıştırmaları, çağrıları ve pilotları. İlk girişte 3 adımlık firma profili doldurulur; sektör, şehir, olgunluk, bütçe ve süre bilgisi brief'in boş alanlarını tamamlar. |
+| **Girişim** | Arayüzde "Hesap açın" → "Çözüm sunuyorum" | Havuzdaki profilini sahiplenir ya da yeni profil açar; program yöneticisi onaylar (şirket e-postasının sitenin alan adıyla eşleşip eşleşmediği onay listesinde görünür). E-posta doğrulaması eklenince `STARTUP_DOMAIN_AUTOVERIFY=true` ile eşleşenler anında doğrulanabilir. Doğrulandıktan sonra kendisine gelen tanıştırma isteklerini, açık çağrıları ve kendi pilotlarını görür; ihtiyaç listesine erişemez. |
+| **Program yöneticisi** | Komut satırından (aşağıda) | Bütün kayıtlar; girişim hesaplarını onaylar, hesabı olmayan girişim adına tanıştırmaya cevap verir |
+
+**Tanıştırma:** Firma eşleşmedeki bir adayı kabul edince girişime tanıştırma isteği gider; girişim kabul edince pilot
+kartı açılır ve iki taraf aynı kartı görür (girişim kilometre taşı ekler, "işe yaradı mı" kararı kurumdadır).
+
+**Program raporu** (yönetici → Rapor): ihtiyaçların pilota ve sonuca dönüşme akışı, sektörler, tanıştırma kabul oranı,
+uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler,
+Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
+
+**Açık çağrı:** Havuzda problemi doğrudan çözen girişim bulunamazsa ihtiyaç tek tıkla açık çağrıya çevrilir (kurum
+adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur; firma kabul edince pilot doğrudan açılır.
 
 ```bash
 docker compose exec api python -m seed.create_admin yonetici@kurum.org "Ad Soyad"

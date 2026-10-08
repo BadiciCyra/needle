@@ -508,3 +508,12 @@ body {
     transform: translateX(166px);
   }
 }
+
+/* Tıklanabilir kart (çağrı listesi): kenarlık koyulaşır */
+.app-hover-card {
+  transition: border-color 120ms ease;
+}
+
+.app-hover-card:hover {
+  border-color: var(--app-border-strong);
+}
