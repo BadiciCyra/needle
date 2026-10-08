@@ -19,6 +19,7 @@ import {
   IconApi,
   IconBuildingCommunity,
   IconBuildingSkyscraper,
+  IconChartBar,
   IconFileDescription,
   IconHeartHandshake,
   IconSpeakerphone,
@@ -49,6 +50,7 @@ import NeedsPage from './pages/NeedsPage'
 import NewNeedPage from './pages/NewNeedPage'
 import OnboardingPage from './pages/OnboardingPage'
 import PilotsPage from './pages/PilotsPage'
+import ReportPage from './pages/ReportPage'
 import StartupHomePage from './pages/StartupHomePage'
 import StartupOnboardingPage from './pages/StartupOnboardingPage'
 import StartupProfilePage from './pages/StartupProfilePage'
@@ -178,6 +180,12 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
       <div className="app-section-label">Ekosistem</div>
       {item('/ekosistem', 'Girişimler', IconBuildingCommunity, count(startups?.length))}
       {isAdmin && item('/hesap-onaylari', 'Girişim hesapları', IconUserCheck, count(claims?.length, true))}
+      {isAdmin && (
+        <>
+          <div className="app-section-label">Program</div>
+          {item('/rapor', 'Rapor', IconChartBar)}
+        </>
+      )}
       {!isAdmin && (
         <>
           <div className="app-section-label">Hesap</div>
@@ -374,6 +382,7 @@ function Shell() {
               <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
               <Route path="/ekosistem" element={<EcosystemPage />} />
               {isAdmin && <Route path="/hesap-onaylari" element={<ClaimsPage />} />}
+              {isAdmin && <Route path="/rapor" element={<ReportPage />} />}
               <Route path="/profil" element={<OnboardingPage mode="edit" />} />
               <Route path="/yeni" element={<Navigate to="/ihtiyaclar/yeni" replace />} />
               <Route path="/girisimler" element={<Navigate to="/ekosistem" replace />} />
