@@ -269,3 +269,33 @@ export interface Claim {
   domain_match: boolean
   created_at: string
 }
+
+// Program yöneticisi raporu (backend/app/api/report_routes.py)
+export interface Report {
+  generated_at: string
+  funnel: { needs: number; briefed: number; matched: number; no_match: number; introduced: number; piloted: number; worked: number }
+  introductions: {
+    total: number
+    waiting: number
+    accepted: number
+    declined: number
+    acceptance_rate: number | null
+    avg_response_days: number | null
+    via_admin: number
+  }
+  pilots: { total: number; active: number; stale: number; done: number; result_evet: number; result_kismen: number; result_hayir: number }
+  sectors: { sector: string; needs: number; no_match: number; introduced: number; pilots: number; worked: number }[]
+  missing_capabilities: { capability: string; needs: number; variants: string[]; need_titles: string[] }[]
+  unmet_needs: {
+    brief_id: number
+    title: string
+    organization: string | null
+    sector: string
+    required_capabilities: string[]
+    open_call_id: number | null
+    applications: number
+  }[]
+  pool: { sector: string; startups: number; with_account: number }[]
+  open_calls: number
+  applications: number
+}

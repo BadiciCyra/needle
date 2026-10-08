@@ -112,6 +112,10 @@ embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
 **Tanıştırma:** Firma eşleşmedeki bir adayı kabul edince girişime tanıştırma isteği gider; girişim kabul edince pilot
 kartı açılır ve iki taraf aynı kartı görür (girişim kilometre taşı ekler, "işe yaradı mı" kararı kurumdadır).
 
+**Program raporu** (yönetici → Rapor): ihtiyaçların pilota ve sonuca dönüşme akışı, sektörler, tanıştırma kabul oranı,
+uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler,
+Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
+
 **Açık çağrı:** Havuzda problemi doğrudan çözen girişim bulunamazsa ihtiyaç tek tıkla açık çağrıya çevrilir (kurum
 adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur; firma kabul edince pilot doğrudan açılır.
 

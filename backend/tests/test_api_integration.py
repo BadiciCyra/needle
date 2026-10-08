@@ -398,3 +398,33 @@ def test_domain_autoverify_only_when_enabled(client):
     app.dependency_overrides[get_settings] = lambda: enabled
     register(client, "kurucu@s04.example", account_type="girisim")
     assert client.post("/startup-account/claim", json={"startup_id": "s04"}).json()["startup"]["verified"] is True
+
+
+def test_admin_report_and_excel_export(client):
+    from io import BytesIO
+
+    from openpyxl import load_workbook
+
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+    client.put("/auth/profile", json={"sector": "Perakende", "city": "İstanbul", "employee_range": "250-999"})
+    brief_id, result = matched_need(client)
+    intro_id = client.post(f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept"}).json()["introduction_id"]
+    admin = admin_client()
+    pilot_id = admin.post(f"/introductions/{intro_id}/respond", json={"decision": "kabul"}).json()["pilot_id"]
+    client.patch(f"/pilots/{pilot_id}", json={"status": "done", "result": "evet"})
+
+    assert client.get("/admin/report").status_code == 403  # firma raporu göremez
+    report = admin.get("/admin/report").json()
+    assert report["funnel"] == {
+        "needs": 1, "briefed": 1, "matched": 1, "no_match": 0, "introduced": 1, "piloted": 1, "worked": 1,
+    }
+    assert report["introductions"]["acceptance_rate"] == 1.0 and report["introductions"]["via_admin"] == 1
+    assert report["pilots"]["result_evet"] == 1
+    assert report["sectors"] == [{"sector": "Perakende", "needs": 1, "no_match": 0, "introduced": 1, "pilots": 1, "worked": 1}]
+    assert sum(r["startups"] for r in report["pool"]) == 40
+
+    excel = admin.get("/admin/report.xlsx")
+    assert excel.status_code == 200 and "needle-rapor-" in excel.headers["content-disposition"]
+    book = load_workbook(BytesIO(excel.content))
+    assert book.sheetnames == ["Özet", "Sektörler", "Eksik yetkinlikler", "Uygun bulunamayan", "Pilotlar", "Havuz"]
+    assert book["Pilotlar"]["E2"].value == "evet"
