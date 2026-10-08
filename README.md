@@ -7,6 +7,7 @@
 Kurumun dağınık ihtiyaç metnini yapılandırılmış bir brief'e çevirir, o brief'i uygun girişimlerle
 **gerekçesiyle** eşleştirir ve eşleşme sonrası pilot sürecini ölçülebilir şekilde takip eder.
 
+[![CI](https://github.com/BadiciCyra/needle/actions/workflows/ci.yml/badge.svg)](https://github.com/BadiciCyra/needle/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/durum-geli%C5%9Ftirme%20a%C5%9Famas%C4%B1nda-orange)
 ![Zemin360](https://img.shields.io/badge/Zemin360-Hackathon%202026-8A2BE2)
@@ -124,6 +125,10 @@ docker compose exec api python -m seed.create_admin yonetici@kurum.org "Ad Soyad
 ```
 
 Şifre ekrandan sorulur (komut geçmişinde kalmaz). Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
+Aynı e-postaya 15 dakikada 5 hatalı denemeden sonra giriş geçici olarak kilitlenir. "Şifremi unuttum" bağlantısı
+e-postayla gider: `.env`'de SMTP ayarlanmadıysa bağlantı `docker compose logs api` çıktısına yazılır. Şifre
+sıfırlanınca ya da değiştirilince diğer cihazlardaki oturumlar kapanır.
+
 HTTPS arkasında yayına alınırken `.env`'de `COOKIE_SECURE=true` yapılmalı. Kayıt ekranındaki aydınlatma metni
 bir taslaktır ve yayından önce hukuki inceleme gerektirir.
 
@@ -137,7 +142,7 @@ npm --prefix frontend install
 npm --prefix frontend run dev        # http://localhost:5173, /api → 127.0.0.1:8010
 ```
 
-Testler: `cd backend && python -m pytest`. Uçtan uca API testi ayrı bir veritabanı ister
+Testler: `cd backend && python -m pytest`. GitHub Actions her PR'da backend testlerini (pgvector'lü Postgres ile, entegrasyon dahil) ve arayüz derlemesini çalıştırır. Uçtan uca API testi ayrı bir veritabanı ister
 (test tabloları silip yeniden kurar): `NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@127.0.0.1:5432/needle_test`.
 
 ## Katkı
