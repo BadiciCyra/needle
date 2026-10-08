@@ -53,6 +53,19 @@ class Settings(BaseSettings):
     # E-posta doğrulaması (adrese gönderilen bağlantı) olmadan açılmamalı: kimse adresin sahibi olduğunu kanıtlamıyor,
     # "ali@girisim.com" ile kayıt olan biri o girişimin profilini ve kurumların ihtiyaçlarını ele geçirirdi.
     startup_domain_autoverify: bool = False
+    # Kaba kuvvet koruması: pencere içinde bu kadar hatalı denemeden sonra giriş geçici olarak kapanır
+    login_max_failures_per_email: int = 5
+    login_max_failures_per_ip: int = 30
+    login_window_minutes: int = 15
+    password_reset_minutes: int = 60  # sıfırlama bağlantısının geçerlilik süresi
+
+    # E-posta (şifre sıfırlama). Boşsa e-posta gönderilmez, bağlantı sunucu loguna yazılır (bkz. app/mailer.py)
+    app_base_url: str = "http://localhost:3000"  # e-postadaki bağlantıların kökü
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    mail_from: str = "Needle <no-reply@needle.local>"
     cookie_secure: bool = False  # HTTPS arkasında yayına alınınca true olmalı
 
     # Pilot takibi
