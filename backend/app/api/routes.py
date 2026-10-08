@@ -7,10 +7,22 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api import schemas as api
+from app.api.collab_routes import call_id_for_brief, intro_out
 from app.api.deps import embedder_dep, llm_dep, reranker_dep, retriever_dep
-from app.auth import current_user, ensure_visible, org_scope
+from app.auth import current_user, ensure_visible, org_scope, startup_scope
 from app.config import Settings, get_settings
-from app.db.models import BriefRecord, Match, MatchRun, Milestone, Need, Organization, Pilot, Startup, User
+from app.db.models import (
+    BriefRecord,
+    Introduction,
+    Match,
+    MatchRun,
+    Milestone,
+    Need,
+    Organization,
+    Pilot,
+    Startup,
+    User,
+)
 from app.db.session import get_db
 from app.embeddings import Embedder
 from app.graphs.brief_graph import build_brief_graph, profile_defaults
@@ -180,7 +192,14 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
         select(Match, Startup).join(Startup, Match.startup_id == Startup.id).where(Match.run_id == run.id).order_by(Match.rank)
     ).all()
     items: dict[str, list[api.SavedMatchItem]] = {"shortlist": [], "rejected": []}
+    intros = {
+        i.match_id: i
+        for i in session.scalars(
+            select(Introduction).where(Introduction.match_id.in_([m.id for m, _ in rows]))
+        ).all()
+    }
     for match, startup in rows:
+        intro = intros.get(match.id)
         items[match.kind].append(
             api.SavedMatchItem(
                 match_id=match.id,
@@ -193,6 +212,7 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
                 # reddedilen kısa liste adayında rejection yalnızca ret sebebini taşır, "yakındı ama" gerekçesi yoktur
                 rejection=match.rejection if match.rejection and "near_miss_reason" in match.rejection else None,
                 declined_reason=(match.rejection or {}).get("declined_reason"),
+                introduction=intro_out(session, intro) if intro else None,
             )
         )
     # match_runs.trace eski kayıtlarda düz metin listesi, yenilerde TraceStep sözlükleri
@@ -203,6 +223,7 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
         no_match=not items["shortlist"],
         retrieval_trace=[s["message"] if isinstance(s, dict) else s for s in run.trace],
         trace_steps=[TraceStep.model_validate(s) for s in run.trace if isinstance(s, dict)],
+        open_call_id=call_id_for_brief(session, brief_id),
         **items,
     )
 
@@ -264,13 +285,16 @@ def decide_match(
         raise HTTPException(409, f"Bu eşleşme için zaten karar verilmiş: {match.status}")
 
     match.decided_at = datetime.now(timezone.utc)
-    pilot_id = None
+    introduction_id = None
     if payload.decision == "accept":
         match.status = "accepted"
-        pilot = Pilot(match_id=match.id)  # kabul edilen eşleşme için pilot kartı otomatik açılır
-        session.add(pilot)
+        # Kabul girişime tanıştırma isteği gönderir; pilot, girişim (ya da onun adına yönetici) kabul edince açılır
+        intro = Introduction(
+            brief_id=match.brief_id, startup_id=match.startup_id, match_id=match.id, firm_note=payload.note
+        )
+        session.add(intro)
         session.flush()
-        pilot_id = pilot.id
+        introduction_id = intro.id
     else:
         match.status = "declined"
         if payload.reason:
@@ -280,27 +304,26 @@ def decide_match(
                 "declined_reason": payload.reason,
             }
     session.commit()
-    return api.DecisionOut(match_id=match.id, status=match.status, pilot_id=pilot_id)
+    return api.DecisionOut(match_id=match.id, status=match.status, introduction_id=introduction_id)
 
 
 @router.get("/startups", response_model=list[StartupProfile], summary="Girişim havuzu")
 def list_startups(session: Session = Depends(get_db), _: User = Depends(current_user)):
-    rows = session.scalars(select(Startup).order_by(Startup.id)).all()
+    rows = session.scalars(select(Startup).where(Startup.status == "aktif").order_by(Startup.id)).all()
     return [to_profile(row) for row in rows]
 
 
 def _pilot_out(session: Session, pilot: Pilot, settings: Settings) -> api.PilotOut:
-    match = session.get(Match, pilot.match_id)
-    record = session.get(BriefRecord, match.brief_id)
+    record = session.get(BriefRecord, pilot.brief_id)
     milestones = session.scalars(select(Milestone).where(Milestone.pilot_id == pilot.id).order_by(Milestone.id)).all()
     days_inactive = (datetime.now(timezone.utc) - pilot.last_activity_at).days
     return api.PilotOut(
         id=pilot.id,
         status=pilot.status,
-        match_id=match.id,
+        match_id=pilot.match_id,
         brief_id=record.id,
         brief_title=(record.data or {}).get("title") or record.need.raw_text[:60],
-        startup=to_profile(session.get(Startup, match.startup_id)),
+        startup=to_profile(session.get(Startup, pilot.startup_id)),
         started_at=pilot.started_at,
         last_activity_at=pilot.last_activity_at,
         days_inactive=days_inactive,
@@ -318,7 +341,11 @@ def _get_pilot(session: Session, pilot_id: int, user: User) -> Pilot:
     pilot = session.get(Pilot, pilot_id)
     if pilot is None:
         raise HTTPException(404, "Pilot bulunamadı")
-    _get_brief(session, session.get(Match, pilot.match_id).brief_id, user)
+    if user.role == "girisim":
+        if pilot.startup_id != startup_scope(user):
+            raise HTTPException(404, "Pilot bulunamadı")
+    else:
+        _get_brief(session, pilot.brief_id, user)
     return pilot
 
 
@@ -327,11 +354,11 @@ def list_pilots(
     session: Session = Depends(get_db), user: User = Depends(current_user), settings: Settings = Depends(get_settings)
 ):
     query = select(Pilot).order_by(Pilot.id.desc())
-    scope = org_scope(user)
-    if scope is not None:
+    if user.role == "girisim":
+        query = query.where(Pilot.startup_id == startup_scope(user))
+    elif (scope := org_scope(user)) is not None:
         query = (
-            query.join(Match, Pilot.match_id == Match.id)
-            .join(BriefRecord, Match.brief_id == BriefRecord.id)
+            query.join(BriefRecord, Pilot.brief_id == BriefRecord.id)
             .join(Need, BriefRecord.need_id == Need.id)
             .where(Need.organization_id == scope)
         )
@@ -347,6 +374,9 @@ def update_pilot(
     settings: Settings = Depends(get_settings),
 ):
     pilot = _get_pilot(session, pilot_id, user)
+    if user.role == "girisim":
+        # Girişim kilometre taşı ekleyip tamamlar; pilotun durumu ve "işe yaradı mı" kararı kurumundur
+        raise HTTPException(403, "Pilot durumunu ve sonucunu kurum günceller")
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(pilot, field, value)
     pilot.last_activity_at = datetime.now(timezone.utc)

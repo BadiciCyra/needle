@@ -34,6 +34,20 @@ _ADDED_COLUMNS = [
     "ALTER TABLE organizations ADD COLUMN IF NOT EXISTS profile JSONB NOT NULL DEFAULT '{}'",
     "ALTER TABLE organizations ADD COLUMN IF NOT EXISTS onboarded_at TIMESTAMPTZ",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS result VARCHAR(10)",
+    # Girişim hesapları, tanıştırma ve açık çağrı
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS startup_id VARCHAR(40) REFERENCES startups(id)",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS startup_verified_at TIMESTAMPTZ",
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS website VARCHAR(300)",
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'aktif'",
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS source VARCHAR(20) NOT NULL DEFAULT 'havuz'",
+    "ALTER TABLE startups ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ",
+    "ALTER TABLE pilots ALTER COLUMN match_id DROP NOT NULL",
+    "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS brief_id INTEGER REFERENCES briefs(id)",
+    "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS startup_id VARCHAR(40) REFERENCES startups(id)",
+    "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS introduction_id INTEGER REFERENCES introductions(id)",
+    # Eski pilotlar yalnızca match_id taşıyordu: brief ve girişimi eşleşmeden doldur
+    "UPDATE pilots p SET brief_id = m.brief_id, startup_id = m.startup_id FROM matches m "
+    "WHERE p.match_id = m.id AND p.brief_id IS NULL",
 ]
 
 
