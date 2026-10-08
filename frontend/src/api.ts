@@ -1,5 +1,6 @@
 import type {
   Claim,
+  Report,
   Introduction,
   OpenCall,
   StartupProfileInput,
@@ -97,6 +98,9 @@ export const api = {
   claims: () => request<Claim[]>('/admin/claims'),
   approveClaim: (userId: number) => post<void>(`/admin/claims/${userId}/approve`),
   rejectClaim: (userId: number) => post<void>(`/admin/claims/${userId}/reject`),
+
+  // Program yöneticisi raporu
+  report: () => request<Report>('/admin/report'),
 
   // Tanıştırmalar
   introductions: () => request<Introduction[]>('/introductions'),
