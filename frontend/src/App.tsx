@@ -22,6 +22,7 @@ import {
   IconChartBar,
   IconFileDescription,
   IconHeartHandshake,
+  IconKey,
   IconSpeakerphone,
   IconUserCheck,
   IconLayoutDashboard,
@@ -38,7 +39,8 @@ import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-r
 import { AuthProvider, useAuth } from './auth'
 import { StitchLoader } from './components/StitchLoader'
 import { AppDataProvider, useAppData } from './data'
-import { LoginPage, RegisterPage } from './pages/AuthPages'
+import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from './pages/AuthPages'
+import PasswordModal from './components/PasswordModal'
 import BriefPage from './pages/BriefPage'
 import CallDetailPage from './pages/CallDetailPage'
 import CallsPage from './pages/CallsPage'
@@ -71,6 +73,7 @@ function Logo({ light = false }: { light?: boolean }) {
 
 function AccountCard() {
   const { me, logout } = useAuth()
+  const [passwordOpen, password] = useDisclosure(false)
   if (!me) return null
   return (
     <Box px={14} py={12} style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
@@ -83,12 +86,20 @@ function AccountCard() {
             {me.name}
           </Text>
         </div>
-        <Tooltip label="Çıkış yap">
-          <ActionIcon variant="subtle" color="gray" onClick={logout} aria-label="Çıkış yap">
-            <IconLogout size={17} />
-          </ActionIcon>
-        </Tooltip>
+        <Group gap={2} wrap="nowrap">
+          <Tooltip label="Şifre değiştir">
+            <ActionIcon variant="subtle" color="gray" onClick={password.open} aria-label="Şifre değiştir">
+              <IconKey size={17} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Çıkış yap">
+            <ActionIcon variant="subtle" color="gray" onClick={logout} aria-label="Çıkış yap">
+              <IconLogout size={17} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
       </Group>
+      <PasswordModal opened={passwordOpen} onClose={password.close} />
     </Box>
   )
 }
@@ -398,6 +409,9 @@ function Shell() {
 
 function Gate() {
   const { me, loading } = useAuth()
+  const { pathname } = useLocation()
+  // E-postadaki sıfırlama bağlantısı oturum açıkken de açılabilmeli
+  if (pathname === '/sifre-sifirla') return <ResetPasswordPage />
   if (loading)
     return (
       <Box h="100vh" style={{ display: 'grid', placeItems: 'center' }}>
@@ -408,6 +422,8 @@ function Gate() {
     return (
       <Routes>
         <Route path="/kayit" element={<RegisterPage />} />
+        <Route path="/sifremi-unuttum" element={<ForgotPasswordPage />} />
+        <Route path="/sifre-sifirla" element={<ResetPasswordPage />} />
         <Route path="*" element={<LoginPage />} />
       </Routes>
     )

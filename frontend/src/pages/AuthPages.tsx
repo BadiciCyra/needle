@@ -18,8 +18,9 @@ import {
 import { useDisclosure } from '@mantine/hooks'
 import { IconAlertCircle, IconArrowRight } from '@tabler/icons-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
+import { api } from '../api'
 import { useAuth } from '../auth'
 import { StitchLoader } from '../components/StitchLoader'
 
@@ -78,6 +79,7 @@ function ErrorBox({ error }: { error: string | null }) {
 
 export function LoginPage() {
   const { login } = useAuth()
+  const [params] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
@@ -112,6 +114,14 @@ export function LoginPage() {
         <Stack>
           <TextInput label="E-posta" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.currentTarget.value)} />
           <PasswordInput label="Şifre" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.currentTarget.value)} />
+          <Anchor component={Link} to="/sifremi-unuttum" size="xs" c="dimmed" td="underline" mt={-8}>
+            Şifremi unuttum
+          </Anchor>
+          {params.get('sifirlandi') && !error && (
+            <Alert color="teal" variant="light">
+              Şifreniz değişti. Yeni şifrenizle giriş yapın.
+            </Alert>
+          )}
           <ErrorBox error={error} />
           <Button type="submit" loading={busy} rightSection={<IconArrowRight size={15} />} mt="xs">
             Giriş yap
@@ -237,6 +247,108 @@ export function RegisterPage() {
       <Modal opened={kvkkOpen} onClose={kvkk.close} title="Aydınlatma metni" size="lg">
         <KvkkText />
       </Modal>
+    </AuthLayout>
+  )
+}
+
+export function ForgotPasswordPage() {
+  const [email, setEmail] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    try {
+      await api.requestPasswordReset(email)
+      setSent(true)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <AuthLayout
+      title="Şifremi unuttum"
+      subtitle={
+        <Anchor component={Link} to="/giris" c="var(--app-ink)" td="underline">
+          Girişe dön
+        </Anchor>
+      }
+    >
+      {sent ? (
+        // Adres kayıtlı olsun olmasın aynı mesaj: hangi e-postaların hesabı olduğu sızmaz
+        <Alert color="gray" variant="light">
+          Bu adresle bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Bağlantı 60 dakika geçerli. E-posta
+          gelmediyse gereksiz klasörüne bakın.
+        </Alert>
+      ) : (
+        <form onSubmit={submit}>
+          <Stack>
+            <TextInput label="E-posta" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.currentTarget.value)} />
+            <ErrorBox error={error} />
+            <Button type="submit" loading={busy} rightSection={<IconArrowRight size={15} />}>
+              Sıfırlama bağlantısı gönder
+            </Button>
+          </Stack>
+        </form>
+      )}
+    </AuthLayout>
+  )
+}
+
+export function ResetPasswordPage() {
+  const [params] = useSearchParams()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+  const token = params.get('anahtar') ?? ''
+  const [password, setPassword] = useState('')
+  const [again, setAgain] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (password !== again) return setError('Şifreler aynı değil')
+    setBusy(true)
+    setError(null)
+    try {
+      await api.confirmPasswordReset(token, password)
+      await logout() // bütün oturumlar sunucuda düştü; bu sekme de giriş ekranına döner
+      navigate('/giris?sifirlandi=1', { replace: true })
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <AuthLayout title="Yeni şifre belirleyin" subtitle="Kaydettiğinizde açık olan bütün oturumlarınız kapanır.">
+      {!token ? (
+        <Alert color="red" variant="light">
+          Bağlantı eksik. E-postadaki bağlantıyı tam olarak açın ya da{' '}
+          <Anchor component={Link} to="/sifremi-unuttum">
+            yeni bağlantı isteyin
+          </Anchor>
+          .
+        </Alert>
+      ) : (
+        <form onSubmit={submit}>
+          <Stack>
+            <PasswordInput label="Yeni şifre" description="En az 10 karakter" autoComplete="new-password" required minLength={10} value={password} onChange={(e) => setPassword(e.currentTarget.value)} />
+            <PasswordInput label="Yeni şifre (tekrar)" autoComplete="new-password" required value={again} onChange={(e) => setAgain(e.currentTarget.value)} />
+            <ErrorBox error={error} />
+            <Button type="submit" loading={busy} disabled={password.length < 10} rightSection={<IconArrowRight size={15} />}>
+              Şifreyi kaydet
+            </Button>
+          </Stack>
+        </form>
+      )}
     </AuthLayout>
   )
 }
