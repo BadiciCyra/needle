@@ -204,8 +204,8 @@ export function RegisterPage() {
           />
           {isStartup ? (
             <Text size="xs" c="dimmed" lh={1.5}>
-              Hesabı açtıktan sonra havuzdaki profilinizi sahiplenir ya da yeni profil oluşturursunuz. Şirket e-postanız
-              sitenizin alan adıyla eşleşirse profiliniz hemen doğrulanır.
+              Hesabı açtıktan sonra havuzdaki profilinizi sahiplenir ya da yeni profil oluşturursunuz. Program yöneticisi
+              onayladığında kurumlardan gelen istekleri görmeye başlarsınız.
             </Text>
           ) : (
             <TextInput label="Kurum adı" required value={form.organization_name} onChange={set('organization_name')} />

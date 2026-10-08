@@ -106,7 +106,7 @@ embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
 | Rol | Nasıl açılır | Ne görür |
 |---|---|---|
 | **Firma** | Arayüzde "Hesap açın" → "Çözüm arıyorum" | Yalnızca kendi kurumunun ihtiyaçları, eşleşmeleri, tanıştırmaları, çağrıları ve pilotları. İlk girişte 3 adımlık firma profili doldurulur; sektör, şehir, olgunluk, bütçe ve süre bilgisi brief'in boş alanlarını tamamlar. |
-| **Girişim** | Arayüzde "Hesap açın" → "Çözüm sunuyorum" | Havuzdaki profilini sahiplenir ya da yeni profil açar. Şirket e-postası sitenin alan adıyla eşleşirse anında doğrulanır; değilse (ve yeni profillerde) program yöneticisi onaylar. Doğrulandıktan sonra kendisine gelen tanıştırma isteklerini, açık çağrıları ve kendi pilotlarını görür; ihtiyaç listesine erişemez. |
+| **Girişim** | Arayüzde "Hesap açın" → "Çözüm sunuyorum" | Havuzdaki profilini sahiplenir ya da yeni profil açar; program yöneticisi onaylar (şirket e-postasının sitenin alan adıyla eşleşip eşleşmediği onay listesinde görünür). E-posta doğrulaması eklenince `STARTUP_DOMAIN_AUTOVERIFY=true` ile eşleşenler anında doğrulanabilir. Doğrulandıktan sonra kendisine gelen tanıştırma isteklerini, açık çağrıları ve kendi pilotlarını görür; ihtiyaç listesine erişemez. |
 | **Program yöneticisi** | Komut satırından (aşağıda) | Bütün kayıtlar; girişim hesaplarını onaylar, hesabı olmayan girişim adına tanıştırmaya cevap verir |
 
 **Tanıştırma:** Firma eşleşmedeki bir adayı kabul edince girişime tanıştırma isteği gider; girişim kabul edince pilot

@@ -33,7 +33,7 @@ export default function ClaimsPage() {
     <>
       <PageHeader
         title="Girişim hesapları"
-        description="Şirket e-postası sitenin alan adıyla eşleşmeyen sahiplenme istekleri ve havuza girmek isteyen yeni profiller. Onaylanan yeni profil eşleştirmeye hemen katılır."
+        description="Profil sahiplenme istekleri ve havuza girmek isteyen yeni profiller. E-posta henüz doğrulanmadığı için alan adı eşleşmesi tek başına kanıt değildir; gerekirse girişimle iletişime geçin. Onaylanan yeni profil eşleştirmeye hemen katılır."
       />
       {claims.length === 0 ? (
         <EmptyState title="Onay bekleyen yok" description="Yeni istekler geldikçe burada görünür." />
@@ -58,7 +58,7 @@ export default function ClaimsPage() {
                     </Text>
                     <Text size="xs" c="dimmed">
                       Site: {c.startup.website ?? 'yok'}
-                      {c.kind === 'sahiplenme' && !c.domain_match ? ' · e-posta alan adı siteyle eşleşmiyor' : ''}
+                      {c.kind === 'sahiplenme' && (c.domain_match ? ' · e-posta alan adı siteyle eşleşiyor' : ' · e-posta alan adı siteyle eşleşmiyor')}
                     </Text>
                   </div>
                 </Group>
