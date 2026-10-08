@@ -428,3 +428,64 @@ def test_admin_report_and_excel_export(client):
     book = load_workbook(BytesIO(excel.content))
     assert book.sheetnames == ["Özet", "Sektörler", "Eksik yetkinlikler", "Uygun bulunamayan", "Pilotlar", "Havuz"]
     assert book["Pilotlar"]["E2"].value == "evet"
+
+
+def test_login_is_locked_after_repeated_failures(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "kilit@firma.example", "Kilit Firma")
+    attacker = TestClient(app)
+    for _ in range(5):
+        assert attacker.post("/auth/login", json={"email": "kilit@firma.example", "password": "yanlis-sifre"}).status_code == 401
+    # Kilitliyken doğru şifre de reddedilir: şifrenin doğru olduğu sızmaz
+    locked = attacker.post("/auth/login", json={"email": "KILIT@firma.example", "password": "uzun-bir-sifre-123"})
+    assert locked.status_code == 429 and "dakika" in locked.json()["detail"]
+    # Başka hesap etkilenmez
+    register(TestClient(app), "baska@firma.example", "Başka Firma")
+    assert TestClient(app).post("/auth/login", json={"email": "baska@firma.example", "password": "uzun-bir-sifre-123"}).status_code == 200
+
+
+def test_password_reset_flow(client, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from app.api import auth_routes
+    from app.main import app
+
+    sent = []
+    monkeypatch.setattr(auth_routes, "send_mail", lambda settings, to, subject, body: sent.append((to, body)))
+    register(client, "unuttum@firma.example", "Unutkan Firma")
+    for _ in range(5):  # kilitli hesap da sıfırlamayla açılır
+        TestClient(app).post("/auth/login", json={"email": "unuttum@firma.example", "password": "yanlis-sifre"})
+
+    # Kayıtlı olmayan adres de aynı cevabı alır (hesap varlığı sızmaz) ama e-posta gitmez
+    assert client.post("/auth/password-reset/request", json={"email": "yok@firma.example"}).status_code == 204
+    assert client.post("/auth/password-reset/request", json={"email": "Unuttum@firma.example"}).status_code == 204
+    [(to, body)] = sent
+    token = body.split("anahtar=")[1].split()[0]
+    assert to == "unuttum@firma.example"
+
+    assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "kisa"}).status_code == 422
+    assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "yepyeni-sifre-456"}).status_code == 204
+    assert client.get("/auth/me").status_code == 401  # açık oturum düştü
+    assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "baska-sifre-789"}).status_code == 400
+    assert client.post("/auth/login", json={"email": "unuttum@firma.example", "password": "uzun-bir-sifre-123"}).status_code == 401
+    assert client.post("/auth/login", json={"email": "unuttum@firma.example", "password": "yepyeni-sifre-456"}).status_code == 200
+
+
+def test_change_password_signs_out_other_devices(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "degis@firma.example", "Değişen Firma")
+    other_device = TestClient(app)
+    other_device.post("/auth/login", json={"email": "degis@firma.example", "password": "uzun-bir-sifre-123"})
+    assert other_device.get("/auth/me").status_code == 200
+
+    wrong = client.post("/auth/password", json={"current_password": "yanlis", "new_password": "yepyeni-sifre-456"})
+    assert wrong.status_code == 400
+    assert client.post("/auth/password", json={"current_password": "uzun-bir-sifre-123", "new_password": "yepyeni-sifre-456"}).status_code == 204
+    assert client.get("/auth/me").status_code == 200  # bu cihaz açık kalır
+    assert other_device.get("/auth/me").status_code == 401
