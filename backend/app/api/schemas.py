@@ -141,9 +141,19 @@ class SavedMatchOut(BaseModel):
     open_call_id: int | None = Field(None, description="Bu ihtiyaç için açılmış çağrı")
 
 
+MilestoneOwner = Literal["kurum", "girisim", "ortak"]
+
+
 class MilestoneIn(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     due_date: date | None = None
+    owner: MilestoneOwner = "ortak"
+
+
+class MilestoneEdit(BaseModel):
+    title: str | None = Field(None, min_length=2, max_length=200)
+    due_date: date | None = None
+    owner: MilestoneOwner | None = None
 
 
 class MilestoneOut(BaseModel):
@@ -151,15 +161,87 @@ class MilestoneOut(BaseModel):
     title: str
     due_date: datetime | None
     completed_at: datetime | None
+    owner: MilestoneOwner = "ortak"
+    overdue: bool = False
 
 
 PilotResult = Literal["evet", "kismen", "hayir"]
+NextStep = Literal["satin_alma", "genisletme", "yeni_pilot", "bitir"]
 
 
 class PilotUpdate(BaseModel):
     status: Literal["active", "paused", "done", "cancelled"] | None = None
     outcome: str | None = Field(None, description="Pilot sonucu (kapalı döngü için)")
     result: PilotResult | None = Field(None, description="İşe yaradı mı?")
+
+
+class PilotPlanIn(BaseModel):
+    goal: str | None = Field(None, max_length=2000)
+    scope: str | None = Field(None, max_length=2000)
+    start_date: date | None = None
+    end_date: date | None = None
+    firm_contact: str | None = Field(None, max_length=200)
+    startup_contact: str | None = Field(None, max_length=200)
+
+
+class MetricIn(BaseModel):
+    name: str = Field(min_length=2, max_length=200)
+    unit: str | None = Field(None, max_length=30)
+    baseline: float | None = None
+    target: float | None = None
+    direction: Literal["artis", "azalis"] = "artis"
+
+
+class MeasurementIn(BaseModel):
+    value: float
+    measured_on: date | None = None
+    note: str | None = Field(None, max_length=300)
+
+
+class MeasurementOut(BaseModel):
+    id: int
+    value: float
+    measured_on: date
+    note: str | None
+    author_role: str
+
+
+class MetricOut(BaseModel):
+    id: int
+    name: str
+    unit: str | None
+    baseline: float | None
+    target: float | None
+    direction: Literal["artis", "azalis"]
+    latest: float | None
+    progress: float | None = Field(description="Hedefe ilerleme 0-1 (hesaplanabiliyorsa)")
+    achieved: bool | None
+    measurements: list[MeasurementOut]
+
+
+class ActivityIn(BaseModel):
+    body: str = Field(min_length=2, max_length=4000)
+
+
+class ActivityOut(BaseModel):
+    id: int
+    kind: Literal["not", "olay"]
+    author_role: str
+    author_name: str | None
+    body: str
+    created_at: datetime
+
+
+class PilotEvaluationIn(BaseModel):
+    result: PilotResult
+    next_step: NextStep
+    startup_rating: int = Field(ge=1, le=5)
+    comment: str | None = Field(None, max_length=4000)
+
+
+class StartupFeedbackIn(BaseModel):
+    feedback: str = Field(min_length=10, max_length=4000)
+    collab_rating: int | None = Field(None, ge=1, le=5)
 
 
 class PilotOut(BaseModel):
@@ -177,6 +259,24 @@ class PilotOut(BaseModel):
     result: PilotResult | None
     milestones: list[MilestoneOut]
     organization: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    overdue_milestones: int = 0
+    next_step: NextStep | None = None
+    evaluated_at: datetime | None = None
+
+
+class PilotDetailOut(PilotOut):
+    goal: str | None
+    scope: str | None
+    firm_contact: str | None
+    startup_contact: str | None
+    startup_rating: int | None
+    startup_feedback: str | None
+    collab_rating: int | None
+    startup_feedback_at: datetime | None
+    metrics: list[MetricOut]
+    activity: list[ActivityOut]
 
 
 EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
@@ -346,3 +446,54 @@ class OrganizationCard(BaseModel):
     website: str | None
     open_calls: list[DirectoryCall] = Field(description="Kurum adını gizlemeyen açık çağrılar")
     joined_at: datetime | None
+
+
+class RecommendedCall(BaseModel):
+    id: int
+    title: str
+    organization: str | None
+    deadline: date | None
+    required_capabilities: list[str]
+    score: float
+    reason: str | None = Field(description="En yakın yetkinlik eşleşmesi")
+
+
+class RecommendedOrganization(BaseModel):
+    id: int
+    name: str
+    sector: str | None
+    city: str | None
+    open_calls: int
+    score: float
+
+
+class DemandSignal(BaseModel):
+    capability: str
+    organizations: int = Field(description="Bu yetkinliği arayan farklı kurum sayısı (en az 2)")
+    variants: list[str]
+    score: float
+
+
+class StartupRecommendations(BaseModel):
+    calls: list[RecommendedCall]
+    organizations: list[RecommendedOrganization]
+    signals: list[DemandSignal]
+
+
+class RecommendedStartup(BaseModel):
+    id: str
+    name: str
+    sector: str
+    maturity: str
+    location: str
+    capabilities: list[str]
+    score: float
+    reason: str | None = Field(description="En yakın yetkinlik eşleşmesi")
+    on_platform: bool = Field(description="Doğrulanmış girişim hesabı var; tanıştırmaya doğrudan cevap verebilir")
+    applied: bool = Field(description="Kurumun açık çağrılarından birine başvurdu")
+
+
+class OrganizationRecommendations(BaseModel):
+    basis: list[str] = Field(description="Önerinin dayandığı aranan yetkinlikler")
+    startups: list[RecommendedStartup]
+

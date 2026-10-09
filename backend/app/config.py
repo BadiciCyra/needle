@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     evidence_min_similarity: float = Field(0.25, ge=0, le=1)
 
     session_days: int = 14
+    admin_email: str = ""
+    admin_password: str = ""
+    admin_name: str = "Program yöneticisi"
     startup_domain_autoverify: bool = False
     login_max_failures_per_email: int = 5
     login_max_failures_per_ip: int = 30

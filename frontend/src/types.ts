@@ -119,11 +119,15 @@ export interface NeedSummary {
   accepted_count: number
 }
 
+export type MilestoneOwner = 'kurum' | 'girisim' | 'ortak'
+
 export interface Milestone {
   id: number
   title: string
   due_date: string | null
   completed_at: string | null
+  owner: MilestoneOwner
+  overdue: boolean
 }
 
 export type PilotStatus = 'active' | 'paused' | 'done' | 'cancelled'
@@ -144,6 +148,73 @@ export interface Pilot {
   result: PilotResult | null
   milestones: Milestone[]
   organization: string | null
+  start_date: string | null
+  end_date: string | null
+  overdue_milestones: number
+  next_step: NextStep | null
+  evaluated_at: string | null
+}
+
+export type NextStep = 'satin_alma' | 'genisletme' | 'yeni_pilot' | 'bitir'
+
+export interface Measurement {
+  id: number
+  value: number
+  measured_on: string
+  note: string | null
+  author_role: string
+}
+
+export interface Metric {
+  id: number
+  name: string
+  unit: string | null
+  baseline: number | null
+  target: number | null
+  direction: 'artis' | 'azalis'
+  latest: number | null
+  progress: number | null
+  achieved: boolean | null
+  measurements: Measurement[]
+}
+
+export interface Activity {
+  id: number
+  kind: 'not' | 'olay'
+  author_role: string
+  author_name: string | null
+  body: string
+  created_at: string
+}
+
+export interface PilotDetail extends Pilot {
+  goal: string | null
+  scope: string | null
+  firm_contact: string | null
+  startup_contact: string | null
+  startup_rating: number | null
+  startup_feedback: string | null
+  collab_rating: number | null
+  startup_feedback_at: string | null
+  metrics: Metric[]
+  activity: Activity[]
+}
+
+export interface PilotPlanInput {
+  goal?: string | null
+  scope?: string | null
+  start_date?: string | null
+  end_date?: string | null
+  firm_contact?: string | null
+  startup_contact?: string | null
+}
+
+export interface MetricInput {
+  name: string
+  unit: string | null
+  baseline: number | null
+  target: number | null
+  direction: 'artis' | 'azalis'
 }
 
 export interface Health {
@@ -317,4 +388,54 @@ export interface Report {
   pool: { sector: string; startups: number; with_account: number }[]
   open_calls: number
   applications: number
+}
+
+export interface RecommendedCall {
+  id: number
+  title: string
+  organization: string | null
+  deadline: string | null
+  required_capabilities: string[]
+  score: number
+  reason: string | null
+}
+
+export interface RecommendedOrganization {
+  id: number
+  name: string
+  sector: string | null
+  city: string | null
+  open_calls: number
+  score: number
+}
+
+export interface DemandSignal {
+  capability: string
+  organizations: number
+  variants: string[]
+  score: number
+}
+
+export interface StartupRecommendations {
+  calls: RecommendedCall[]
+  organizations: RecommendedOrganization[]
+  signals: DemandSignal[]
+}
+
+export interface RecommendedStartup {
+  id: string
+  name: string
+  sector: string
+  maturity: Maturity
+  location: string
+  capabilities: string[]
+  score: number
+  reason: string | null
+  on_platform: boolean
+  applied: boolean
+}
+
+export interface OrganizationRecommendations {
+  basis: string[]
+  startups: RecommendedStartup[]
 }

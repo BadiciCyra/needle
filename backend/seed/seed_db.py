@@ -90,6 +90,11 @@ def startup_count() -> int:
 
 
 if __name__ == "__main__":
+    settings = get_settings()
+    if settings.admin_email and settings.admin_password:
+        from seed.create_admin import ensure_admin
+
+        print(ensure_admin(settings.admin_email, settings.admin_password, settings.admin_name))
     if "--if-empty" in sys.argv and (existing := startup_count()):
         print(f"Girişim tablosu dolu ({existing} kayıt), seed atlandı; {backfill_extras()} boş site/iletişim alanı dolduruldu.")
     else:

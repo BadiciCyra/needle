@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.auth_routes import router as auth_router
 from app.api.collab_routes import router as collab_router
+from app.api.pilot_routes import router as pilot_router
 from app.api.report_routes import router as report_router
 from app.api.routes import router
 from app.config import get_settings
@@ -38,6 +39,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(router)
 app.include_router(collab_router)
+app.include_router(pilot_router)
 app.include_router(report_router)
 
 

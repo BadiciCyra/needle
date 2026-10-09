@@ -110,6 +110,23 @@ def matched_need(client) -> tuple[int, dict]:
     return body["brief_id"], client.post(f"/briefs/{body['brief_id']}/match").json()
 
 
+def insert_brief(email: str, capabilities: list[str]) -> int:
+    from app.db import session as db_session
+    from app.db.models import BriefRecord, Need, User
+
+    with db_session.get_session_factory()() as s:
+        org_id = s.query(User).filter_by(email=email).one().organization_id
+        need = Need(organization_id=org_id, raw_text="Depolarda stok sayımı ve şikayet ayrıştırma")
+        s.add(need)
+        s.flush()
+        record = BriefRecord(need_id=need.id, status="final", followup_questions=[], answers={}, data={
+            "title": "Depo ve şikayet ihtiyacı", "problem": "Elle yapılıyor", "required_capabilities": capabilities,
+        })
+        s.add(record)
+        s.commit()
+        return record.id
+
+
 def set_website(startup_id: str, url: str):
     from app.db import session as db_session
     from app.db.models import Startup
@@ -559,3 +576,138 @@ def test_startups_can_explore_organizations_before_verification(client):
 
     client.patch(f"/calls/{visible}", json={"status": "kapali"})
     assert startup.get("/organizations").json()[0]["open_calls"] == []
+
+
+def test_pilot_management_plan_metrics_activity_and_evaluation(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+    brief_id, result = matched_need(client)
+    intro_id = client.post(f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept"}).json()["introduction_id"]
+    pilot_id = admin_client().post(f"/introductions/{intro_id}/respond", json={"decision": "kabul"}).json()["pilot_id"]
+
+    # Pilot açılınca plan brief'ten önerilir: amaç, tarihler (3 ay), 5 kilometre taşı ve başarı kriterinden hedef
+    pilot = client.get(f"/pilots/{pilot_id}").json()
+    assert pilot["goal"] and pilot["start_date"] and pilot["end_date"]
+    assert [m["owner"] for m in pilot["milestones"]] == ["ortak", "kurum", "girisim", "ortak", "ortak"]
+    [metric] = pilot["metrics"]
+    assert metric["target"] == 85.0 and metric["unit"] == "%"
+    assert "Pilot açıldı" in pilot["activity"][-1]["body"]
+
+    pilot = client.patch(f"/pilots/{pilot_id}/plan", json={"firm_contact": "Ayşe Yılmaz, ayse@kuzey.example"}).json()
+    assert pilot["firm_contact"].startswith("Ayşe")
+    assert client.patch(f"/pilots/{pilot_id}/plan", json={"start_date": "2026-12-01", "end_date": "2026-11-01"}).status_code == 422
+
+    client.patch(f"/metrics/{metric['id']}", json={**{k: metric[k] for k in ("name", "unit", "target", "direction")}, "baseline": 60})
+    pilot = client.post(f"/metrics/{metric['id']}/measurements", json={"value": 72.5, "measured_on": "2026-11-15"}).json()
+    assert pilot["metrics"][0]["latest"] == 72.5 and pilot["metrics"][0]["progress"] == 0.5
+
+    late = client.post(f"/pilots/{pilot_id}/milestones", json={"title": "Geciken iş", "due_date": "2020-01-01", "owner": "girisim"}).json()
+    assert late["overdue_milestones"] == 1
+
+    # Girişim pilotu görür, not yazar, ölçüm ekler; durumu ve kurumun değerlendirmesini değiştiremez
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    set_website("s01", "https://metinsel.example")
+    startup.post("/startup-account/claim", json={"startup_id": "s01"})
+    [claim] = admin_client().get("/admin/claims").json()
+    admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
+    assert startup.post(f"/pilots/{pilot_id}/activity", json={"body": "Örnek veri setini aldık, kuruluma başlıyoruz."}).status_code == 200
+    assert startup.post(f"/metrics/{metric['id']}/measurements", json={"value": 80}).status_code == 200
+    assert startup.patch(f"/pilots/{pilot_id}", json={"status": "paused"}).status_code == 403
+    evaluation = {"result": "evet", "next_step": "satin_alma", "startup_rating": 5, "comment": "Hedef tuttu."}
+    assert startup.post(f"/pilots/{pilot_id}/evaluation", json=evaluation).status_code == 403
+    assert client.post(f"/pilots/{pilot_id}/startup-feedback", json={"feedback": "Kurum yazmamalı bunu."}).status_code == 403
+
+    # Başka firma göremez
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    assert other.get(f"/pilots/{pilot_id}").status_code == 404
+    assert other.post(f"/pilots/{pilot_id}/activity", json={"body": "merhaba"}).status_code == 404
+
+    done = client.post(f"/pilots/{pilot_id}/evaluation", json=evaluation).json()
+    assert done["status"] == "done" and done["next_step"] == "satin_alma" and done["startup_rating"] == 5
+    fb = startup.post(f"/pilots/{pilot_id}/startup-feedback", json={"feedback": "Veri erişimi hızlıydı, iyi bir iş birliği oldu.", "collab_rating": 4}).json()
+    assert fb["collab_rating"] == 4 and fb["startup_feedback_at"]
+
+    bodies = [a["body"] for a in client.get(f"/pilots/{pilot_id}").json()["activity"]]
+    assert bodies[0] == "Girişim pilotu değerlendirdi (iş birliği 4/5)"
+    assert any(b.startswith("Pilot değerlendirildi: işe yaradı mı evet") for b in bodies)
+    assert "Örnek veri setini aldık, kuruluma başlıyoruz." in bodies
+    assert any(b.startswith("Ölçüm: ") and b.endswith(" = 72,5%") for b in bodies)
+
+
+def test_admin_account_is_bootstrapped_from_settings(client):
+    from seed.create_admin import ensure_admin
+
+    assert ensure_admin("Kurulum@Program.example", "kisa", "Ad") .startswith("ADMIN_PASSWORD en az 10")
+    assert ensure_admin("Kurulum@Program.example", "kurulum-sifresi-1", "Kurulum Yöneticisi") == "Yönetici hesabı oluşturuldu: kurulum@program.example"
+    assert ensure_admin("kurulum@program.example", "kurulum-sifresi-1", "X") == "Yönetici hesabı zaten var: kurulum@program.example"
+    login = client.post("/auth/login", json={"email": "kurulum@program.example", "password": "kurulum-sifresi-1"})
+    assert login.status_code == 200 and login.json()["role"] == "yonetici"
+    register(client, "firma@ornek.example", "Örnek Firma")
+    assert "yönetici yapılmadı" in ensure_admin("firma@ornek.example", "kurulum-sifresi-1", "X")
+
+
+def test_startup_recommendations_calls_organizations_and_demand_signals(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "a@firma-a.example", "Firma A")
+    brief_a, _ = matched_need(client)
+    client.post("/calls", json={"brief_id": brief_a, "title": "Türkçe metin sınıflandırma çağrısı",
+                                "summary": "Bayi şikayetlerini Türkçe metin sınıflandırma ile ayırmak istiyoruz."})
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    other.put("/auth/profile", json={"sector": "Lojistik", "city": "İzmir", "employee_range": "250-999",
+                                     "description": "Depo ve stok yönetimi yapan lojistik firması."})
+    brief_b = insert_brief("b@firma-b.example", ["Türkçe metin sınıflandırma", "RFID ile stok sayımı"])
+    other.post("/calls", json={"brief_id": brief_b, "title": "Depo stok sayımı çağrısı",
+                               "summary": "Depolarda RFID ile stok sayımını hızlandıracak çözüm arıyoruz."})
+
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    assert startup.get("/startup-account/recommendations").status_code == 409
+    startup.post("/startup-account/claim", json={"startup_id": "s01"})
+    recs = startup.get("/startup-account/recommendations").json()
+
+    assert recs["calls"][0]["title"] == "Türkçe metin sınıflandırma çağrısı"
+    assert "Türkçe metin sınıflandırma" in recs["calls"][0]["reason"]
+    assert recs["calls"][0]["score"] > recs["calls"][1]["score"]
+    assert [(s["capability"], s["organizations"]) for s in recs["signals"]] == [("Türkçe metin sınıflandırma", 2)]
+    assert set(recs["signals"][0]) == {"capability", "organizations", "variants", "score"}
+    assert "Firma B" in {o["name"] for o in recs["organizations"]}
+    assert client.get("/startup-account/recommendations").status_code == 403
+
+
+def test_organization_recommendations_mirror_startup_side(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "a@firma-a.example", "Firma A")
+    assert client.get("/organization/recommendations").status_code == 409
+    brief_id, _ = matched_need(client)
+    call = client.post("/calls", json={"brief_id": brief_id, "title": "Şikayet sınıflandırma çağrısı",
+                                       "summary": "Bayi şikayetlerini otomatik ayırmak istiyoruz."}).json()
+
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    startup.post("/startup-account/claim", json={"startup_id": "s01"})
+    admin = admin_client()
+    [claim] = admin.get("/admin/claims").json()
+    admin.post(f"/admin/claims/{claim['user_id']}/approve")
+    assert startup.post(f"/calls/{call['id']}/applications", json={"note": "Türkçe şikayet metinlerini sınıflandıran hazır modelimiz var."}).status_code == 200
+    assert startup.get("/organization/recommendations").status_code == 403
+
+    recs = client.get("/organization/recommendations").json()
+    assert recs["basis"] and len(recs["startups"]) == 10
+    scores = [s["score"] for s in recs["startups"]]
+    assert scores == sorted(scores, reverse=True)
+    [s01] = [s for s in recs["startups"] if s["id"] == "s01"]
+    assert s01["on_platform"] and s01["applied"]
+    assert s01["reason"].startswith("Aradığınız “")
+    assert not any(s["on_platform"] for s in recs["startups"] if s["id"] != "s01")

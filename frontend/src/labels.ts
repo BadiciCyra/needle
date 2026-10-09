@@ -1,6 +1,6 @@
 import type { ComboboxItem, OptionsFilter } from '@mantine/core'
 
-import type { IntroStatus, Maturity, NeedSummary, PilotResult, PilotStatus } from './types'
+import type { IntroStatus, Maturity, MilestoneOwner, NeedSummary, NextStep, PilotResult, PilotStatus } from './types'
 
 export const MATURITY_LABEL: Record<Maturity, string> = {
   fikir: 'Fikir',
@@ -34,6 +34,17 @@ export const INTRO_STATUS: Record<IntroStatus, { label: string; color: string }>
   kabul: { label: 'Tanıştırma kabul edildi', color: TAG_COLOR.green },
   ret: { label: 'Girişim reddetti', color: TAG_COLOR.gray },
 }
+
+export const NEXT_STEP: Record<NextStep, string> = {
+  satin_alma: 'Satın alma / sözleşme',
+  genisletme: 'Pilotu genişletme',
+  yeni_pilot: 'Farklı kapsamda yeni pilot',
+  bitir: 'Bitirme',
+}
+
+export const OWNER_LABEL: Record<MilestoneOwner, string> = { kurum: 'Kurum', girisim: 'Girişim', ortak: 'Ortak' }
+
+export const ROLE_LABEL: Record<string, string> = { kurum: 'Kurum', girisim: 'Girişim', yonetici: 'Program yöneticisi', sistem: 'Needle' }
 
 export const PILOT_RESULT: Record<PilotResult, string> = { evet: 'Evet', kismen: 'Kısmen', hayir: 'Hayır' }
 

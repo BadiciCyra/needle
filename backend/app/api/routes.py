@@ -1,6 +1,6 @@
 """Needle API uç noktaları."""
 
-from datetime import datetime, time, timezone
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
@@ -9,17 +9,15 @@ from sqlalchemy.orm import Session
 from app.api import schemas as api
 from app.api.collab_routes import call_id_for_brief, intro_email_draft, intro_out, verified_owner
 from app.api.deps import embedder_dep, llm_dep, reranker_dep, retriever_dep
-from app.auth import current_user, ensure_visible, org_scope, startup_scope
+from app.auth import current_user, ensure_visible, org_scope
 from app.config import Settings, get_settings
 from app.db.models import (
     BriefRecord,
     Introduction,
     Match,
     MatchRun,
-    Milestone,
     Need,
     Organization,
-    Pilot,
     Startup,
     User,
 )
@@ -312,107 +310,3 @@ def decide_match(
 def list_startups(session: Session = Depends(get_db), _: User = Depends(current_user)):
     rows = session.scalars(select(Startup).where(Startup.status == "aktif").order_by(Startup.id)).all()
     return [to_profile(row) for row in rows]
-
-
-def _pilot_out(session: Session, pilot: Pilot, settings: Settings) -> api.PilotOut:
-    record = session.get(BriefRecord, pilot.brief_id)
-    milestones = session.scalars(select(Milestone).where(Milestone.pilot_id == pilot.id).order_by(Milestone.id)).all()
-    days_inactive = (datetime.now(timezone.utc) - pilot.last_activity_at).days
-    return api.PilotOut(
-        id=pilot.id,
-        status=pilot.status,
-        match_id=pilot.match_id,
-        brief_id=record.id,
-        brief_title=(record.data or {}).get("title") or record.need.raw_text[:60],
-        startup=to_profile(session.get(Startup, pilot.startup_id)),
-        started_at=pilot.started_at,
-        last_activity_at=pilot.last_activity_at,
-        days_inactive=days_inactive,
-        stale=pilot.status == "active" and days_inactive >= settings.pilot_stale_days,
-        outcome=pilot.outcome,
-        result=pilot.result,
-        organization=record.need.organization.name if record.need.organization_id else None,
-        milestones=[
-            api.MilestoneOut(id=m.id, title=m.title, due_date=m.due_date, completed_at=m.completed_at) for m in milestones
-        ],
-    )
-
-
-def _get_pilot(session: Session, pilot_id: int, user: User) -> Pilot:
-    pilot = session.get(Pilot, pilot_id)
-    if pilot is None:
-        raise HTTPException(404, "Pilot bulunamadı")
-    if user.role == "girisim":
-        if pilot.startup_id != startup_scope(user):
-            raise HTTPException(404, "Pilot bulunamadı")
-    else:
-        _get_brief(session, pilot.brief_id, user)
-    return pilot
-
-
-@router.get("/pilots", response_model=list[api.PilotOut], summary="Pilotlar (hareketsizlik uyarısıyla)")
-def list_pilots(
-    session: Session = Depends(get_db), user: User = Depends(current_user), settings: Settings = Depends(get_settings)
-):
-    query = select(Pilot).order_by(Pilot.id.desc())
-    if user.role == "girisim":
-        query = query.where(Pilot.startup_id == startup_scope(user))
-    elif (scope := org_scope(user)) is not None:
-        query = (
-            query.join(BriefRecord, Pilot.brief_id == BriefRecord.id)
-            .join(Need, BriefRecord.need_id == Need.id)
-            .where(Need.organization_id == scope)
-        )
-    return [_pilot_out(session, p, settings) for p in session.scalars(query).all()]
-
-
-@router.patch("/pilots/{pilot_id}", response_model=api.PilotOut, summary="Pilot durumu / sonucu")
-def update_pilot(
-    pilot_id: int,
-    payload: api.PilotUpdate,
-    session: Session = Depends(get_db),
-    user: User = Depends(current_user),
-    settings: Settings = Depends(get_settings),
-):
-    pilot = _get_pilot(session, pilot_id, user)
-    if user.role == "girisim":
-        raise HTTPException(403, "Pilot durumunu ve sonucunu kurum günceller")
-    for field, value in payload.model_dump(exclude_unset=True).items():
-        setattr(pilot, field, value)
-    pilot.last_activity_at = datetime.now(timezone.utc)
-    session.commit()
-    return _pilot_out(session, pilot, settings)
-
-
-@router.post("/pilots/{pilot_id}/milestones", response_model=api.PilotOut, summary="Kilometre taşı ekle")
-def add_milestone(
-    pilot_id: int,
-    payload: api.MilestoneIn,
-    session: Session = Depends(get_db),
-    user: User = Depends(current_user),
-    settings: Settings = Depends(get_settings),
-):
-    pilot = _get_pilot(session, pilot_id, user)
-    due = datetime.combine(payload.due_date, time(), tzinfo=timezone.utc) if payload.due_date else None
-    session.add(Milestone(pilot_id=pilot.id, title=payload.title, due_date=due))
-    pilot.last_activity_at = datetime.now(timezone.utc)
-    session.commit()
-    return _pilot_out(session, pilot, settings)
-
-
-@router.post("/milestones/{milestone_id}/complete", response_model=api.PilotOut, summary="Kilometre taşını tamamla")
-def complete_milestone(
-    milestone_id: int,
-    session: Session = Depends(get_db),
-    user: User = Depends(current_user),
-    settings: Settings = Depends(get_settings),
-):
-    milestone = session.get(Milestone, milestone_id)
-    if milestone is None:
-        raise HTTPException(404, "Kilometre taşı bulunamadı")
-    pilot = _get_pilot(session, milestone.pilot_id, user)
-    now = datetime.now(timezone.utc)
-    milestone.completed_at = milestone.completed_at or now
-    pilot.last_activity_at = now
-    session.commit()
-    return _pilot_out(session, pilot, settings)

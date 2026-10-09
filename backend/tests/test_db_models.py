@@ -21,6 +21,9 @@ def test_all_tables_are_defined():
         "call_applications",
         "login_attempts",
         "password_reset_tokens",
+        "pilot_metrics",
+        "metric_measurements",
+        "pilot_activity",
     }
 
 
