@@ -40,7 +40,7 @@ function IntroCard({
               <Text size="sm" c="dimmed">
                 {isStartup ? counterpart : b.title}
                 {isAdmin && intro.organization ? ` · ${intro.organization}` : ''} · {timeAgo(intro.created_at)}
-                {intro.source === 'cagri' ? ' · açık çağrıdan' : ''}
+                {intro.source === 'cagri' ? ' · açık çağrıdan' : intro.source === 'havuz' ? ' · havuzdan' : ''}
               </Text>
             </div>
           </Group>
@@ -147,7 +147,7 @@ export default function IntroductionsPage() {
             ? 'Kurumlar ihtiyaçları için sizi seçtiğinde istek buraya düşer. Kabul ederseniz pilot kartı iki taraf için de açılır.'
             : isAdmin
               ? 'Kurumların seçtiği girişimlere giden istekler. Hesabı olmayan girişimlerle görüşüp sonucu onların adına işleyin.'
-              : 'Kabul ettiğiniz adaylara giden tanıştırma istekleri. Girişim kabul edince pilot kartı açılır.'
+              : 'Kabul ettiğiniz adaylara ve havuzdan seçtiğiniz girişimlere giden tanıştırma istekleri. Girişim kabul edince pilot kartı açılır.'
         }
       />
       <SegmentedControl

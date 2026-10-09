@@ -711,3 +711,37 @@ def test_organization_recommendations_mirror_startup_side(client):
     assert s01["on_platform"] and s01["applied"]
     assert s01["reason"].startswith("Aradığınız “")
     assert not any(s["on_platform"] for s in recs["startups"] if s["id"] != "s01")
+
+
+def test_firm_can_request_introduction_from_pool(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "a@firma-a.example", "Firma A")
+    brief_id, match = matched_need(client)
+    shortlisted = match["shortlist"][0]["startup"]["id"]
+    outside = next(s["id"] for s in client.get("/startups").json() if s["id"] not in {
+        i["startup"]["id"] for i in match["shortlist"] + match["rejected"]
+    })
+
+    intro = client.post("/introductions", json={"brief_id": brief_id, "startup_id": outside, "note": "Tanışalım."})
+    assert intro.status_code == 200, intro.text
+    assert intro.json()["source"] == "havuz" and intro.json()["status"] == "bekliyor"
+    assert intro.json()["email"] is not None
+    again = client.post("/introductions", json={"brief_id": brief_id, "startup_id": outside})
+    assert again.status_code == 409
+
+    linked = client.post("/introductions", json={"brief_id": brief_id, "startup_id": shortlisted}).json()
+    assert linked["source"] == "eslestirme"
+    saved = client.get(f"/briefs/{brief_id}/match").json()
+    [item] = [i for i in saved["shortlist"] if i["startup"]["id"] == shortlisted]
+    assert item["status"] == "accepted" and item["introduction"]["id"] == linked["id"]
+
+    assert client.post("/introductions", json={"brief_id": brief_id, "startup_id": "yok"}).status_code == 404
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    assert other.post("/introductions", json={"brief_id": brief_id, "startup_id": outside}).status_code == 404
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    assert startup.post("/introductions", json={"brief_id": brief_id, "startup_id": outside}).status_code == 403

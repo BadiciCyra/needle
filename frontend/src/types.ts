@@ -303,7 +303,7 @@ export interface Introduction {
   organization: string | null
   startup: StartupProfile
   startup_has_account: boolean
-  source: 'eslestirme' | 'cagri'
+  source: 'eslestirme' | 'cagri' | 'havuz'
   firm_note: string | null
   startup_note: string | null
   responded_by: 'girisim' | 'yonetici' | null

@@ -306,6 +306,50 @@ def decide_match(
     return api.DecisionOut(match_id=match.id, status=match.status, introduction_id=introduction_id)
 
 
+@router.post("/introductions", response_model=api.IntroductionOut, summary="Havuzdan doğrudan tanışma iste")
+def create_direct_introduction(
+    payload: api.DirectIntroIn,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
+):
+    """Firma, eşleştirmenin önermediği bir girişimle de kendi ihtiyacı için tanışma isteyebilir.
+
+    Aynı ihtiyaç ve girişim için bekleyen ya da kabul edilmiş bir tanışma varsa yenisi açılmaz. Girişim bu
+    ihtiyacın kısa listesinde öneri olarak duruyorsa öneri kabul edilmiş sayılır ve tanışmaya bağlanır.
+    """
+    org_scope(user)
+    record = _get_brief(session, payload.brief_id, user)
+    startup = session.get(Startup, payload.startup_id)
+    if startup is None or startup.status != "aktif":
+        raise HTTPException(404, "Girişim bulunamadı")
+    existing = session.scalar(
+        select(Introduction).where(
+            Introduction.brief_id == record.id,
+            Introduction.startup_id == startup.id,
+            Introduction.status.in_(["bekliyor", "kabul"]),
+        )
+    )
+    if existing is not None:
+        raise HTTPException(409, "Bu ihtiyaç için bu girişimle zaten bir tanışma var")
+
+    match = session.scalar(
+        select(Match).where(Match.brief_id == record.id, Match.startup_id == startup.id, Match.status == "suggested")
+    )
+    if match is not None:
+        match.status = "accepted"
+        match.decided_at = datetime.now(timezone.utc)
+    intro = Introduction(
+        brief_id=record.id, startup_id=startup.id, match_id=match.id if match else None, firm_note=payload.note
+    )
+    session.add(intro)
+    session.flush()
+    if verified_owner(session, startup.id) is None:
+        intro_email_draft(session, intro, user, settings)
+    session.commit()
+    return intro_out(session, intro, user)
+
+
 @router.get("/startups", response_model=list[StartupProfile], summary="Girişim havuzu")
 def list_startups(session: Session = Depends(get_db), _: User = Depends(current_user)):
     rows = session.scalars(select(Startup).where(Startup.status == "aktif").order_by(Startup.id)).all()
