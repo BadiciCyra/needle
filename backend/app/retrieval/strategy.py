@@ -28,7 +28,8 @@ def build_queries(brief: Brief, embedder: Embedder, filters: SearchFilters, top_
 def fuse(result_lists: list[list[Candidate]]) -> list[Candidate]:
     """Reciprocal Rank Fusion: birden çok listede üst sıralarda çıkan aday öne geçer.
 
-    Adayın vector_score'u gördüğü en yüksek kosinüs benzerliği olarak kalır; sıralama RRF'e göre yapılır.
+    Adayın vector_score'u gördüğü en yüksek kosinüs benzerliği olarak kalır; RRF puanı fusion_score'a yazılır
+    ve sıralama ona göre yapılır.
     """
     fused: dict[str, tuple[float, Candidate]] = {}
     for results in result_lists:
@@ -42,6 +43,8 @@ def fuse(result_lists: list[list[Candidate]]) -> list[Candidate]:
             else:
                 fused[candidate.startup.id] = (rrf, candidate)
     ordered = sorted(fused.values(), key=lambda item: item[0], reverse=True)
+    for score, candidate in ordered:
+        candidate.fusion_score = score
     return [candidate for _, candidate in ordered]
 
 

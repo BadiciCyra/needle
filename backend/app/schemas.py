@@ -97,6 +97,7 @@ class Candidate(BaseModel):
 
     startup: StartupProfile
     vector_score: float = 0.0
+    fusion_score: float = Field(0.0, description="RRF puanı: aday kaç sorguda, kaçıncı sırada çıktı")
     rerank_score: float | None = None
     raw_rerank_score: float | None = Field(None, description="Reranker'ın ham skoru, tercih cezası uygulanmadan önce")
     direct_fit: bool | None = Field(None, description="Ürünü bu problemi doğrudan çözüyor mu (LLM sıralayıcı); None = bilinmiyor")

@@ -42,6 +42,7 @@ def test_fuse_rewards_candidates_found_by_several_queries(tmp_path):
     a, b, c = (Candidate(startup=s, vector_score=0.5) for s in startups)
     fused = fuse([[a, b], [c, b], [b]])
     assert fused[0].startup.id == b.startup.id
+    assert fused[0].fusion_score > fused[1].fusion_score > 0
 
 
 def test_location_filter_is_respected():
