@@ -1,5 +1,10 @@
 import type {
   Claim,
+  MetricInput,
+  MilestoneOwner,
+  NextStep,
+  PilotDetail,
+  PilotPlanInput,
   OrganizationCard,
   Report,
   Introduction,
@@ -85,11 +90,31 @@ export const api = {
     }),
   startups: () => request<StartupProfile[]>('/startups'),
   pilots: () => request<Pilot[]>('/pilots'),
+  pilot: (pilotId: number) => request<PilotDetail>(`/pilots/${pilotId}`),
   updatePilot: (pilotId: number, body: { status?: PilotStatus; outcome?: string; result?: PilotResult }) =>
-    request<Pilot>(`/pilots/${pilotId}`, { method: 'PATCH', body: JSON.stringify(body) }),
-  addMilestone: (pilotId: number, title: string, due_date?: string) =>
-    post<Pilot>(`/pilots/${pilotId}/milestones`, { title, due_date: due_date || null }),
-  completeMilestone: (milestoneId: number) => post<Pilot>(`/milestones/${milestoneId}/complete`),
+    request<PilotDetail>(`/pilots/${pilotId}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  updatePlan: (pilotId: number, body: PilotPlanInput) =>
+    request<PilotDetail>(`/pilots/${pilotId}/plan`, { method: 'PATCH', body: JSON.stringify(body) }),
+  fillPlanDefaults: (pilotId: number) => post<PilotDetail>(`/pilots/${pilotId}/plan/defaults`),
+  addMilestone: (pilotId: number, title: string, due_date?: string, owner: MilestoneOwner = 'ortak') =>
+    post<PilotDetail>(`/pilots/${pilotId}/milestones`, { title, due_date: due_date || null, owner }),
+  editMilestone: (milestoneId: number, body: { title?: string; due_date?: string | null; owner?: MilestoneOwner }) =>
+    request<PilotDetail>(`/milestones/${milestoneId}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteMilestone: (milestoneId: number) => request<PilotDetail>(`/milestones/${milestoneId}`, { method: 'DELETE' }),
+  completeMilestone: (milestoneId: number) => post<PilotDetail>(`/milestones/${milestoneId}/complete`),
+  reopenMilestone: (milestoneId: number) => post<PilotDetail>(`/milestones/${milestoneId}/reopen`),
+  addMetric: (pilotId: number, body: MetricInput) => post<PilotDetail>(`/pilots/${pilotId}/metrics`, body),
+  editMetric: (metricId: number, body: MetricInput) =>
+    request<PilotDetail>(`/metrics/${metricId}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  deleteMetric: (metricId: number) => request<PilotDetail>(`/metrics/${metricId}`, { method: 'DELETE' }),
+  addMeasurement: (metricId: number, value: number, measured_on?: string, note?: string) =>
+    post<PilotDetail>(`/metrics/${metricId}/measurements`, { value, measured_on: measured_on || null, note: note || null }),
+  deleteMeasurement: (measurementId: number) => request<PilotDetail>(`/measurements/${measurementId}`, { method: 'DELETE' }),
+  addNote: (pilotId: number, body: string) => post<PilotDetail>(`/pilots/${pilotId}/activity`, { body }),
+  evaluatePilot: (pilotId: number, body: { result: PilotResult; next_step: NextStep; startup_rating: number; comment?: string }) =>
+    post<PilotDetail>(`/pilots/${pilotId}/evaluation`, body),
+  startupFeedback: (pilotId: number, body: { feedback: string; collab_rating: number | null }) =>
+    post<PilotDetail>(`/pilots/${pilotId}/startup-feedback`, body),
 
   claimStartup: (startup_id: string) => post<Me>('/startup-account/claim', { startup_id }),
   createStartupProfile: (profile: StartupProfileInput) => post<Me>('/startup-account/new', profile),

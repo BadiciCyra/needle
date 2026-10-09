@@ -117,6 +117,12 @@ kartı açılır ve iki taraf aynı kartı görür (girişim kilometre taşı ek
 uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler,
 Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
 
+**Pilot:** Her pilotun kendi sayfası var. Pilot açılınca plan brief'ten önerilir (amaç, kapsam, brief'teki süreye göre
+tarihler, sorumlu tarafı belli beş kilometre taşı ve başarı kriterinden ölçülebilir hedef). Kurum ve girişim hedeflere
+ölçüm ekler, gidişat grafikte görünür; iki taraf güncelleme akışında birbirine not yazar ve her değişiklik akışa düşer.
+Pilot bitince kurum işe yarayıp yaramadığını, sonraki adımı (satın alma, genişletme, yeni pilot, bitirme) ve girişime
+puanını kaydeder; girişim de kendi değerlendirmesini yazar.
+
 **Açık çağrı:** Havuzda problemi doğrudan çözen girişim bulunamazsa ihtiyaç tek tıkla açık çağrıya çevrilir (kurum
 adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur; firma kabul edince pilot doğrudan açılır.
 

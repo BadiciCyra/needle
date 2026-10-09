@@ -54,6 +54,7 @@ import NeedsPage from './pages/NeedsPage'
 import NewNeedPage from './pages/NewNeedPage'
 import OnboardingPage from './pages/OnboardingPage'
 import OrganizationsPage from './pages/OrganizationsPage'
+import PilotDetailPage from './pages/PilotDetailPage'
 import PilotsPage from './pages/PilotsPage'
 import ReportPage from './pages/ReportPage'
 import StartupHomePage from './pages/StartupHomePage'
@@ -386,6 +387,7 @@ function Shell() {
               <Route path="/cagrilar" element={<CallsPage />} />
               <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
               <Route path="/pilotlar" element={<RequireVerified title="Pilotlar"><PilotsPage /></RequireVerified>} />
+              <Route path="/pilotlar/:pilotId" element={<RequireVerified title="Pilot"><PilotDetailPage /></RequireVerified>} />
               <Route path="/kurumlar" element={<OrganizationsPage />} />
               <Route path="/girisimler" element={<EcosystemPage />} />
               <Route path="/profil-bagla" element={<StartupOnboardingPage />} />
@@ -400,6 +402,7 @@ function Shell() {
               <Route path="/ihtiyaclar/:briefId" element={<BriefPage />} />
               <Route path="/tanistirmalar" element={<IntroductionsPage />} />
               <Route path="/pilotlar" element={<PilotsPage />} />
+              <Route path="/pilotlar/:pilotId" element={<PilotDetailPage />} />
               <Route path="/cagrilar" element={<CallsPage />} />
               <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
               <Route path="/ekosistem" element={<EcosystemPage />} />
