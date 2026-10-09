@@ -389,3 +389,53 @@ export interface Report {
   open_calls: number
   applications: number
 }
+
+export interface RecommendedCall {
+  id: number
+  title: string
+  organization: string | null
+  deadline: string | null
+  required_capabilities: string[]
+  score: number
+  reason: string | null
+}
+
+export interface RecommendedOrganization {
+  id: number
+  name: string
+  sector: string | null
+  city: string | null
+  open_calls: number
+  score: number
+}
+
+export interface DemandSignal {
+  capability: string
+  organizations: number
+  variants: string[]
+  score: number
+}
+
+export interface StartupRecommendations {
+  calls: RecommendedCall[]
+  organizations: RecommendedOrganization[]
+  signals: DemandSignal[]
+}
+
+export interface RecommendedStartup {
+  id: string
+  name: string
+  sector: string
+  maturity: Maturity
+  location: string
+  capabilities: string[]
+  score: number
+  reason: string | null
+  on_platform: boolean
+  applied: boolean
+}
+
+export interface OrganizationRecommendations {
+  basis: string[]
+  startups: RecommendedStartup[]
+}

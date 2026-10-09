@@ -8,7 +8,7 @@ zaten ilgisini bildirmiş olduğu için firmanın kabulü tanıştırmayı da ta
 """
 
 import re
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,6 +19,7 @@ from app.api import schemas as api
 from app.api.auth_routes import me_out
 from app.api.deps import embedder_dep
 from app.api.pilot_routes import apply_plan_defaults, log_event
+from app.api.report_routes import group_phrases
 from app.auth import (
     current_user,
     email_matches_site,
@@ -41,7 +42,7 @@ from app.db.models import (
     User,
 )
 from app.db.session import get_db
-from app.embeddings import Embedder
+from app.embeddings import Embedder, cosine
 from app.retrieval.pgvector import to_profile
 from app.schemas import StartupProfile
 
@@ -631,3 +632,170 @@ def list_organizations(session: Session = Depends(get_db), user: User = Depends(
             )
         )
     return out
+
+
+SIGNAL_DAYS = 120
+SIGNAL_MIN_ORGS = 2
+
+
+def _startup_vector(session: Session, user: User, embedder: Embedder) -> tuple[StartupProfile, list[float]]:
+    if user.role != "girisim":
+        raise HTTPException(403, "Öneriler girişim hesaplarına açık")
+    startup = session.get(Startup, user.startup_id) if user.startup_id else None
+    if startup is None:
+        raise HTTPException(409, "Önerileri görmek için önce girişim profilinizi bağlayın")
+    profile = to_profile(startup)
+    vector = list(startup.embedding) if startup.embedding is not None else embedder.embed_query(profile.to_search_text())
+    return profile, vector
+
+
+def _closest(own: list[str], wanted: list[str], embedder: Embedder) -> tuple[str, str] | None:
+    if not own or not wanted:
+        return None
+    vectors = embedder.embed_documents(own + wanted)
+    mine, theirs = vectors[: len(own)], vectors[len(own):]
+    score, i, j = max((cosine(a, b), i, j) for i, a in enumerate(mine) for j, b in enumerate(theirs))
+    return (own[i], wanted[j]) if score > 0 else None
+
+
+def _best_pair(own: list[str], wanted: list[str], embedder: Embedder) -> str | None:
+    pair = _closest(own, wanted, embedder)
+    return f"Sizin “{pair[0]}” yetkinliğiniz ↔ aranan “{pair[1]}”" if pair else None
+
+
+@router.get("/startup-account/recommendations", response_model=api.StartupRecommendations, summary="Girişime uygun çağrılar, kurumlar ve talep sinyalleri")
+def startup_recommendations(
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    embedder: Embedder = Depends(embedder_dep),
+):
+    profile, vector = _startup_vector(session, user, embedder)
+
+    calls = [c for c in session.scalars(select(OpenCall).order_by(OpenCall.id.desc())) if _is_open(c)]
+    call_items = []
+    if calls:
+        records = {c.id: session.get(BriefRecord, c.brief_id) for c in calls}
+        texts = []
+        for c in calls:
+            caps = (records[c.id].data or {}).get("required_capabilities") or []
+            texts.append("\n".join([c.title, c.summary, " ; ".join(caps)]))
+        for c, v in zip(calls, embedder.embed_documents(texts)):
+            record = records[c.id]
+            caps = (record.data or {}).get("required_capabilities") or []
+            org = record.need.organization
+            call_items.append(
+                api.RecommendedCall(
+                    id=c.id,
+                    title=c.title,
+                    organization=None if c.hide_organization or org is None else org.name,
+                    deadline=c.deadline,
+                    required_capabilities=caps,
+                    score=round(cosine(vector, v), 3),
+                    reason=_best_pair(profile.capabilities, caps, embedder),
+                )
+            )
+    call_items.sort(key=lambda r: -r.score)
+
+    directory = list_organizations(session, user)
+    org_items = []
+    described = [o for o in directory if o.description or o.open_calls]
+    if described:
+        texts = [
+            "\n".join(filter(None, [o.name, o.sector, o.description, *[c.title for c in o.open_calls]])) for o in described
+        ]
+        for o, v in zip(described, embedder.embed_documents(texts)):
+            org_items.append(
+                api.RecommendedOrganization(
+                    id=o.id, name=o.name, sector=o.sector, city=o.city, open_calls=len(o.open_calls), score=round(cosine(vector, v), 3)
+                )
+            )
+    org_items.sort(key=lambda r: -r.score)
+
+    since = _now() - timedelta(days=SIGNAL_DAYS)
+    items = []
+    for record in session.scalars(
+        select(BriefRecord).join(Need, BriefRecord.need_id == Need.id).where(
+            BriefRecord.status == "final", Need.organization_id.is_not(None), Need.created_at >= since
+        )
+    ):
+        for cap in (record.data or {}).get("required_capabilities") or []:
+            items.append((cap, f"kurum-{record.need.organization_id}"))
+    groups = [g for g in group_phrases(items, embedder) if g.needs >= SIGNAL_MIN_ORGS]
+    signals = []
+    if groups:
+        for g, v in zip(groups, embedder.embed_documents([g.capability for g in groups])):
+            signals.append(
+                api.DemandSignal(capability=g.capability, organizations=g.needs, variants=g.variants, score=round(cosine(vector, v), 3))
+            )
+    signals.sort(key=lambda s: (-s.score, -s.organizations))
+
+    return api.StartupRecommendations(calls=call_items[:10], organizations=org_items[:10], signals=signals[:8])
+
+
+def _wanted_capabilities(session: Session, organization_id: int) -> list[str]:
+    since = _now() - timedelta(days=SIGNAL_DAYS)
+    seen: dict[str, str] = {}
+    for record in session.scalars(
+        select(BriefRecord).join(Need, BriefRecord.need_id == Need.id).where(
+            BriefRecord.status == "final", Need.organization_id == organization_id, Need.created_at >= since
+        ).order_by(BriefRecord.id.desc())
+    ):
+        for cap in (record.data or {}).get("required_capabilities") or []:
+            seen.setdefault(cap.strip().casefold(), cap.strip())
+    return list(seen.values())
+
+
+@router.get("/organization/recommendations", response_model=api.OrganizationRecommendations, summary="Kuruma uygun girişimler")
+def organization_recommendations(
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    embedder: Embedder = Depends(embedder_dep),
+):
+    """Kurumun tanıtımı ve son ihtiyaçlarında aranan yetkinliklere göre havuzdaki en yakın girişimler.
+
+    Girişim tarafındaki "size uygun kurumlar" listesinin karşılığı: iki taraf aynı vektör uzayında birbirini görür.
+    """
+    if user.role != "firma" or user.organization_id is None:
+        raise HTTPException(403, "Öneriler firma hesaplarına açık")
+    org = session.get(Organization, user.organization_id)
+    profile = org.profile or {}
+    wanted = _wanted_capabilities(session, org.id)
+    open_titles = [c.title for c in session.scalars(select(OpenCall).where(OpenCall.organization_id == org.id)) if _is_open(c)]
+    text = "\n".join(filter(None, [org.sector, profile.get("description"), *open_titles, " ; ".join(wanted)]))
+    if not profile.get("description") and not wanted:
+        raise HTTPException(409, "Önerileri görmek için kurum tanıtımınızı yazın ya da bir ihtiyaç tamamlayın")
+
+    vector = embedder.embed_query(text)
+    distance = Startup.embedding.cosine_distance(vector).label("distance")
+    rows = session.execute(
+        select(Startup, distance).where(Startup.embedding.is_not(None), Startup.status == "aktif").order_by(distance).limit(10)
+    ).all()
+    ids = [row.Startup.id for row in rows]
+    on_platform = set(session.scalars(
+        select(User.startup_id).where(User.startup_id.in_(ids), User.startup_verified_at.is_not(None))
+    )) if ids else set()
+    applied = set(session.scalars(
+        select(Application.startup_id).join(OpenCall, Application.call_id == OpenCall.id).where(
+            OpenCall.organization_id == org.id, Application.startup_id.in_(ids)
+        )
+    )) if ids else set()
+
+    startups = []
+    for row in rows:
+        st = row.Startup
+        pair = _closest(st.capabilities or [], wanted, embedder)
+        startups.append(
+            api.RecommendedStartup(
+                id=st.id,
+                name=st.name,
+                sector=st.sector,
+                maturity=st.maturity,
+                location=st.location,
+                capabilities=st.capabilities or [],
+                score=round(1.0 - float(row.distance), 3),
+                reason=f"Aradığınız “{pair[1]}” ↔ girişimin “{pair[0]}” yetkinliği" if pair else None,
+                on_platform=st.id in on_platform,
+                applied=st.id in applied,
+            )
+        )
+    return api.OrganizationRecommendations(basis=wanted[:12], startups=startups)

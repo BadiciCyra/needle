@@ -6,6 +6,8 @@ import type {
   PilotDetail,
   PilotPlanInput,
   OrganizationCard,
+  OrganizationRecommendations,
+  StartupRecommendations,
   Report,
   Introduction,
   OpenCall,
@@ -127,6 +129,8 @@ export const api = {
   rejectClaim: (userId: number) => post<void>(`/admin/claims/${userId}/reject`),
 
   organizations: () => request<OrganizationCard[]>('/organizations'),
+  startupRecommendations: () => request<StartupRecommendations>('/startup-account/recommendations'),
+  organizationRecommendations: () => request<OrganizationRecommendations>('/organization/recommendations'),
 
   report: () => request<Report>('/admin/report'),
 

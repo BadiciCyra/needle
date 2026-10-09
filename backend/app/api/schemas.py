@@ -446,3 +446,54 @@ class OrganizationCard(BaseModel):
     website: str | None
     open_calls: list[DirectoryCall] = Field(description="Kurum adını gizlemeyen açık çağrılar")
     joined_at: datetime | None
+
+
+class RecommendedCall(BaseModel):
+    id: int
+    title: str
+    organization: str | None
+    deadline: date | None
+    required_capabilities: list[str]
+    score: float
+    reason: str | None = Field(description="En yakın yetkinlik eşleşmesi")
+
+
+class RecommendedOrganization(BaseModel):
+    id: int
+    name: str
+    sector: str | None
+    city: str | None
+    open_calls: int
+    score: float
+
+
+class DemandSignal(BaseModel):
+    capability: str
+    organizations: int = Field(description="Bu yetkinliği arayan farklı kurum sayısı (en az 2)")
+    variants: list[str]
+    score: float
+
+
+class StartupRecommendations(BaseModel):
+    calls: list[RecommendedCall]
+    organizations: list[RecommendedOrganization]
+    signals: list[DemandSignal]
+
+
+class RecommendedStartup(BaseModel):
+    id: str
+    name: str
+    sector: str
+    maturity: str
+    location: str
+    capabilities: list[str]
+    score: float
+    reason: str | None = Field(description="En yakın yetkinlik eşleşmesi")
+    on_platform: bool = Field(description="Doğrulanmış girişim hesabı var; tanıştırmaya doğrudan cevap verebilir")
+    applied: bool = Field(description="Kurumun açık çağrılarından birine başvurdu")
+
+
+class OrganizationRecommendations(BaseModel):
+    basis: list[str] = Field(description="Önerinin dayandığı aranan yetkinlikler")
+    startups: list[RecommendedStartup]
+

@@ -123,6 +123,11 @@ tarihler, sorumlu tarafı belli beş kilometre taşı ve başarı kriterinden ö
 Pilot bitince kurum işe yarayıp yaramadığını, sonraki adımı (satın alma, genişletme, yeni pilot, bitirme) ve girişime
 puanını kaydeder; girişim de kendi değerlendirmesini yazar.
 
+**Size uygun:** İki taraf aynı vektör uzayında birbirini görür. Girişim, yetkinliklerine en yakın açık çağrıları
+("sizin X yetkinliğiniz ↔ aranan Y" gerekçesiyle), kurumları ve son dört ayda en az iki kurumun aradığı yetkinlikleri
+(talep sinyali, kurum adı gizli) görür. Firma da tanıtımı ve son ihtiyaçlarında aranan yetkinliklere göre en yakın
+girişimleri; platformda hesabı olanları ve çağrısına başvuranları işaretli olarak görür.
+
 **Açık çağrı:** Havuzda problemi doğrudan çözen girişim bulunamazsa ihtiyaç tek tıkla açık çağrıya çevrilir (kurum
 adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur; firma kabul edince pilot doğrudan açılır.
 
@@ -130,7 +135,8 @@ adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur;
 docker compose exec api python -m seed.create_admin yonetici@kurum.org "Ad Soyad"
 ```
 
-Şifre ekrandan sorulur (komut geçmişinde kalmaz). Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
+Şifre ekrandan sorulur (komut geçmişinde kalmaz). Konsola erişim yoksa `.env` içine `ADMIN_EMAIL` ve
+`ADMIN_PASSWORD` yazıp api konteynerini yeniden başlatmak yeterli: hesap açılışta oluşturulur, varsa dokunulmaz. Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
 Aynı e-postaya 15 dakikada 5 hatalı denemeden sonra giriş geçici olarak kilitlenir. "Şifremi unuttum" bağlantısı
 e-postayla gider: `.env`'de SMTP ayarlanmadıysa bağlantı `docker compose logs api` çıktısına yazılır. Şifre
 sıfırlanınca ya da değiştirilince diğer cihazlardaki oturumlar kapanır.
