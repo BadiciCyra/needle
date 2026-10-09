@@ -367,7 +367,8 @@ export default function MatchResults({
         <Stack>
           <Text size="sm" c="dimmed">
             Girişime ihtiyacınızın özetiyle bir tanıştırma isteği gider. Kabul ederse pilot kartı iki taraf için de açılır.
-            Girişimin Needle hesabı yoksa program yöneticisi aracılık eder.
+            Girişimin Needle hesabı yoksa Tanıştırmalar sayfasında düzenleyip kendi e-postanızdan gönderebileceğiniz bir
+            e-posta taslağı hazırlanır. Notunuz taslağa da eklenir.
           </Text>
           <Textarea
             label="Girişime not (isteğe bağlı)"

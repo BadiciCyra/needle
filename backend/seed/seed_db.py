@@ -21,17 +21,24 @@ from app.embeddings import get_embedder
 from app.seed_data import SEED_DIR, load_startups
 
 
-def _websites(filename: str) -> dict[str, str]:
-    """Kaynaklı seed'de ilk kaynak girişimin sitesidir (sahiplenmede e-posta alan adıyla karşılaştırılır)."""
+def _extras(filename: str) -> dict[str, dict]:
+    """Profil şemasında olmayan seed alanları: site (ilk kaynak) ve sitesinden toplanan iletişim adresi."""
     raw = json.loads((SEED_DIR / filename).read_text(encoding="utf-8"))
-    return {item["id"]: item["kaynak"][0] for item in raw if item.get("kaynak")}
+    return {
+        item["id"]: {
+            "website": item["kaynak"][0] if item.get("kaynak") else None,
+            "contact_email": (item.get("iletisim") or {}).get("email"),
+            "contact_source": (item.get("iletisim") or {}).get("kaynak"),
+        }
+        for item in raw
+    }
 
 
 def seed_startups() -> int:
     init_db()
     filename = get_settings().startups_file
     startups = load_startups(filename)
-    websites = _websites(filename)
+    extras = _extras(filename)
     vectors = get_embedder().embed_documents([s.to_search_text() for s in startups])
 
     rows = [
@@ -44,7 +51,7 @@ def seed_startups() -> int:
             "capabilities": s.capabilities,
             "description": s.description,
             "past_pilots": s.past_pilots,
-            "website": websites.get(s.id),
+            **extras.get(s.id, {"website": None, "contact_email": None, "contact_source": None}),
             "embedding": vector,
         }
         for s, vector in zip(startups, vectors)
@@ -60,16 +67,20 @@ def seed_startups() -> int:
     return len(rows)
 
 
-def backfill_websites() -> int:
-    """Site sütunu sonradan eklendi: dolu veritabanında boş kalanları seed dosyasından tamamlar."""
+def backfill_extras() -> int:
+    """Site ve iletişim sütunları sonradan eklendi: dolu veritabanında boş kalanları seed dosyasından tamamlar."""
+    changed = 0
     with get_session_factory()() as session:
-        changed = 0
-        for startup_id, url in _websites(get_settings().startups_file).items():
-            changed += session.execute(
-                update(Startup).where(Startup.id == startup_id, Startup.website.is_(None)).values(website=url)
-            ).rowcount
+        for startup_id, extra in _extras(get_settings().startups_file).items():
+            for column in ("website", "contact_email", "contact_source"):
+                if extra[column]:
+                    changed += session.execute(
+                        update(Startup)
+                        .where(Startup.id == startup_id, getattr(Startup, column).is_(None))
+                        .values({column: extra[column]})
+                    ).rowcount
         session.commit()
-        return changed
+    return changed
 
 
 def startup_count() -> int:
@@ -80,7 +91,7 @@ def startup_count() -> int:
 
 if __name__ == "__main__":
     if "--if-empty" in sys.argv and (existing := startup_count()):
-        print(f"Girişim tablosu dolu ({existing} kayıt), seed atlandı; {backfill_websites()} girişimin sitesi dolduruldu.")
+        print(f"Girişim tablosu dolu ({existing} kayıt), seed atlandı; {backfill_extras()} boş site/iletişim alanı dolduruldu.")
     else:
         count = seed_startups()
         print(f"{count} girişim yüklendi.")

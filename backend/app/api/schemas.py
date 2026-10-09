@@ -76,6 +76,27 @@ class IntroBrief(BaseModel):
     timeline: str | None = None
 
 
+class IntroEmail(BaseModel):
+    """Tanıştırma e-postası taslağı (yalnızca firma ve yönetici görür)."""
+
+    to: str | None
+    subject: str
+    body: str
+    contact_source: str | None = Field(None, description="Alıcı adresinin bulunduğu sayfa")
+    updated_at: datetime | None
+    sent_at: datetime | None
+
+
+class IntroEmailIn(BaseModel):
+    to: str | None = Field(None, max_length=254)
+    subject: str = Field(min_length=3, max_length=300)
+    body: str = Field(min_length=10, max_length=10000)
+
+
+class IntroEmailSentIn(BaseModel):
+    sent: bool = True
+
+
 class IntroductionOut(BaseModel):
     id: int
     status: IntroStatus
@@ -91,6 +112,7 @@ class IntroductionOut(BaseModel):
     created_at: datetime
     responded_at: datetime | None
     pilot_id: int | None = None
+    email: IntroEmail | None = None
 
 
 class IntroResponseIn(BaseModel):
