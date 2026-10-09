@@ -18,6 +18,23 @@ from app.db.models import User
 from app.db.session import get_session_factory, init_db
 
 
+def ensure_admin(email: str, password: str, name: str) -> str:
+    """Yönetici hesabı yoksa oluşturur; varsa dokunmaz. Durumu anlatan tek satır döndürür."""
+    email = email.strip().lower()
+    if len(password) < 10:
+        return "ADMIN_PASSWORD en az 10 karakter olmalı; yönetici hesabı oluşturulmadı."
+    init_db()
+    with get_session_factory()() as session:
+        existing = session.scalar(select(User).where(User.email == email))
+        if existing:
+            if existing.role != "yonetici":
+                return f"{email} başka bir rolle kayıtlı ({existing.role}); yönetici yapılmadı."
+            return f"Yönetici hesabı zaten var: {email}"
+        session.add(User(email=email, password_hash=hash_password(password), name=name.strip(), role="yonetici"))
+        session.commit()
+    return f"Yönetici hesabı oluşturuldu: {email}"
+
+
 def main() -> None:
     if len(sys.argv) < 3:
         sys.exit(__doc__)
