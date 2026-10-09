@@ -105,7 +105,7 @@ class IntroductionOut(BaseModel):
     organization: str | None
     startup: StartupProfile
     startup_has_account: bool = Field(description="Girişimin doğrulanmış hesabı var mı (yoksa yönetici aracılık eder)")
-    source: Literal["eslestirme", "cagri"]
+    source: Literal["eslestirme", "cagri", "havuz"]
     firm_note: str | None
     startup_note: str | None
     responded_by: str | None
@@ -113,6 +113,12 @@ class IntroductionOut(BaseModel):
     responded_at: datetime | None
     pilot_id: int | None = None
     email: IntroEmail | None = None
+
+
+class DirectIntroIn(BaseModel):
+    brief_id: int = Field(description="Tanışmanın konusu olan ihtiyaç")
+    startup_id: str
+    note: str | None = Field(None, max_length=2000, description="Girişime giden tanıştırma notu")
 
 
 class IntroResponseIn(BaseModel):

@@ -196,7 +196,7 @@ export default function EcosystemPage() {
         </SimpleGrid>
       )}
 
-      <StartupDrawer startup={selected} onClose={() => setParams({})} />
+      <StartupDrawer startup={selected} onClose={() => setParams({})} introduce />
     </>
   )
 }

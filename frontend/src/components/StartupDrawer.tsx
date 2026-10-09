@@ -2,9 +2,10 @@ import { Anchor, Divider, Drawer, Group, List, SimpleGrid, Stack, Text, Title } 
 
 import { MATURITY_LABEL } from '../labels'
 import type { StartupProfile } from '../types'
+import IntroRequest from './IntroRequest'
 import { MetaItem, OrgAvatar } from './ui'
 
-export default function StartupDrawer({ startup, onClose }: { startup: StartupProfile | null; onClose: () => void }) {
+export default function StartupDrawer({ startup, onClose, introduce = false }: { startup: StartupProfile | null; onClose: () => void; introduce?: boolean }) {
   return (
     <Drawer opened={startup !== null} onClose={onClose} title="Girişim profili" size="md">
       {startup && (
@@ -22,6 +23,8 @@ export default function StartupDrawer({ startup, onClose }: { startup: StartupPr
               )}
             </div>
           </Group>
+
+          {introduce && <IntroRequest startup={startup} />}
 
           <Text size="sm" lh={1.6}>
             {startup.description}
