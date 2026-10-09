@@ -122,3 +122,33 @@ def test_raw_rerank_score_is_kept_before_preference_penalty(tmp_path):
     top = run(dealer_brief(location_preference="Trabzon"), tmp_path).shortlist[0]
     assert top.filter_notes
     assert abs(top.score - top.rerank_score * 0.85) < 1e-9
+
+
+class ScriptedRetriever:
+    def __init__(self, lists: dict[str, list[tuple[int, float]]]):
+        self.lists = lists
+
+    def search(self, query):
+        from app.schemas import Candidate
+
+        rows = self.lists.get(query.label, [])
+        return [Candidate(startup=STARTUPS[i], vector_score=score) for i, score in rows]
+
+
+def test_pool_is_cut_by_rrf_not_by_single_best_cosine(tmp_path):
+    brief = dealer_brief()
+    single_hit, broad = STARTUPS[5], STARTUPS[6]
+    lists = {"brief": [(5, 0.95), (6, 0.40)]}
+    for cap in brief.required_capabilities:
+        lists[f"yetkinlik: {cap}"] = [(6, 0.55)]
+    settings = Settings(demo_cache_dir=str(tmp_path), evidence_min_similarity=0.0, retrieve_top_k=1)
+    graph = build_match_graph(
+        retriever=ScriptedRetriever(lists),
+        embedder=EMBEDDER,
+        reranker=PassthroughReranker(),
+        llm=StructuredLLM(EchoRationaleBackend(), settings),
+        settings=settings,
+    )
+    result = graph.invoke({"brief": brief.model_dump(mode="json")})["result"]
+    seen = {i.startup.id for i in result.shortlist + result.rejected}
+    assert seen == {broad.id} and single_hit.id not in seen

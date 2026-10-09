@@ -197,8 +197,10 @@ def build_match_graph(
             if existing is None:
                 new += 1
                 pool[candidate.startup.id] = candidate
-            elif candidate.vector_score > existing.vector_score:
-                pool[candidate.startup.id] = candidate
+            else:
+                best = candidate if candidate.vector_score > existing.vector_score else existing
+                best.fusion_score = max(existing.fusion_score, candidate.fusion_score)
+                pool[candidate.startup.id] = best
         round_no = state["round"] + 1
         message = f"Tur {round_no}: filtreler ({state['filters'].describe()}) → {new} yeni aday, havuz {len(pool)}"
         log = _log(
@@ -220,7 +222,7 @@ def build_match_graph(
 
     def rerank(state: MatchState) -> MatchState:
         brief = Brief.model_validate(state["brief"])
-        pool = sorted(state["pool"].values(), key=lambda c: c.vector_score, reverse=True)
+        pool = sorted(state["pool"].values(), key=lambda c: (c.fusion_score, c.vector_score), reverse=True)
         pool = annotate_relaxations(pool[: settings.retrieve_top_k], brief)
         ranked = reranker.rerank(brief.to_search_text(), pool)
 
