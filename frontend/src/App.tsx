@@ -91,12 +91,12 @@ function AccountCard() {
         </div>
         <Group gap={2} wrap="nowrap">
           <Tooltip label="Şifre değiştir">
-            <ActionIcon variant="subtle" color="gray" onClick={password.open} aria-label="Şifre değiştir">
+            <ActionIcon variant="subtle" className="app-nav-icon" onClick={password.open} aria-label="Şifre değiştir">
               <IconKey size={17} />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Çıkış yap">
-            <ActionIcon variant="subtle" color="gray" onClick={logout} aria-label="Çıkış yap">
+            <ActionIcon variant="subtle" className="app-nav-icon" onClick={logout} aria-label="Çıkış yap">
               <IconLogout size={17} />
             </ActionIcon>
           </Tooltip>
