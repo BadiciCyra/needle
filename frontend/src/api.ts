@@ -110,6 +110,10 @@ export const api = {
   introductions: () => request<Introduction[]>('/introductions'),
   respondIntroduction: (id: number, decision: 'kabul' | 'ret', note?: string) =>
     post<Introduction>(`/introductions/${id}/respond`, { decision, note }),
+  createIntroEmail: (id: number) => post<Introduction>(`/introductions/${id}/email/draft`),
+  saveIntroEmail: (id: number, body: { to: string | null; subject: string; body: string }) =>
+    request<Introduction>(`/introductions/${id}/email`, { method: 'PUT', body: JSON.stringify(body) }),
+  markIntroEmailSent: (id: number, sent: boolean) => post<Introduction>(`/introductions/${id}/email/sent`, { sent }),
 
   // Açık çağrılar
   calls: () => request<OpenCall[]>('/calls'),

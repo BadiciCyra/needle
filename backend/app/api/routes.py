@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api import schemas as api
-from app.api.collab_routes import call_id_for_brief, intro_out
+from app.api.collab_routes import call_id_for_brief, intro_email_draft, intro_out, verified_owner
 from app.api.deps import embedder_dep, llm_dep, reranker_dep, retriever_dep
 from app.auth import current_user, ensure_visible, org_scope, startup_scope
 from app.config import Settings, get_settings
@@ -212,7 +212,7 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
                 # reddedilen kısa liste adayında rejection yalnızca ret sebebini taşır, "yakındı ama" gerekçesi yoktur
                 rejection=match.rejection if match.rejection and "near_miss_reason" in match.rejection else None,
                 declined_reason=(match.rejection or {}).get("declined_reason"),
-                introduction=intro_out(session, intro) if intro else None,
+                introduction=intro_out(session, intro, user) if intro else None,
             )
         )
     # match_runs.trace eski kayıtlarda düz metin listesi, yenilerde TraceStep sözlükleri
@@ -275,7 +275,11 @@ def match_brief(
 
 @router.post("/matches/{match_id}/decision", response_model=api.DecisionOut, summary="Eşleşmeyi kabul et / reddet")
 def decide_match(
-    match_id: int, payload: api.DecisionIn, session: Session = Depends(get_db), user: User = Depends(current_user)
+    match_id: int,
+    payload: api.DecisionIn,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
 ):
     match = session.get(Match, match_id)
     if match is None:
@@ -294,6 +298,9 @@ def decide_match(
         )
         session.add(intro)
         session.flush()
+        # Girişimin hesabı yoksa istek ona ancak e-postayla ulaşır: firmanın düzenleyip göndereceği taslak hazırlanır
+        if verified_owner(session, match.startup_id) is None:
+            intro_email_draft(session, intro, user, settings)
         introduction_id = intro.id
     else:
         match.status = "declined"

@@ -489,3 +489,50 @@ def test_change_password_signs_out_other_devices(client):
     assert client.post("/auth/password", json={"current_password": "uzun-bir-sifre-123", "new_password": "yepyeni-sifre-456"}).status_code == 204
     assert client.get("/auth/me").status_code == 200  # bu cihaz açık kalır
     assert other_device.get("/auth/me").status_code == 401
+
+
+def test_intro_email_draft_for_startups_without_account(client):
+    from fastapi.testclient import TestClient
+
+    from app.db import session as db_session
+    from app.db.models import Startup
+    from app.main import app
+
+    with db_session.get_session_factory()() as s:
+        s.get(Startup, "s01").contact_email = "info@metinsel.example"
+        s.get(Startup, "s01").contact_source = "https://metinsel.example/iletisim"
+        s.commit()
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+    _, result = matched_need(client)
+    intro_id = client.post(
+        f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept", "note": "Haftaya görüşebilir miyiz?"}
+    ).json()["introduction_id"]
+
+    # Hesabı olmayan girişim için taslak hazır: alıcı sitesinden, gövdede ihtiyaç, gerekçe ve firmanın notu
+    [intro] = client.get("/introductions").json()
+    email = intro["email"]
+    assert email["to"] == "info@metinsel.example" and email["sent_at"] is None
+    assert "Kuzey Beyaz Eşya sizinle tanışmak istiyor" in email["subject"]
+    assert "uygun." in email["body"] and "Haftaya görüşebilir miyiz?" in email["body"] and "/kayit" in email["body"]
+
+    edited = client.put(f"/introductions/{intro_id}/email", json={**email, "subject": "Kısa bir tanışma", "to": "ceo@metinsel.example"})
+    assert edited.status_code == 200 and edited.json()["email"]["subject"] == "Kısa bir tanışma"
+    assert client.put(f"/introductions/{intro_id}/email", json={**email, "to": "adres-degil"}).status_code == 422
+    sent = client.post(f"/introductions/{intro_id}/email/sent", json={"sent": True}).json()["email"]
+    assert sent["sent_at"] is not None
+    assert client.put(f"/introductions/{intro_id}/email", json=email).status_code == 409  # gönderildikten sonra kilitli
+
+    # Başka firma göremez, değiştiremez
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    assert other.put(f"/introductions/{intro_id}/email", json=email).status_code == 404
+
+    # Girişim hesabı açılınca istek uygulamada görünür ama firmanın taslağı görünmez
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    startup.post("/startup-account/claim", json={"startup_id": "s01"})
+    [claim] = admin_client().get("/admin/claims").json()
+    admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
+    [seen] = startup.get("/introductions").json()
+    assert seen["email"] is None
+    assert startup.post(f"/introductions/{intro_id}/email/sent", json={"sent": False}).status_code == 404
