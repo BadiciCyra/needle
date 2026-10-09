@@ -536,3 +536,44 @@ def test_intro_email_draft_for_startups_without_account(client):
     [seen] = startup.get("/introductions").json()
     assert seen["email"] is None
     assert startup.post(f"/introductions/{intro_id}/email/sent", json={"sent": False}).status_code == 404
+
+
+def test_startups_can_explore_organizations_before_verification(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+    client.put("/auth/profile", json={
+        "sector": "Perakende", "city": "İstanbul", "employee_range": "250-999", "systems": ["SAP"],
+        "budget_range": "1 milyon TL üzeri", "description": "Beyaz eşya üretip bayi ağıyla satıyoruz.",
+        "website": "https://kuzey.example",
+    })
+    brief_id, _ = matched_need(client)
+    visible = client.post("/calls", json={
+        "brief_id": brief_id, "title": "Şikayet sınıflandırma çağrısı", "summary": "Ayda 3.000 şikayeti otomatik sınıflandırmak istiyoruz.",
+    }).json()["id"]
+
+    gizli = TestClient(app)
+    register(gizli, "gizli@firma.example", "Gizli Firma")
+    gizli.put("/auth/profile", json={"sector": "Enerji", "city": "Ankara", "employee_range": "1000+", "directory_visible": False})
+    register(TestClient(app), "yarim@firma.example", "Profili Eksik Firma")  # profilini doldurmamış: listede yok
+
+    # Profilini henüz bağlamamış girişim de kurumları, girişimleri ve çağrıları görebilir
+    startup = TestClient(app)
+    register(startup, "kurucu@yeni.example", account_type="girisim")
+    [org] = startup.get("/organizations").json()
+    assert org["name"] == "Kuzey Beyaz Eşya" and org["description"].startswith("Beyaz eşya")
+    assert org["city"] == "İstanbul" and org["website"] == "https://kuzey.example"
+    assert [c["id"] for c in org["open_calls"]] == [visible]
+    assert "systems" not in org and "budget_range" not in org  # eşleştirme ayarları gizli
+    assert len(startup.get("/startups").json()) == 40
+    assert [c["id"] for c in startup.get("/calls").json()] == [visible]
+    # ama doğrulanmadan başvuramaz, tanıştırma ve pilot göremez
+    note = {"note": "Hazır modelimiz var, iki haftada kurarız, referanslarımız mevcut."}
+    assert startup.post(f"/calls/{visible}/applications", json=note).status_code == 403
+    assert startup.get("/introductions").status_code == 403
+
+    # Kurum adını gizleyen çağrı dizinde kuruma bağlanmaz
+    client.patch(f"/calls/{visible}", json={"status": "kapali"})
+    assert startup.get("/organizations").json()[0]["open_calls"] == []

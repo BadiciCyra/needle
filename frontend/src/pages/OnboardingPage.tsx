@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, Chip, Group, Stack, Stepper, Text, Title } from '@mantine/core'
+import { Alert, Box, Button, Card, Checkbox, Chip, Group, Stack, Stepper, Text, Textarea, TextInput, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconAlertCircle, IconArrowLeft, IconArrowRight, IconCheck } from '@tabler/icons-react'
 import { useState, type ReactNode } from 'react'
@@ -63,6 +63,7 @@ export default function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboar
     systems: [],
     data_constraints: [],
     startup_location: 'fark_etmez',
+    directory_visible: true,
     ...existing,
   })
   const [step, setStep] = useState(0)
@@ -70,7 +71,8 @@ export default function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboar
   const [error, setError] = useState<string | null>(null)
   const set = <K extends keyof OrgProfile>(key: K, value: OrgProfile[K]) => setProfile((p) => ({ ...p, [key]: value }))
 
-  const step1Done = !!profile.sector && !!profile.city && !!profile.employee_range
+  const websiteOk = !profile.website?.trim() || /^https?:\/\//.test(profile.website.trim())
+  const step1Done = !!profile.sector && !!profile.city && !!profile.employee_range && websiteOk
 
   const finish = async () => {
     setBusy(true)
@@ -89,6 +91,9 @@ export default function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboar
         budget_range: profile.budget_range ?? null,
         pilot_duration: profile.pilot_duration ?? null,
         data_constraints: profile.data_constraints ?? [],
+        description: profile.description?.trim() || null,
+        website: profile.website?.trim() || null,
+        directory_visible: profile.directory_visible ?? true,
       })
       if (mode === 'edit') {
         notifications.show({ message: 'Firma profili kaydedildi' })
@@ -115,6 +120,30 @@ export default function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboar
           <Question title="Kaç kişi çalışıyor?">
             <Choice value={profile.employee_range ?? null} options={EMPLOYEE_RANGES} onChange={(v) => set('employee_range', v)} />
           </Question>
+          <Question title="Firmanız ne iş yapıyor?" hint="İsteğe bağlı. Girişimler Kurumlar sayfasında sizi bu tanıtımla görür; iki üç cümle yeter.">
+            <Textarea
+              placeholder="Örn. Beyaz eşya üretiyor, Türkiye genelinde 1.200 bayi ile satıyoruz."
+              autosize
+              minRows={2}
+              maxLength={600}
+              value={profile.description ?? ''}
+              onChange={(e) => set('description', e.currentTarget.value)}
+            />
+          </Question>
+          <Question title="Web siteniz">
+            <TextInput
+              placeholder="https://"
+              value={profile.website ?? ''}
+              onChange={(e) => set('website', e.currentTarget.value)}
+              error={websiteOk ? undefined : 'https:// ile başlamalı'}
+            />
+          </Question>
+          <Checkbox
+            checked={profile.directory_visible ?? true}
+            onChange={(e) => set('directory_visible', e.currentTarget.checked)}
+            label="Firmamı girişimlere Kurumlar sayfasında göster"
+            description="Yalnızca ad, sektör, şehir, büyüklük, tanıtım ve kurum adını gizlemeyen açık çağrılar görünür. İhtiyaçlarınız ve buradaki diğer ayarlar gizli kalır."
+          />
         </Stack>
       ),
     },

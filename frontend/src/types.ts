@@ -169,6 +169,22 @@ export interface OrgProfile {
   budget_range: string | null
   pilot_duration: string | null
   data_constraints: string[]
+  description?: string | null // kurumlar dizininde girişimlere görünen tanıtım
+  website?: string | null
+  directory_visible?: boolean
+}
+
+// Kurumlar dizini: girişimlerin talep tarafını tanıması için (eşleştirme ayarları gizli)
+export interface OrganizationCard {
+  id: number
+  name: string
+  sector: string | null
+  city: string | null
+  employee_range: string | null
+  description: string | null
+  website: string | null
+  open_calls: { id: number; title: string; deadline: string | null }[]
+  joined_at: string | null
 }
 
 export interface Me {
