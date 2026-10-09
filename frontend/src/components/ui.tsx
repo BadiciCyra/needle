@@ -45,7 +45,6 @@ export interface Stat {
   tone?: 'alert'
 }
 
-// Kart ızgarası yerine çizgilerle ayrılmış tek bir rakam şeridi
 export function StatStrip({ items }: { items: Stat[] }) {
   return (
     <Box

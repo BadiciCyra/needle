@@ -138,7 +138,6 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
   const activePilots = pilots?.filter((p) => p.status === 'active').length
   const stale = pilots?.some((p) => p.stale)
   const waitingIntros = introductions?.filter((i) => i.status === 'bekliyor').length
-  // Girişim için başvurulabilir çağrı; kurum için değerlendirilmeyi bekleyen başvurusu olan açık çağrı
   const callCount = isStartup
     ? calls?.filter((c) => c.status === 'acik' && !c.my_application).length
     : calls?.filter((c) => c.status === 'acik').length
@@ -423,7 +422,6 @@ function Shell() {
 function Gate() {
   const { me, loading } = useAuth()
   const { pathname } = useLocation()
-  // E-postadaki sıfırlama bağlantısı oturum açıkken de açılabilmeli
   if (pathname === '/sifre-sifirla') return <ResetPasswordPage />
   if (loading)
     return (
@@ -440,10 +438,8 @@ function Gate() {
         <Route path="*" element={<LoginPage />} />
       </Routes>
     )
-  // Firma ilk girişte profilini doldurur; girişim profilini bağlar ve doğrulanır; yönetici doğrudan panele girer
   if (me.role === 'firma' && !me.organization?.onboarded) return <OnboardingPage mode="onboarding" />
   return (
-    // Hesap değişince (çıkış/giriş) veriler sıfırdan yüklensin
     <AppDataProvider key={me.id}>
       <Shell />
     </AppDataProvider>

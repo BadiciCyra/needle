@@ -9,7 +9,6 @@ import { useAppData } from '../data'
 import { TAG_COLOR, timeAgo } from '../labels'
 import type { Claim, StartupProfile } from '../types'
 
-// Program yöneticisi: alan adıyla doğrulanamayan sahiplenmeler ve havuza girmek isteyen yeni profiller
 export default function ClaimsPage() {
   const { claims, refresh } = useAppData()
   const [busy, setBusy] = useState<number | null>(null)

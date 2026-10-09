@@ -75,7 +75,6 @@ def register(
         session.add(organization)
         session.flush()
         organization_id = organization.id
-    # Girişim hesabı burada profilsiz açılır; ardından havuzdaki profilini sahiplenir ya da yenisini açar
     user = User(
         email=email,
         password_hash=hash_password(payload.password),
@@ -99,7 +98,6 @@ def login(
     settings: Settings = Depends(get_settings),
 ):
     email, ip = payload.email.strip().lower(), client_ip(request)
-    # Kaba kuvvet koruması: kilitliyken doğru şifre de denenmez (şifrenin doğru olduğu sızmasın)
     if login_blocked(session, email, ip, settings):
         session.commit()
         raise HTTPException(
@@ -109,7 +107,6 @@ def login(
     if user is None:
         record_failed_login(session, email, ip)
         session.commit()
-        # Hangisinin yanlış olduğunu söylemiyoruz (hesap varlığını sızdırmamak için)
         raise HTTPException(401, "E-posta veya şifre hatalı")
     clear_failed_logins(session, email)
     start_session(session, response, user, settings)
@@ -144,7 +141,6 @@ def save_profile(payload: api.OrgProfile, session: Session = Depends(get_db), us
 def request_password_reset(
     payload: api.ResetRequestIn, session: Session = Depends(get_db), settings: Settings = Depends(get_settings)
 ):
-    # Hesap olsa da olmasa da aynı cevap: e-posta adresinin kayıtlı olup olmadığı sızmaz
     user = session.scalar(select(User).where(User.email == payload.email.strip().lower()))
     if user is None:
         return
@@ -166,7 +162,7 @@ def confirm_password_reset(payload: api.ResetConfirmIn, session: Session = Depen
     if user is None:
         raise HTTPException(400, "Bağlantı geçersiz ya da süresi dolmuş. Yeni bir sıfırlama bağlantısı isteyin.")
     user.password_hash = hash_password(payload.password)
-    end_all_sessions(session, user)  # açık kalmış (belki çalınmış) oturumlar düşer
+    end_all_sessions(session, user)
     clear_failed_logins(session, user.email)
     session.commit()
 
@@ -181,6 +177,5 @@ def change_password(
     if not verify_password(user.password_hash, payload.current_password):
         raise HTTPException(400, "Mevcut şifre hatalı")
     user.password_hash = hash_password(payload.new_password)
-    end_all_sessions(session, user, keep_token=request.cookies.get(COOKIE_NAME))  # bu cihaz açık kalır
+    end_all_sessions(session, user, keep_token=request.cookies.get(COOKIE_NAME))
     session.commit()
-

@@ -22,14 +22,14 @@ from app.schemas import Brief, FollowUpQuestions
 
 class BriefState(TypedDict, total=False):
     raw_text: str
-    answers: dict[str, str]           # alan adı → kurumun cevabı
-    asked_questions: list[dict]       # önceki turda sorulan sorular
-    followup_rounds: int              # şimdiye kadar kaç tur takip sorusu soruldu
+    answers: dict[str, str]
+    asked_questions: list[dict]
+    followup_rounds: int
     brief: dict
     missing_fields: list[str]
     questions: list[dict]
-    status: str                       # needs_input | final
-    defaults: dict                    # firma profilinden gelen varsayılanlar (profile_defaults)
+    status: str
+    defaults: dict
 
 
 def profile_defaults(profile: dict | None) -> dict:
@@ -54,7 +54,7 @@ def apply_defaults(brief: dict, defaults: dict) -> dict:
 
 def build_brief_graph(llm: StructuredLLM, settings: Settings | None = None):
     settings = settings or get_settings()
-    max_rounds = 1  # en fazla bir tur takip sorusu: sonsuz döngü yok
+    max_rounds = 1
 
     def extract_brief(state: BriefState) -> BriefState:
         brief = llm.invoke(
@@ -81,7 +81,7 @@ def build_brief_graph(llm: StructuredLLM, settings: Settings | None = None):
 
     def check_completeness(state: BriefState) -> BriefState:
         brief = Brief.model_validate(apply_defaults(state["brief"], state.get("defaults") or {}))
-        missing = brief.computed_missing_fields()  # LLM'in beyanı değil, kodun hesabı
+        missing = brief.computed_missing_fields()
         brief.missing_fields = missing
         return {"brief": brief.model_dump(mode="json"), "missing_fields": missing}
 

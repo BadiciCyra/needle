@@ -1,4 +1,3 @@
-// Yazı tipleri pakete gömülü: demo ortamında internet olmasa da tasarım bozulmaz
 import '@fontsource/ibm-plex-sans/400.css'
 import '@fontsource/ibm-plex-sans/500.css'
 import '@fontsource/ibm-plex-sans/600.css'
@@ -23,7 +22,6 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme} defaultColorScheme="light">
       <BrowserRouter>
-        {/* Bildirimler router içinde: mesajdaki <Link> bağlantıları yönlendirici bağlamına ihtiyaç duyar */}
         <Notifications position="bottom-right" />
         <App />
       </BrowserRouter>

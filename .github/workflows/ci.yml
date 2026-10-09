@@ -1,5 +1,3 @@
-# Her PR'da ve main'e her push'ta: backend testleri (entegrasyon dahil) ve arayüz derlemesi.
-# LLM ve embedding modeli gerekmez: testler sahte LLM ve HashingEmbedder kullanır.
 name: CI
 
 on:
@@ -27,7 +25,6 @@ jobs:
           --health-cmd "pg_isready -U needle -d needle_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      # Entegrasyon testi tabloları silip kurar: yalnızca bu geçici test veritabanında çalışır
       NEEDLE_TEST_DATABASE_URL: postgresql+psycopg://needle:needle@localhost:5432/needle_test
       DATABASE_URL: postgresql+psycopg://needle:needle@localhost:5432/needle_test
     defaults:

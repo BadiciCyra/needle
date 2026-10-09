@@ -11,13 +11,11 @@ def test_same_phrase_is_counted_once_per_need():
         HashingEmbedder(),
     )
     [g] = groups
-    assert g.needs == 2  # aynı ihtiyacın iki "yakındı ama" adayı aynı eksikliği iki kez saydırmaz
+    assert g.needs == 2
     assert g.need_titles == ["Bayi şikayeti", "Müşteri geri bildirimi"]
 
 
 def test_similar_phrases_merge_and_unrelated_stay_apart():
-    # Sahte embedder ortak kelime sayar: "metin sınıflandırma" ile "Türkçe metin sınıflandırma" benzer,
-    # "su kaçağı tespiti" alakasız
     groups = group_phrases(
         [("Türkçe metin sınıflandırma", "A"), ("Türkçe metin sınıflandırma", "B"), ("metin sınıflandırma", "C"),
          ("su kaçağı tespiti", "D")],

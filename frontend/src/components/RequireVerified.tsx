@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { EmptyState, PageHeader } from './ui'
 
-// Tanıştırma, pilot ve çağrı başvurusu kurumların verisine dokunur: girişim profili doğrulanınca açılır
 export default function RequireVerified({ title, children }: { title: string; children: ReactNode }) {
   const { me, isStartup } = useAuth()
   if (!isStartup || me?.startup?.verified) return <>{children}</>

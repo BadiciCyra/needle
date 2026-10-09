@@ -94,7 +94,6 @@ function OrgCard({ org }: { org: OrganizationCard }) {
   )
 }
 
-// Talep tarafının vitrini: girişimler hangi kurumların platformda olduğunu ve ne iş yaptıklarını görür
 export default function OrganizationsPage() {
   const [orgs, setOrgs] = useState<OrganizationCard[] | null>(null)
   const [query, setQuery] = useState('')

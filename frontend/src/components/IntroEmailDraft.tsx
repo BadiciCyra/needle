@@ -8,8 +8,6 @@ import { formatDate, TAG_COLOR } from '../labels'
 import type { Introduction } from '../types'
 import { Tag } from './ui'
 
-// Hesabı olmayan girişime tanıştırma e-postası: uygulama göndermez. Firma ya da yönetici taslağı düzenler,
-// kendi e-posta uygulamasından gönderir ve "gönderildi" diye işaretler.
 export default function IntroEmailDraft({ intro, onChange }: { intro: Introduction; onChange: (i: Introduction) => void }) {
   const email = intro.email
   const [open, setOpen] = useState(!email?.sent_at)

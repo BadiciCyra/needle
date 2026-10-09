@@ -286,7 +286,6 @@ export default function PilotsPage() {
                 <Table.Tbody>
                   {shown.map((p) => {
                     const { total, done, pct } = progressOf(p)
-                    // Girişim kendi adını değil karşı tarafı (kurumu) görür
                     const counterpart = isStartup ? p.organization ?? 'Kurum' : p.startup.name
                     return (
                       <Table.Tr key={p.id} className="app-row-link" onClick={() => setOpenId(p.id)}>

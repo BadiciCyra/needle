@@ -23,7 +23,6 @@ from app.db.session import get_db
 
 COOKIE_NAME = "needle_session"
 _hasher = PasswordHasher()
-# Var olmayan e-postada da aynı sürede cevap vermek için (kullanıcı varlığını süreden sızdırmamak)
 _DUMMY_HASH = _hasher.hash("needle-zamanlama-esitleme")
 
 
@@ -86,7 +85,6 @@ def end_all_sessions(session: Session, user: User, keep_token: str | None = None
 
 def create_reset_token(session: Session, user: User, settings: Settings) -> str:
     token = secrets.token_urlsafe(32)
-    # Önceki kullanılmamış bağlantılar geçersiz olur: yalnızca son gönderilen çalışır
     session.execute(delete(PasswordResetToken).where(PasswordResetToken.user_id == user.id))
     session.add(
         PasswordResetToken(
@@ -175,7 +173,6 @@ def startup_scope(user: User) -> str:
     return user.startup_id
 
 
-# Kişisel e-posta servisleri alan adı doğrulamasında kullanılmaz (herkes gmail adresi alabilir)
 _FREE_MAIL = {
     "gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com", "yahoo.com", "yandex.com",
     "yandex.com.tr", "icloud.com", "me.com", "proton.me", "protonmail.com", "msn.com", "mail.com", "aol.com",

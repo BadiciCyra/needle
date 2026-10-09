@@ -24,7 +24,6 @@ function Question({ title, hint, children }: { title: string; hint?: string; chi
   )
 }
 
-// Tek seçimli düğmeler: açılır menüden daha hızlı cevaplanır
 function Choice<T extends string>({ value, options, onChange }: { value: T | null; options: readonly { value: T; label: string }[]; onChange: (v: T) => void }) {
   return (
     <Chip.Group value={value as string | null} onChange={(v: string) => onChange(v as T)}>
@@ -77,8 +76,6 @@ export default function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboar
   const finish = async () => {
     setBusy(true)
     setError(null)
-    // İlk girişte: profil kaydolunca oturum kapısı bu sayfayı hemen kaldırır, sonraki navigate boşa düşer.
-    // Hedef adres önceden ayarlanır; kayıt başarısız olursa kapı yine bu sayfayı gösterir.
     if (mode === 'onboarding') navigate('/ihtiyaclar/yeni', { replace: true })
     try {
       await saveProfile({

@@ -19,7 +19,6 @@ from app.schemas import Candidate
 
 class Reranker(Protocol):
     name: str
-    # Güven eşiği varsayılanları (match_graph.select_shortlist); her sıralayıcının skor ölçeğine göre
     min_score: float
     relative_ratio: float
 
@@ -30,7 +29,7 @@ class Reranker(Protocol):
 
 class PassthroughReranker:
     name = "none"
-    min_score = 0.0  # kosinüs benzerliği mutlak alaka söylemez; kırpma yapılmaz
+    min_score = 0.0
     relative_ratio = 0.0
 
     def rerank(self, query: str, candidates: list[Candidate]) -> list[Candidate]:
@@ -41,7 +40,7 @@ class PassthroughReranker:
 
 class CrossEncoderReranker:
     name = "cross_encoder"
-    min_score = 0.003  # analiz/esik_analizi.py: negatif ihtiyaçlarda birinci bile bunun altında kalıyor
+    min_score = 0.003
     relative_ratio = 0.3
 
     def __init__(self, model_name: str):
@@ -60,7 +59,7 @@ class CrossEncoderReranker:
             return []
         logits = self._load().predict([(query, c.startup.to_search_text()) for c in candidates])
         for candidate, logit in zip(candidates, logits):
-            candidate.rerank_score = 1.0 / (1.0 + math.exp(-float(logit)))  # 0-1 aralığına sigmoid
+            candidate.rerank_score = 1.0 / (1.0 + math.exp(-float(logit)))
         return sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
 
 
@@ -106,7 +105,6 @@ Emin değilsen ayni_nesne için false seç."""
 
 
 def _is_direct(check: _Check) -> bool:
-    # Kararı model değil kod verir: üç somut sorunun üçü de olumlu olmalı
     return check.ayni_nesne and check.ayni_is and not check.uyarlama_gerekir
 
 
@@ -119,8 +117,6 @@ class LLMReranker:
     """
 
     name = "llm"
-    # 0-10 puanın onda biri: birinci 4/10 veya altındaysa "güçlü eşleşme yok"; birincinin %60'ının
-    # altındakiler kırpılır (ör. 9/10 birinciyken 5/10 ve altı listeye girmez)
     min_score = 0.5
     relative_ratio = 0.6
 
@@ -134,7 +130,6 @@ class LLMReranker:
             return []
         self._score(query, candidates)
         ranked = sorted(candidates, key=lambda c: c.rerank_score, reverse=True)
-        # Taban puanın altındakiler zaten kısa listeye giremez; denetim çağrısı onlar için harcanmaz
         to_check = [c for c in ranked[: self.verify_top_n] if c.rerank_score >= self.min_score]
         checked = {c.startup.id for c in to_check}
         for candidate in ranked:
@@ -159,7 +154,7 @@ class LLMReranker:
         for candidate in candidates:
             checks = [c for r in rounds for c in r.adaylar if c.startup_id == candidate.startup.id]
             yes = [c for c in checks if _is_direct(c)]
-            candidate.direct_fit = len(yes) * 2 > self.votes  # cevap gelmeyen oy "hayır" sayılır
+            candidate.direct_fit = len(yes) * 2 > self.votes
             winner = (yes if candidate.direct_fit else [c for c in checks if not _is_direct(c)]) or checks
             if winner:
                 candidate.direct_fit_reason = f"{winner[0].urun_ne_yapar} ({len(yes)}/{self.votes} oy evet)"

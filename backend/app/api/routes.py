@@ -81,10 +81,8 @@ def create_need(
     settings: Settings = Depends(get_settings),
 ):
     if user.role == "firma":
-        # Firma her zaman kendi kurumu adına ihtiyaç girer; gövdedeki kurum bilgisi yok sayılır
         organization_id = user.organization_id
     elif payload.organization:
-        # Program yöneticisi bir kurum adına ihtiyaç girebilir
         organization = Organization(**payload.organization.model_dump())
         session.add(organization)
         session.flush()
@@ -209,13 +207,11 @@ def get_latest_match(brief_id: int, session: Session = Depends(get_db), user: Us
                 score=match.score,
                 vector_score=match.vector_score,
                 rationale=match.rationale,
-                # reddedilen kısa liste adayında rejection yalnızca ret sebebini taşır, "yakındı ama" gerekçesi yoktur
                 rejection=match.rejection if match.rejection and "near_miss_reason" in match.rejection else None,
                 declined_reason=(match.rejection or {}).get("declined_reason"),
                 introduction=intro_out(session, intro, user) if intro else None,
             )
         )
-    # match_runs.trace eski kayıtlarda düz metin listesi, yenilerde TraceStep sözlükleri
     return api.SavedMatchOut(
         brief_id=brief_id,
         run_id=run.id,
@@ -292,13 +288,11 @@ def decide_match(
     introduction_id = None
     if payload.decision == "accept":
         match.status = "accepted"
-        # Kabul girişime tanıştırma isteği gönderir; pilot, girişim (ya da onun adına yönetici) kabul edince açılır
         intro = Introduction(
             brief_id=match.brief_id, startup_id=match.startup_id, match_id=match.id, firm_note=payload.note
         )
         session.add(intro)
         session.flush()
-        # Girişimin hesabı yoksa istek ona ancak e-postayla ulaşır: firmanın düzenleyip göndereceği taslak hazırlanır
         if verified_owner(session, match.startup_id) is None:
             intro_email_draft(session, intro, user, settings)
         introduction_id = intro.id
@@ -382,7 +376,6 @@ def update_pilot(
 ):
     pilot = _get_pilot(session, pilot_id, user)
     if user.role == "girisim":
-        # Girişim kilometre taşı ekleyip tamamlar; pilotun durumu ve "işe yaradı mı" kararı kurumundur
         raise HTTPException(403, "Pilot durumunu ve sonucunu kurum günceller")
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(pilot, field, value)
@@ -417,7 +410,7 @@ def complete_milestone(
     milestone = session.get(Milestone, milestone_id)
     if milestone is None:
         raise HTTPException(404, "Kilometre taşı bulunamadı")
-    pilot = _get_pilot(session, milestone.pilot_id, user)  # yetki kontrolü değişiklikten önce
+    pilot = _get_pilot(session, milestone.pilot_id, user)
     now = datetime.now(timezone.utc)
     milestone.completed_at = milestone.completed_at or now
     pilot.last_activity_at = now

@@ -179,10 +179,6 @@ class PilotOut(BaseModel):
     organization: str | None = None
 
 
-# --------------------------------------------------------------------------- #
-# Hesaplar ve firma profili
-# --------------------------------------------------------------------------- #
-
 EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
 
 
@@ -226,7 +222,6 @@ class OrgProfile(BaseModel):
     budget_range: str | None = Field(None, max_length=100)
     pilot_duration: str | None = Field(None, max_length=100)
     data_constraints: list[str] = Field(default_factory=list, max_length=8)
-    # Kurumlar dizininde girişimlere görünen tanıtım. Eşleştirme bilgileri (sistemler, bütçe, veri kısıtları) gösterilmez
     description: str | None = Field(None, max_length=600, description="Firmanız ne iş yapıyor?")
     website: str | None = Field(None, max_length=300, pattern=r"^https?://")
     directory_visible: bool = Field(True, description="Kurumlar dizininde girişimlere görünsün mü")
@@ -255,10 +250,6 @@ class MeOut(BaseModel):
     organization: OrganizationOut | None
     startup: StartupAccountOut | None = None
 
-
-# --------------------------------------------------------------------------- #
-# Girişim hesabı
-# --------------------------------------------------------------------------- #
 
 class ClaimIn(BaseModel):
     startup_id: str
@@ -289,10 +280,6 @@ class ClaimOut(BaseModel):
     domain_match: bool
     created_at: datetime
 
-
-# --------------------------------------------------------------------------- #
-# Açık çağrılar
-# --------------------------------------------------------------------------- #
 
 class OpenCallIn(BaseModel):
     brief_id: int
@@ -343,10 +330,6 @@ class OpenCallOut(BaseModel):
     applications: list[ApplicationOut] = Field(default_factory=list, description="Firma ve yönetici için başvurular")
 
 
-# --------------------------------------------------------------------------- #
-# Kurumlar dizini (girişimlerin talep tarafını tanıması için)
-# --------------------------------------------------------------------------- #
-
 class DirectoryCall(BaseModel):
     id: int
     title: str
@@ -363,4 +346,3 @@ class OrganizationCard(BaseModel):
     website: str | None
     open_calls: list[DirectoryCall] = Field(description="Kurum adını gizlemeyen açık çağrılar")
     joined_at: datetime | None
-

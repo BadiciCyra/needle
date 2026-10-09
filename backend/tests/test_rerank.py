@@ -45,7 +45,6 @@ def test_llm_reranker_uses_model_scores(tmp_path):
     ranked = reranker.rerank("bayi şikayetleri", candidates(("s21", 0.9), ("s01", 0.5)))
     assert [c.startup.id for c in ranked] == ["s01", "s21"]
     assert ranked[0].rerank_score == pytest.approx(0.9)
-    # s21 taban puanın (5/10) altında: denetime hiç girmez, doğrudan çözen sayılmaz
     assert [c.direct_fit for c in ranked] == [True, False]
     assert "Denetlenmedi" in ranked[1].direct_fit_reason
 
@@ -54,7 +53,6 @@ def test_direct_fit_needs_all_three_answers(tmp_path):
     reranker = llm_reranker(
         tmp_path,
         '{"scores": [{"startup_id": "s01", "score": 9}, {"startup_id": "s21", "score": 8}, {"startup_id": "s02", "score": 8}]}',
-        # s21: aynı iş değil; s02: uyarlama gerekir → ikisi de "hayır"
         checks(check("s01"), check("s21", is_=False), check("s02", uyarlama=True)),
     )
     ranked = reranker.rerank("q", candidates(("s01", 0.5), ("s21", 0.5), ("s02", 0.5)))
@@ -63,7 +61,6 @@ def test_direct_fit_needs_all_three_answers(tmp_path):
 
 def test_majority_vote_decides(tmp_path):
     scores = '{"scores": [{"startup_id": "s01", "score": 9}, {"startup_id": "s21", "score": 8}]}'
-    # s01: 2/3 evet → evet; s21: 1/3 evet → hayır
     reranker = llm_reranker(
         tmp_path,
         scores,

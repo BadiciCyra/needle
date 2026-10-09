@@ -1,5 +1,3 @@
-// Firma profili seçenekleri ve sektöre göre hazır sorun şablonları
-
 export const SECTORS = [
   'Üretim',
   'Otomotiv',
@@ -19,7 +17,6 @@ export const SECTORS = [
   'Diğer',
 ]
 
-// Girişim havuzundaki sektör adları (backend seed ile aynı)
 export const STARTUP_SECTORS = [
   'yazılım', 'üretim', 'endüstriyel IoT', 'iş güvenliği', 'enerji', 'akıllı şehir', 'lojistik', 'sağlık', 'finans',
   'sigorta', 'tarım', 'perakende', 'insan kaynakları', 'hukuk', 'eğitim', 'medya', 'siber güvenlik', 'turizm',
@@ -53,7 +50,6 @@ export interface ProblemTemplate {
   text: string
 }
 
-// Firma bir şablonu seçip kendi cümleleriyle düzenler; Needle'ın "önce sorun, sonra eşleşme" ilkesi korunur
 export const SECTOR_TEMPLATES: Record<string, ProblemTemplate[]> = {
   Üretim: [
     { label: 'Kalite kontrolde gözden kaçan hatalar', text: 'Üretim hattında ürün yüzeyindeki hataları operatörler gözle kontrol ediyor; vardiya sonuna doğru kaçırmalar artıyor.' },
@@ -105,7 +101,6 @@ export const SECTOR_TEMPLATES: Record<string, ProblemTemplate[]> = {
   ],
 }
 
-// Sektöre özel şablon yoksa
 export const GENERIC_TEMPLATES: ProblemTemplate[] = [
   { label: 'Elle yapılan tekrarlı işler', text: 'Ekiplerimiz tekrarlayan ofis işlerine (veri girişi, rapor hazırlama) çok zaman harcıyor.' },
   { label: 'Müşteri taleplerine yetişememe', text: 'Müşterilerden gelen taleplere zamanında yanıt veremiyoruz; talepler kanallar arasında kayboluyor.' },

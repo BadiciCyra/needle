@@ -36,7 +36,7 @@ def main() -> None:
     raw: dict[str, RationaleBatch] = {}
     invoke = llm.invoke
 
-    def spy(schema, **kwargs):  # koruma çalışmadan önceki ham gerekçeleri yakala
+    def spy(schema, **kwargs):
         out = invoke(schema, **kwargs)
         if schema is RationaleBatch:
             raw["batch"] = out.model_copy(deep=True)

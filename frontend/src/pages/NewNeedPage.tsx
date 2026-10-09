@@ -25,7 +25,6 @@ import { StitchProgress } from '../components/StitchLoader'
 import { PageHeader } from '../components/ui'
 import { useAppData } from '../data'
 
-// backend/seed/needs.json'dan örnekler (kurgusal kurumlar)
 const EXAMPLES = [
   {
     label: 'Bayi şikayetlerini sınıflandırma',

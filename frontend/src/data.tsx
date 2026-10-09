@@ -4,8 +4,6 @@ import { api } from './api'
 import { useAuth } from './auth'
 import type { Claim, Health, Introduction, NeedSummary, OpenCall, Pilot, StartupProfile } from './types'
 
-// Uygulama genelinde paylaşılan veri: kenar çubuğu sayaçları, genel bakış ve global arama aynı kaynağı kullanır.
-// Rol neyi görebiliyorsa o yüklenir: girişim ihtiyaç listesini göremez, onay listesi yalnızca yöneticide.
 interface AppData {
   needs: NeedSummary[] | null
   pilots: Pilot[] | null

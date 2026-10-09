@@ -40,8 +40,6 @@ class EchoRationaleBackend:
 
 
 def run(brief: Brief, tmp_path, **settings_overrides):
-    # Sahte embedder anlam bilmez; graf testlerinde benzerlik kontrolü varsayılan olarak kapalı.
-    # Kanıt doğrulamayı sınayan testler (test_gorunur_gerekce.py) bu ayarı kendileri verir.
     settings = Settings(**{"demo_cache_dir": str(tmp_path), "evidence_min_similarity": 0.0, **settings_overrides})
     graph = build_match_graph(
         retriever=InMemoryRetriever(STARTUPS, EMBEDDER),
@@ -64,8 +62,6 @@ def dealer_brief(**overrides) -> Brief:
 
 
 def test_close_scores_keep_full_shortlist_and_three_rejected(tmp_path):
-    # Sahte embedder'ın skorları birbirine yakın (0,60 · 0,33 · 0,32 · 0,30 · 0,27): sınır 0,3 × 0,60 = 0,18,
-    # beşi de geçer. Güven eşiğinin kırptığı durumlar tests/test_guven_esigi.py'de.
     result = run(dealer_brief(), tmp_path)
     assert len(result.shortlist) == 5
     assert len(result.rejected) == 3
@@ -82,7 +78,6 @@ def test_hallucinated_capabilities_are_removed_from_evidence(tmp_path):
 
 
 def test_filters_are_relaxed_when_too_few_candidates(tmp_path):
-    # Trabzon'da tek girişim var → lokasyon filtresi gevşetilmeli
     result = run(dealer_brief(location_preference="Trabzon"), tmp_path)
     trace = "\n".join(result.retrieval_trace)
     assert "Tur 1" in trace and "Tur 2" in trace
@@ -92,8 +87,6 @@ def test_filters_are_relaxed_when_too_few_candidates(tmp_path):
 
 def test_relevance_beats_location_preference_but_note_is_shown(tmp_path):
     result = run(dealer_brief(location_preference="Trabzon"), tmp_path)
-    # Trabzon'daki tek girişim (mobil form yazılımı) alakasız; İstanbul'daki NLP girişimi yine üstte,
-    # ama "lokasyon tercihi dışında" notuyla
     top = result.shortlist[0]
     assert top.startup.id == "s01"
     assert any("lokasyon tercihi Trabzon" in note for note in top.filter_notes)
@@ -110,7 +103,6 @@ def test_no_relaxation_needed_when_enough_candidates(tmp_path):
 
 
 def test_strict_ratio_setting_trims_the_shortlist(tmp_path):
-    # Ayar grafa gerçekten bağlı mı? Oran 0,9 olunca sadece birinciye çok yakın olanlar kalır.
     result = run(dealer_brief(), tmp_path, shortlist_relative_ratio=0.9)
     assert 1 <= len(result.shortlist) < 5
     assert result.shortlist[0].startup.id == "s01"
@@ -118,7 +110,6 @@ def test_strict_ratio_setting_trims_the_shortlist(tmp_path):
 
 
 def test_high_min_score_setting_returns_no_match_with_near_misses(tmp_path):
-    # Taban birincinin skorunun üstündeyse: kısa liste boş, en yakın 3 aday "yakındı ama" gerekçesiyle döner
     result = run(dealer_brief(), tmp_path, shortlist_min_score=0.99)
     assert result.shortlist == []
     assert result.no_match is True
@@ -128,7 +119,6 @@ def test_high_min_score_setting_returns_no_match_with_near_misses(tmp_path):
 
 
 def test_raw_rerank_score_is_kept_before_preference_penalty(tmp_path):
-    # s01 İstanbul'da, kurum Trabzon istiyor → skoru 0,85 ile cezalandırılır; ham skor ayrıca saklanmalı
     top = run(dealer_brief(location_preference="Trabzon"), tmp_path).shortlist[0]
     assert top.filter_notes
     assert abs(top.score - top.rerank_score * 0.85) < 1e-9

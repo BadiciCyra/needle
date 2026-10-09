@@ -1,7 +1,5 @@
 import { Card, Stack, Text } from '@mantine/core'
 
-// İğne soldan sağa ilerler, kumaşa batıp çıkar; arkasında teyel dikişi belirir.
-// Zamanlama global.css'teki .stitch-* animasyonlarında; hareketi azaltma tercihinde durağan görünür.
 const START = 14
 const END = 166
 const Y = 30
@@ -17,18 +15,14 @@ export function StitchLoader({ width = 180, label = 'Yükleniyor' }: { width?: n
       aria-label={label}
       style={{ overflow: 'visible' }}
     >
-      {/* kumaş çizgisi: çok soluk kılavuz */}
       <line x1={START} x2={END} y1={Y} y2={Y} className="stitch-fabric" />
 
-      {/* teyel dikişi: iğnenin arkasında açığa çıkar */}
       <g className="stitch-trail">
         <line x1={START} x2={END} y1={Y} y2={Y} className="stitch-seam" />
       </g>
 
-      {/* iğne + iplik: birlikte ilerler; iğne ucu dikiş çizgisine değer, batınca altına iner */}
       <g className="stitch-travel">
         <g className="stitch-bob">
-          {/* iplik: iğne deliğinden arkadaki son dikişe sarkar */}
           <path d={`M -5 ${Y - 22} C -9 ${Y - 18}, -13 ${Y - 3}, -30 ${Y}`} className="stitch-thread" />
           <line x1={-6} y1={Y - 26} x2={1} y2={Y - 1} className="stitch-needle" />
           <ellipse cx={-5} cy={Y - 22} rx={1} ry={2.6} transform={`rotate(-16 -5 ${Y - 22})`} className="stitch-eye" />
@@ -38,7 +32,6 @@ export function StitchLoader({ width = 180, label = 'Yükleniyor' }: { width?: n
   )
 }
 
-// Uzun işlemler için: animasyon + başlık + açıklama
 export function StitchProgress({ title, description }: { title: string; description?: string }) {
   return (
     <Card py={48}>

@@ -37,7 +37,6 @@ from app.embeddings import Embedder, cosine
 
 router = APIRouter(prefix="/admin", tags=["program yöneticisi raporu"])
 
-# Bu kadar benzer iki eksik yetkinlik ifadesi aynı satırda toplanır ("Türkçe metin sınıflandırma" ~ "metin sınıflandırma")
 SIMILAR_PHRASE = 0.8
 
 
@@ -231,7 +230,6 @@ def build_report(session: Session, embedder: Embedder, settings: Settings) -> Re
                     )
                 )
                 phrases += [(c, title_of(record)) for c in (record.data or {}).get("required_capabilities") or []]
-            # "Yakındı ama" adaylarının eksik yetkinliği: havuzun bu ihtiyaçta neyi karşılayamadığı
             for rejection in session.scalars(
                 select(Match.rejection).where(Match.run_id == run_id, Match.kind == "rejected")
             ):
@@ -239,7 +237,6 @@ def build_report(session: Session, embedder: Embedder, settings: Settings) -> Re
                 if missing and missing.strip():
                     phrases.append((missing, title_of(record)))
         brief_pilots = pilots_by_brief.get(record.id, [])
-        # Tanıştırma akışından önce açılan pilotların tanıştırma kaydı yok; pilot varsa tanıştırma olmuş sayılır
         if record.id in intro_briefs or brief_pilots:
             funnel["introduced"] += 1
             row["introduced"] += 1
@@ -251,7 +248,6 @@ def build_report(session: Session, embedder: Embedder, settings: Settings) -> Re
             row["worked"] += 1
 
     answered = [i for i in intros if i.status in ("kabul", "ret") and i.responded_at]
-    # Çağrı başvurusundan doğan tanıştırma zaten kabul edilmiş açılır; cevap süresi ve oran eşleştirmeden gelenlerle ölçülür
     from_matching = [i for i in answered if i.application_id is None]
     accepted = sum(i.status == "kabul" for i in from_matching)
     intro_stats = IntroStats(
@@ -309,10 +305,6 @@ def report(
 ):
     return build_report(session, embedder, settings)
 
-
-# --------------------------------------------------------------------------- #
-# Excel çıktısı
-# --------------------------------------------------------------------------- #
 
 def _pct(value: float | None) -> str:
     return "—" if value is None else f"%{round(value * 100)}"

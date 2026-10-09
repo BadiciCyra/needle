@@ -7,7 +7,6 @@ import { api } from '../api'
 import { useAppData } from '../data'
 import type { Brief } from '../types'
 
-// Brief'ten girişimlerin okuyacağı çağrı metnini hazırlar; kurum yayından önce düzenler
 function draftSummary(brief: Brief): string {
   return [
     brief.problem,

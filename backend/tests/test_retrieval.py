@@ -65,7 +65,7 @@ def test_relaxation_ladder_drops_location_then_lowers_maturity():
 
 def test_relaxed_candidates_get_notes_for_negative_matching():
     brief = dealer_brief(location_preference="Ankara", min_maturity=Maturity.early_revenue)
-    s01 = next(s for s in load_startups() if s.id == "s01")  # İstanbul, mvp
+    s01 = next(s for s in load_startups() if s.id == "s01")
     [annotated] = annotate_relaxations([Candidate(startup=s01)], brief)
     assert any("lokasyon" in n for n in annotated.filter_notes)
     assert any("olgunluk" in n for n in annotated.filter_notes)
@@ -79,7 +79,7 @@ def test_pgvector_statement_applies_filters():
         top_k=5,
     )
     sql = str(build_statement(query).compile(dialect=postgresql.dialect()))
-    assert "<=>" in sql           # pgvector kosinüs mesafesi
+    assert "<=>" in sql
     assert "startups.location" in sql
     assert "startups.maturity IN" in sql
     assert "NOT IN" in sql

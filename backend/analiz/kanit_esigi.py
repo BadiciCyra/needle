@@ -65,7 +65,6 @@ def dagilim(ciftler: list[dict]) -> None:
 
 
 def esik_tablosu(ciftler: list[dict]) -> None:
-    # Ayar henüz config.py'ye eklenmediyse (Adım 1 Adım 2'den önce yapılıyor) işaret konmaz
     mevcut = getattr(get_settings(), "evidence_min_similarity", None)
     dogru = [c for c in ciftler if c["tur"] == "dogru"]
     tuzak = [c for c in ciftler if c["tur"] == "tuzak"]

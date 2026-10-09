@@ -12,12 +12,10 @@ import type { StartupProfile } from '../types'
 
 const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
 
-// Artık uygulama kabuğunun içinde açılır (girişim doğrulanmadan da gezinebilir); üst çubuk ve çıkış kabukta
 function Frame({ children }: { children: React.ReactNode }) {
   return <Box maw={760}>{children}</Box>
 }
 
-// Doğrulama bekleyen girişim: ne beklediğini ve ne yapabileceğini görür
 function Pending() {
   const { me } = useAuth()
   const startup = me!.startup!

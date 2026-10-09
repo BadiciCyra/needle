@@ -12,7 +12,6 @@ export const MATURITY_LABEL: Record<Maturity, string> = {
 
 export const MATURITY_ORDER: Maturity[] = ['fikir', 'prototip', 'mvp', 'ilk_gelir', 'buyume']
 
-// Etiket renkleri: kare işaretin rengi (CSS değeri)
 export const TAG_COLOR = {
   green: '#3f7a52',
   ochre: '#c08a2a',
@@ -38,7 +37,6 @@ export const INTRO_STATUS: Record<IntroStatus, { label: string; color: string }>
 
 export const PILOT_RESULT: Record<PilotResult, string> = { evet: 'Evet', kismen: 'Kısmen', hayir: 'Hayır' }
 
-// İhtiyacın süreçteki aşaması (NeedSummary'den türetilir)
 export type Stage = 'followup' | 'ready' | 'review' | 'pilot'
 
 export const STAGE: Record<Stage, { label: string; color: string; hint: string }> = {
@@ -91,7 +89,6 @@ export const initials = (name: string) =>
     .map((w) => w[0]!.toLocaleUpperCase('tr-TR'))
     .join('')
 
-// Mantine'in varsayılan araması toLowerCase kullanır: "İzmir" → "i̇zmir" olur ve "izm" eşleşmez. Türkçe küçültme ile ara.
 export const trLower = (s: string) => s.toLocaleLowerCase('tr-TR')
 
 export const trFilter: OptionsFilter = ({ options, search }) => {

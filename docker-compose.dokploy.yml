@@ -1,17 +1,3 @@
-# Needle — Dokploy (ya da herhangi bir sunucu) için yayın compose dosyası
-#
-# Yerel geliştirmedeki docker-compose.yml'den farkları:
-#   - Hiçbir port sunucuya açılmaz. Dışarıya yalnızca "web" çıkar; Dokploy'un Domains sekmesinden
-#     web servisine, 80 numaralı porta domain bağlanır (Traefik + Let's Encrypt).
-#   - Veritabanı şifresi ve bütün ayarlar Dokploy'un Environment sekmesinden gelir (.env olarak yazılır).
-#   - Veriler adlandırılmış volume'larda durur, yeniden deploy'da silinmez.
-#
-# Environment sekmesine en az şunlar yazılır (bkz. docs/dokploy-kurulum.md):
-#   POSTGRES_PASSWORD=<uzun rastgele şifre>
-#   LLM_API_KEY=<Gemini anahtarı>
-#   APP_BASE_URL=https://<domain>
-#   COOKIE_SECURE=true          (domain HTTPS ise; düz http ile deniyorsan false)
-
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -34,12 +20,10 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql+psycopg://needle:${POSTGRES_PASSWORD}@db:5432/needle
-    # Girişim tablosu boşsa 282 girişimi embedding'leriyle yükler (ilk açılışta birkaç dakika sürer)
     command: sh -c "python -m seed.seed_db --if-empty && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     expose:
       - "8000"
     volumes:
-      # Embedding modeli (~470 MB) her deploy'da yeniden inmesin
       - hf-cache:/root/.cache/huggingface
     depends_on:
       db:

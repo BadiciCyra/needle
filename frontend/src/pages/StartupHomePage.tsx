@@ -7,7 +7,6 @@ import { PageHeader, PageLoader, SectionCard, StatStrip, Tag } from '../componen
 import { useAppData } from '../data'
 import { TAG_COLOR, timeAgo } from '../labels'
 
-// Girişimin genel bakışı: bekleyen davetler, başvurulabilir çağrılar, süren pilotlar
 export default function StartupHomePage() {
   const { me } = useAuth()
   const { introductions, calls, pilots } = useAppData()

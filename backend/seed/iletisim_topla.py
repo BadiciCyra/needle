@@ -27,11 +27,8 @@ MAILTO = re.compile(r"mailto:([^\"'?>\s]+)", re.I)
 HREF = re.compile(r"href=[\"']([^\"'#]+)[\"']", re.I)
 CONTACT_WORDS = ("iletisim", "iletişim", "contact", "bize-ulasin", "bize-ulaşın", "ulasin", "hakkimizda", "about")
 GUESSES = ("/iletisim", "/contact", "/tr/iletisim", "/en/contact", "/contact-us", "/bize-ulasin")
-# Genel kutular kişisel adreslerden önce gelir; tanıştırma kuruma gider
 PREFERRED = ("info", "hello", "merhaba", "iletisim", "contact", "bilgi", "sales", "satis", "business", "team")
-# Görsel dosya adları, şablon ve izleme servislerinin adresleri e-posta değildir
 JUNK = re.compile(r"\.(png|jpe?g|gif|svg|webp|css|js)$|example\.|sentry|wixpress|domain\.com|email\.com|yourdomain|@2x", re.I)
-# Form alanlarındaki örnek adresler ("you@company.com", "ornek@sirket.com") gerçek iletişim adresi değildir
 PLACEHOLDER = re.compile(r"@(company|sirket|şirket|quest|test|mail|firma|example)\.(com|com\.tr)$|^(info|test|ornek|örnek)@(gmail|hotmail)\.com$", re.I)
 UA = "Mozilla/5.0 (compatible; NeedleBot/1.0; +iletisim toplama)"
 _ctx = ssl.create_default_context()
@@ -55,7 +52,6 @@ def domain(url: str) -> str:
 def emails_in(html: str) -> list[str]:
     text = unescape(html).replace("[at]", "@").replace("(at)", "@")
     found = [unquote(m).strip().lower() for m in MAILTO.findall(text)] + [m.lower() for m in EMAIL.findall(text)]
-    # mailto bağlantısının içi bazen adres değildir ("mailto:iletisim"); yalnızca geçerli adresler kalır
     found = [e.rstrip(".") for e in found]
     return [e for e in found if EMAIL.fullmatch(e) and not JUNK.search(e) and not PLACEHOLDER.search(e)]
 

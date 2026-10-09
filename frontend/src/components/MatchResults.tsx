@@ -28,7 +28,6 @@ import OpenCallModal from './OpenCallModal'
 import StartupDrawer from './StartupDrawer'
 import { OrgAvatar, Tag } from './ui'
 
-// Yapılandırılmış iz adımı → zaman çizelgesi başlığı ve özeti
 function describeStep(s: TraceStep): { title: string; detail: string } {
   switch (s.stage) {
     case 'plan':
@@ -51,7 +50,6 @@ function describeStep(s: TraceStep): { title: string; detail: string } {
   }
 }
 
-// LLM yeniden sıralayıcının 0-1 skoru (tercih dışı adaylarda 0,85 ile çarpılmış)
 function fitLevel(score: number) {
   if (score >= 0.7)
     return { label: 'Güçlü uyum', color: TAG_COLOR.green, bar: 'ink', hint: 'İhtiyacın çekirdeğini doğrudan karşılıyor.' }
@@ -63,7 +61,7 @@ function fitLevel(score: number) {
 function StatusBadge({ item }: { item: MatchItem }) {
   if (item.status === 'accepted') {
     const intro = item.introduction
-    if (!intro) return <Tag color={TAG_COLOR.green}>Kabul edildi</Tag> // tanıştırma akışından önceki kayıt
+    if (!intro) return <Tag color={TAG_COLOR.green}>Kabul edildi</Tag>
     const s = INTRO_STATUS[intro.status]
     return (
       <Tag color={s.color} tooltip={intro.startup_note ?? undefined}>
@@ -220,7 +218,6 @@ export default function MatchResults({
     setBusy(true)
     try {
       await api.decide(item.match_id, decision, why, note)
-      // Tanıştırmanın durumu sunucuda oluştuğu için kayıtlı sonuç yeniden okunur
       onChange(await api.latestMatch(view.brief_id))
       refresh()
       notifications.show(

@@ -14,10 +14,9 @@ def test_forty_valid_startups_with_unique_ids():
 def test_real_startups_are_valid_and_sourced():
     startups = load_startups("startups_gercek.json")
     assert len({s.id for s in startups}) == len(startups) >= 100
-    assert not {s.id for s in startups} & {s.id for s in load_startups()}  # kurgusal id'lerle çakışmaz
+    assert not {s.id for s in startups} & {s.id for s in load_startups()}
     raw = json.loads((SEED_DIR / "startups_gercek.json").read_text(encoding="utf-8"))
     assert all(item["kaynak"] and all(u.startswith("https://") for u in item["kaynak"]) for item in raw)
-    # Site metninden otomatik çıkarılan girişimlerde her yetkinliğin birebir alıntı kanıtı var
     for item in (i for i in raw if i.get("otomatik_cikarim")):
         kanitli = {k["yetkinlik"] for k in item["kanitlar"] if k["alinti"].strip()}
         assert set(item["capabilities"]) <= kanitli, item["name"]

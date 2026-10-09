@@ -9,10 +9,6 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
-# --------------------------------------------------------------------------- #
-# Ortak sözlükler
-# --------------------------------------------------------------------------- #
-
 class Maturity(str, Enum):
     """Girişimin olgunluk seviyesi."""
 
@@ -23,13 +19,8 @@ class Maturity(str, Enum):
     growth = "buyume"
 
 
-# Brief'te dolu olması gereken alanlar. Eksikse takip sorusu sorulur.
 REQUIRED_BRIEF_FIELDS = ("problem", "scope", "required_capabilities", "success_criteria", "timeline")
 
-
-# --------------------------------------------------------------------------- #
-# Brief (Adım 1)
-# --------------------------------------------------------------------------- #
 
 class Brief(BaseModel):
     """Kurumun serbest metninden çıkarılan yapılandırılmış ihtiyaç."""
@@ -79,10 +70,6 @@ class FollowUpQuestions(BaseModel):
     questions: list[FollowUpQuestion]
 
 
-# --------------------------------------------------------------------------- #
-# Girişim profili
-# --------------------------------------------------------------------------- #
-
 class StartupProfile(BaseModel):
     id: str
     name: str
@@ -104,10 +91,6 @@ class StartupProfile(BaseModel):
             ]
         )
 
-
-# --------------------------------------------------------------------------- #
-# Eşleştirme (Adım 2)
-# --------------------------------------------------------------------------- #
 
 class Candidate(BaseModel):
     """Retrieval'dan dönen aday; skorlar aşama aşama doldurulur."""
@@ -195,16 +178,3 @@ class MatchResult(BaseModel):
     trace_steps: list[TraceStep] = Field(
         default_factory=list, description="Aynı iz, arayüzün çizebileceği yapılandırılmış adımlar halinde"
     )
-
-
-
-
-#Neden iki ayrıskor alanı? Candidate) grafın içinde taşınan nesne, MatchResultItem ise
-#dışarıya verilen sonuç. Ham skoru içeride hesaplayıp dışarıya taşımak için ikisinde de bir alan
-#gerekiyor.
-
-#no_match açıklaması neden bu kadar uzun? nil'den öğrendiğimiz ders bu. Sistem havuzda
-#uygun girişim yok" diyemez, çünkü bazen uygun girişim vardır ama arama onu kaçırır. Açıklama
-#Iki ihtimali de dürüstçe söylüyor. Bu açıklama API dokümanında ( /docs) sayfasında) görünecek
-#ve arayüzü yazan kişi mesajı buna göre seçecek.
-

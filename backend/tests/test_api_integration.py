@@ -120,7 +120,7 @@ def set_website(startup_id: str, url: str):
 
 
 def test_full_flow_need_to_pilot(client):
-    assert client.get("/needs").status_code == 401  # oturum olmadan veri yok
+    assert client.get("/needs").status_code == 401
     register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
 
     need = client.post("/needs", json={
@@ -132,7 +132,6 @@ def test_full_flow_need_to_pilot(client):
     assert body["status"] == "needs_input"
     assert {q["field"] for q in body["questions"]} == {"scope", "success_criteria", "timeline"}
 
-    # Brief tamamlanmadan eşleştirme yapılamaz
     assert client.post(f"/briefs/{body['brief_id']}/match").status_code == 409
 
     answered = client.post(f"/briefs/{body['brief_id']}/answers", json={"answers": {
@@ -151,7 +150,6 @@ def test_full_flow_need_to_pilot(client):
     top_match_id = result["match_ids"]["s01"]
     decision = client.post(f"/matches/{top_match_id}/decision", json={"decision": "accept", "note": "Görüşelim"})
     assert decision.status_code == 200
-    # Kabul pilotu değil tanıştırmayı başlatır; girişimin hesabı yok, yönetici onun adına cevaplar
     intro_id = decision.json()["introduction_id"]
     assert client.get("/pilots").json() == []
     [intro] = client.get("/introductions").json()
@@ -168,7 +166,7 @@ def test_full_flow_need_to_pilot(client):
 
     needs = client.get("/needs").json()
     assert needs[0]["brief_id"] == body["brief_id"] and needs[0]["accepted_count"] == 1
-    assert needs[0]["organization"] == "Kuzey Beyaz Eşya"  # firma kendi kurumu adına girer
+    assert needs[0]["organization"] == "Kuzey Beyaz Eşya"
 
     saved = client.get(f"/briefs/{body['brief_id']}/match").json()
     by_id = {item["match_id"]: item for item in saved["shortlist"]}
@@ -200,7 +198,7 @@ def test_firms_only_see_their_own_records(client):
     other = TestClient(app)
     register(other, "b@firma-b.example", "Firma B")
     assert other.get("/needs").json() == []
-    assert other.get(f"/briefs/{brief_id}").status_code == 404  # 403 değil: kaydın varlığı da sızmaz
+    assert other.get(f"/briefs/{brief_id}").status_code == 404
     assert other.post(f"/briefs/{brief_id}/answers", json={"answers": {"scope": "x"}}).status_code == 404
     assert other.post(f"/briefs/{brief_id}/match").status_code == 404
     assert other.get("/pilots").json() == []
@@ -242,7 +240,7 @@ def test_profile_fills_empty_brief_fields(client):
     assert brief["sector"] == "perakende"
     assert brief["location_preference"] == "İstanbul"
     assert brief["min_maturity"] == "mvp"
-    assert brief["timeline"] == "3 ay"  # profilden geldi; artık sorulmuyor
+    assert brief["timeline"] == "3 ay"
     assert "timeline" not in {q["field"] for q in body["questions"]}
 
 
@@ -260,18 +258,16 @@ def test_startup_claims_profile_and_answers_introduction(client):
     me = register(startup, "ali@metinsel.example", account_type="girisim")
     assert me["role"] == "girisim" and me["organization"] is None and me["startup"] is None
 
-    # Girişim kurum kayıtlarını göremez (organization_id boş diye "kısıtsız" sayılmamalı)
     assert startup.get("/needs").status_code == 403
     assert startup.get(f"/briefs/{brief_id}").status_code == 403
     assert startup.get(f"/briefs/{brief_id}/match").status_code == 403
-    assert startup.get("/introductions").status_code == 403  # profil doğrulanmadan davet yok
+    assert startup.get("/introductions").status_code == 403
 
-    # Alan adı eşleşse de e-posta doğrulaması olmadığı için varsayılan olarak yönetici onaylar
     me = startup.post("/startup-account/claim", json={"startup_id": "s01"}).json()
     assert me["startup"]["verified"] is False
     admin = admin_client()
     [claim] = admin.get("/admin/claims").json()
-    assert claim["domain_match"] is True  # onay listesinde ipucu
+    assert claim["domain_match"] is True
     assert admin.post(f"/admin/claims/{claim['user_id']}/approve").status_code == 204
     assert startup.get("/auth/me").json()["startup"]["verified"] is True
 
@@ -282,13 +278,11 @@ def test_startup_claims_profile_and_answers_introduction(client):
     assert answered["status"] == "kabul" and answered["responded_by"] == "girisim"
     assert startup.post(f"/introductions/{intro_id}/respond", json={"decision": "ret"}).status_code == 409
 
-    # İki taraf aynı pilotu görür; girişim kilometre taşı ekler ama sonucu kurum belirler
     [pilot] = startup.get("/pilots").json()
     assert pilot["id"] == answered["pilot_id"] and [p["id"] for p in client.get("/pilots").json()] == [pilot["id"]]
     assert startup.post(f"/pilots/{pilot['id']}/milestones", json={"title": "Örnek veri"}).status_code == 200
     assert startup.patch(f"/pilots/{pilot['id']}", json={"result": "evet"}).status_code == 403
 
-    # Aynı ihtiyaç bir çağrıya açılsa da zaten tanıştırılmış girişim ikinci kez başvuramaz (iki pilot olmasın)
     call_id = client.post("/calls", json={
         "brief_id": brief_id, "title": "Şikayet sınıflandırma çağrısı",
         "summary": "Ayda 3.000 Türkçe şikayet metnini otomatik sınıflandırmak istiyoruz.",
@@ -296,7 +290,6 @@ def test_startup_claims_profile_and_answers_introduction(client):
     note = {"note": "Hazır modelimiz var, iki haftada kurarız, referanslarımız mevcut."}
     assert startup.post(f"/calls/{call_id}/applications", json=note).status_code == 409
 
-    # Aynı profili ikinci bir hesap sahiplenemez
     other = TestClient(app)
     register(other, "veli@metinsel.example", account_type="girisim")
     assert other.post("/startup-account/claim", json={"startup_id": "s01"}).status_code == 409
@@ -306,7 +299,7 @@ def test_unverified_claim_and_new_profile_need_admin_approval(client):
     register(client, "kisisel@gmail.com", account_type="girisim")
     set_website("s02", "https://s02.example")
     me = client.post("/startup-account/claim", json={"startup_id": "s02"}).json()
-    assert me["startup"]["verified"] is False  # kişisel e-posta: yönetici onayı gerekir
+    assert me["startup"]["verified"] is False
 
     from fastapi.testclient import TestClient
 
@@ -322,7 +315,7 @@ def test_unverified_claim_and_new_profile_need_admin_approval(client):
     me = newcomer.post("/startup-account/new", json=profile).json()
     assert me["startup"]["status"] == "onay_bekliyor"
     new_id = me["startup"]["id"]
-    assert new_id not in {s["id"] for s in client.get("/startups").json()}  # onaysız profil havuzda görünmez
+    assert new_id not in {s["id"] for s in client.get("/startups").json()}
 
     admin = admin_client()
     claims = {c["kind"]: c for c in admin.get("/admin/claims").json()}
@@ -332,7 +325,7 @@ def test_unverified_claim_and_new_profile_need_admin_approval(client):
 
     assert newcomer.get("/auth/me").json()["startup"] == {"id": new_id, "name": "Yeni Girişim", "status": "aktif", "verified": True}
     assert new_id in {s["id"] for s in admin.get("/startups").json()}
-    assert client.get("/auth/me").json()["startup"] is None  # reddedilen sahiplenme: başka profil deneyebilir
+    assert client.get("/auth/me").json()["startup"] is None
     assert client.get("/startup-account/profile").status_code == 404
 
 
@@ -360,13 +353,12 @@ def test_open_call_application_becomes_pilot(client):
     [claim] = admin_client().get("/admin/claims").json()
     admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
     [listed] = startup.get("/calls").json()
-    assert listed["organization"] is None and listed["application_count"] == 0  # kurum adı gizli
+    assert listed["organization"] is None and listed["application_count"] == 0
     note = {"note": "Türkçe şikayet metinlerini sınıflandıran hazır modelimiz var, iki haftada kurarız."}
     applied = startup.post(f"/calls/{call_id}/applications", json=note).json()
     assert applied["my_application"]["status"] == "yeni"
     assert startup.post(f"/calls/{call_id}/applications", json=note).status_code == 409
 
-    # Başka bir firma çağrıyı göremez
     other = TestClient(app)
     register(other, "b@firma-b.example", "Firma B")
     assert other.get("/calls").json() == [] and other.get(f"/calls/{call_id}").status_code == 404
@@ -384,7 +376,6 @@ def test_open_call_application_becomes_pilot(client):
     assert intro["source"] == "cagri" and intro["status"] == "kabul"
 
     assert client.patch(f"/calls/{call_id}", json={"status": "kapali"}).json()["status"] == "kapali"
-    # Kapalı çağrı yeni girişimlere görünmez, başvuran yine görür
     assert [c["id"] for c in startup.get("/calls").json()] == [call_id]
 
 
@@ -413,7 +404,7 @@ def test_admin_report_and_excel_export(client):
     pilot_id = admin.post(f"/introductions/{intro_id}/respond", json={"decision": "kabul"}).json()["pilot_id"]
     client.patch(f"/pilots/{pilot_id}", json={"status": "done", "result": "evet"})
 
-    assert client.get("/admin/report").status_code == 403  # firma raporu göremez
+    assert client.get("/admin/report").status_code == 403
     report = admin.get("/admin/report").json()
     assert report["funnel"] == {
         "needs": 1, "briefed": 1, "matched": 1, "no_match": 0, "introduced": 1, "piloted": 1, "worked": 1,
@@ -439,10 +430,8 @@ def test_login_is_locked_after_repeated_failures(client):
     attacker = TestClient(app)
     for _ in range(5):
         assert attacker.post("/auth/login", json={"email": "kilit@firma.example", "password": "yanlis-sifre"}).status_code == 401
-    # Kilitliyken doğru şifre de reddedilir: şifrenin doğru olduğu sızmaz
     locked = attacker.post("/auth/login", json={"email": "KILIT@firma.example", "password": "uzun-bir-sifre-123"})
     assert locked.status_code == 429 and "dakika" in locked.json()["detail"]
-    # Başka hesap etkilenmez
     register(TestClient(app), "baska@firma.example", "Başka Firma")
     assert TestClient(app).post("/auth/login", json={"email": "baska@firma.example", "password": "uzun-bir-sifre-123"}).status_code == 200
 
@@ -456,10 +445,9 @@ def test_password_reset_flow(client, monkeypatch):
     sent = []
     monkeypatch.setattr(auth_routes, "send_mail", lambda settings, to, subject, body: sent.append((to, body)))
     register(client, "unuttum@firma.example", "Unutkan Firma")
-    for _ in range(5):  # kilitli hesap da sıfırlamayla açılır
+    for _ in range(5):
         TestClient(app).post("/auth/login", json={"email": "unuttum@firma.example", "password": "yanlis-sifre"})
 
-    # Kayıtlı olmayan adres de aynı cevabı alır (hesap varlığı sızmaz) ama e-posta gitmez
     assert client.post("/auth/password-reset/request", json={"email": "yok@firma.example"}).status_code == 204
     assert client.post("/auth/password-reset/request", json={"email": "Unuttum@firma.example"}).status_code == 204
     [(to, body)] = sent
@@ -468,7 +456,7 @@ def test_password_reset_flow(client, monkeypatch):
 
     assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "kisa"}).status_code == 422
     assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "yepyeni-sifre-456"}).status_code == 204
-    assert client.get("/auth/me").status_code == 401  # açık oturum düştü
+    assert client.get("/auth/me").status_code == 401
     assert client.post("/auth/password-reset/confirm", json={"token": token, "password": "baska-sifre-789"}).status_code == 400
     assert client.post("/auth/login", json={"email": "unuttum@firma.example", "password": "uzun-bir-sifre-123"}).status_code == 401
     assert client.post("/auth/login", json={"email": "unuttum@firma.example", "password": "yepyeni-sifre-456"}).status_code == 200
@@ -487,7 +475,7 @@ def test_change_password_signs_out_other_devices(client):
     wrong = client.post("/auth/password", json={"current_password": "yanlis", "new_password": "yepyeni-sifre-456"})
     assert wrong.status_code == 400
     assert client.post("/auth/password", json={"current_password": "uzun-bir-sifre-123", "new_password": "yepyeni-sifre-456"}).status_code == 204
-    assert client.get("/auth/me").status_code == 200  # bu cihaz açık kalır
+    assert client.get("/auth/me").status_code == 200
     assert other_device.get("/auth/me").status_code == 401
 
 
@@ -508,7 +496,6 @@ def test_intro_email_draft_for_startups_without_account(client):
         f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept", "note": "Haftaya görüşebilir miyiz?"}
     ).json()["introduction_id"]
 
-    # Hesabı olmayan girişim için taslak hazır: alıcı sitesinden, gövdede ihtiyaç, gerekçe ve firmanın notu
     [intro] = client.get("/introductions").json()
     email = intro["email"]
     assert email["to"] == "info@metinsel.example" and email["sent_at"] is None
@@ -520,14 +507,12 @@ def test_intro_email_draft_for_startups_without_account(client):
     assert client.put(f"/introductions/{intro_id}/email", json={**email, "to": "adres-degil"}).status_code == 422
     sent = client.post(f"/introductions/{intro_id}/email/sent", json={"sent": True}).json()["email"]
     assert sent["sent_at"] is not None
-    assert client.put(f"/introductions/{intro_id}/email", json=email).status_code == 409  # gönderildikten sonra kilitli
+    assert client.put(f"/introductions/{intro_id}/email", json=email).status_code == 409
 
-    # Başka firma göremez, değiştiremez
     other = TestClient(app)
     register(other, "b@firma-b.example", "Firma B")
     assert other.put(f"/introductions/{intro_id}/email", json=email).status_code == 404
 
-    # Girişim hesabı açılınca istek uygulamada görünür ama firmanın taslağı görünmez
     startup = TestClient(app)
     register(startup, "ali@metinsel.example", account_type="girisim")
     startup.post("/startup-account/claim", json={"startup_id": "s01"})
@@ -557,23 +542,20 @@ def test_startups_can_explore_organizations_before_verification(client):
     gizli = TestClient(app)
     register(gizli, "gizli@firma.example", "Gizli Firma")
     gizli.put("/auth/profile", json={"sector": "Enerji", "city": "Ankara", "employee_range": "1000+", "directory_visible": False})
-    register(TestClient(app), "yarim@firma.example", "Profili Eksik Firma")  # profilini doldurmamış: listede yok
+    register(TestClient(app), "yarim@firma.example", "Profili Eksik Firma")
 
-    # Profilini henüz bağlamamış girişim de kurumları, girişimleri ve çağrıları görebilir
     startup = TestClient(app)
     register(startup, "kurucu@yeni.example", account_type="girisim")
     [org] = startup.get("/organizations").json()
     assert org["name"] == "Kuzey Beyaz Eşya" and org["description"].startswith("Beyaz eşya")
     assert org["city"] == "İstanbul" and org["website"] == "https://kuzey.example"
     assert [c["id"] for c in org["open_calls"]] == [visible]
-    assert "systems" not in org and "budget_range" not in org  # eşleştirme ayarları gizli
+    assert "systems" not in org and "budget_range" not in org
     assert len(startup.get("/startups").json()) == 40
     assert [c["id"] for c in startup.get("/calls").json()] == [visible]
-    # ama doğrulanmadan başvuramaz, tanıştırma ve pilot göremez
     note = {"note": "Hazır modelimiz var, iki haftada kurarız, referanslarımız mevcut."}
     assert startup.post(f"/calls/{visible}/applications", json=note).status_code == 403
     assert startup.get("/introductions").status_code == 403
 
-    # Kurum adını gizleyen çağrı dizinde kuruma bağlanmaz
     client.patch(f"/calls/{visible}", json={"status": "kapali"})
     assert startup.get("/organizations").json()[0]["open_calls"] == []

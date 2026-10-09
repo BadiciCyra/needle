@@ -6,10 +6,10 @@
   --app-border: #e0dcd3;
   --app-border-strong: #c9c4b8;
   --app-ink: #1a1916;
-  --app-muted: #66615a; /* kâğıt zeminde 5.4:1 */
+  --app-muted: #66615a;
   --app-header: rgba(243, 241, 236, 0.9);
-  --app-accent: var(--mantine-color-thread-7); /* çizgi ve büyük rakamlar */
-  --app-accent-text: var(--mantine-color-thread-8); /* küçük metin, 5.1:1 */
+  --app-accent: var(--mantine-color-thread-7);
+  --app-accent-text: var(--mantine-color-thread-8);
   --app-danger: #c0392b;
   --mantine-color-body: var(--app-canvas);
   --mantine-color-dimmed: var(--app-muted);
@@ -22,7 +22,7 @@
   --app-border: #2e2c27;
   --app-border-strong: #45423b;
   --app-ink: #ece9e2;
-  --app-muted: #9d988c; /* koyu zeminde 5.7:1 */
+  --app-muted: #9d988c;
   --app-header: rgba(20, 19, 17, 0.9);
   --app-accent: var(--mantine-color-thread-5);
   --app-accent-text: var(--mantine-color-thread-5);
@@ -42,14 +42,14 @@ body {
   color: #1a1916;
 }
 
-/* Yüzeyler: düz, kıl çizgisi kenarlık */
+
 .mantine-Card-root,
 .app-surface {
   background: var(--app-surface);
   border-color: var(--app-border);
 }
 
-/* Sayfa başlığı: serif */
+
 .app-display {
   font-family: 'Instrument Serif', Georgia, serif;
   font-weight: 400;
@@ -71,7 +71,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Tablolar */
+
 .app-table-wrap {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
@@ -98,7 +98,7 @@ body {
   cursor: pointer;
 }
 
-/* Kenar çubuğu: koyu mürekkep */
+
 .app-navbar {
   background: #1a1916;
   border-right: none;
@@ -175,7 +175,7 @@ body {
   border-color: var(--app-ink);
 }
 
-/* Rakam şeridi */
+
 .app-stats {
   display: grid;
   border-top: 1px solid var(--app-ink);
@@ -218,7 +218,7 @@ body {
   }
 }
 
-/* Durum etiketi: renkli kare + metin */
+
 .app-tag {
   display: inline-flex;
   align-items: center;
@@ -235,13 +235,13 @@ body {
   flex-shrink: 0;
 }
 
-/* Kanıt satırı */
+
 .app-evidence {
   border-left: 2px solid var(--app-accent);
   padding-left: 12px;
 }
 
-/* Monogram */
+
 .app-mono-avatar {
   display: grid;
   place-items: center;
@@ -272,7 +272,7 @@ body {
   background: var(--app-surface-2);
 }
 
-/* Küçük alan etiketi: büyük harfli mono etiketlerden daha sakin */
+
 .app-caption {
   font-size: 12px;
   color: var(--app-muted);
@@ -284,9 +284,7 @@ body {
   color: var(--app-ink);
 }
 
-/* ---- Mantine bileşenlerini temaya uydurma ---- */
 
-/* Adım göstergesi: kare, ince çizgi, mono numara */
 .mantine-Stepper-stepIcon {
   border-radius: 2px;
   border-width: 1px;
@@ -322,7 +320,7 @@ body {
   color: var(--app-muted);
 }
 
-/* Uyarı kutuları: düz yüzey + soldan renkli çizgi */
+
 .mantine-Alert-root {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
@@ -337,7 +335,7 @@ body {
   color: var(--app-ink);
 }
 
-/* Açılır menüler ve popover'lar */
+
 .mantine-Popover-dropdown,
 .mantine-Combobox-dropdown {
   border-radius: 2px;
@@ -350,7 +348,7 @@ body {
   font-size: 14px;
 }
 
-/* Giriş alanları */
+
 .mantine-Input-input {
   background: var(--app-surface);
   border-color: var(--app-border-strong);
@@ -365,7 +363,7 @@ body {
   margin-bottom: 4px;
 }
 
-/* Global arama (Spotlight) */
+
 .mantine-Spotlight-content {
   border-radius: 2px;
   border: 1px solid var(--app-border-strong);
@@ -401,7 +399,7 @@ body {
   color: inherit;
 }
 
-/* Panel ve pencere başlıkları */
+
 .mantine-Drawer-title,
 .mantine-Modal-title {
   font-size: 13px;
@@ -417,7 +415,7 @@ body {
   background: var(--app-surface);
 }
 
-/* Akordeon, onay kutusu, segment kontrolü */
+
 .mantine-Accordion-item {
   border-radius: 2px;
   border-color: var(--app-border);
@@ -438,8 +436,7 @@ body {
   font-size: 12px;
 }
 
-/* ---- İğne-iplik yükleme animasyonu (StitchLoader) ----
-   Döngü 2.8 sn: iğne 152px yol alır; dikiş aralığı 16px → batış ritmi 2.8 × 16 / 152 ≈ 0.295 sn */
+
 .stitch {
   --stitch-cycle: 2.8s;
   --stitch-beat: 0.295s;
@@ -509,7 +506,7 @@ body {
   }
 }
 
-/* Tıklanabilir kart (çağrı listesi): kenarlık koyulaşır */
+
 .app-hover-card {
   transition: border-color 120ms ease;
 }

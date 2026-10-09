@@ -1,5 +1,3 @@
-// Backend şemalarının (backend/app/schemas.py, backend/app/api/schemas.py) TypeScript karşılıkları
-
 export type Maturity = 'fikir' | 'prototip' | 'mvp' | 'ilk_gelir' | 'buyume'
 
 export interface Brief {
@@ -19,7 +17,7 @@ export interface Brief {
 export interface FollowUpQuestion {
   field: string
   question: string
-  examples?: string[] // tek dokunuşla seçilebilen hazır cevaplar
+  examples?: string[]
 }
 
 export interface BriefOut {
@@ -46,7 +44,7 @@ export interface EvidenceLink {
   brief_phrase: string
   startup_capability: string
   explanation: string
-  support_score?: number | null // ifade–yetkinlik benzerliği (0-1), kod hesaplar
+  support_score?: number | null
 }
 
 export interface MatchRationale {
@@ -83,7 +81,7 @@ export interface MatchView {
   shortlist: MatchItem[]
   rejected: MatchItem[]
   retrieval_trace: string[]
-  trace_steps?: TraceStep[] // eski kayıtlarda boş
+  trace_steps?: TraceStep[]
   open_call_id?: number | null
 }
 
@@ -103,7 +101,6 @@ export interface TraceStep {
   evidence_total?: number
 }
 
-// POST /briefs/{id}/match cevabı: durumlar ayrı bir sözlükte gelir
 export interface MatchOut extends Omit<MatchView, 'shortlist' | 'rejected'> {
   shortlist: Omit<MatchItem, 'match_id' | 'status'>[]
   rejected: Omit<MatchItem, 'match_id' | 'status'>[]
@@ -156,7 +153,6 @@ export interface Health {
   rerank_backend: string
 }
 
-// Hesaplar ve firma profili (backend/app/api/schemas.py)
 export type Role = 'firma' | 'yonetici' | 'girisim'
 
 export interface OrgProfile {
@@ -169,12 +165,11 @@ export interface OrgProfile {
   budget_range: string | null
   pilot_duration: string | null
   data_constraints: string[]
-  description?: string | null // kurumlar dizininde girişimlere görünen tanıtım
+  description?: string | null
   website?: string | null
   directory_visible?: boolean
 }
 
-// Kurumlar dizini: girişimlerin talep tarafını tanıması için (eşleştirme ayarları gizli)
 export interface OrganizationCard {
   id: number
   name: string
@@ -209,7 +204,6 @@ export interface StartupAccount {
   verified: boolean
 }
 
-// Girişimin kendi profili (oluşturma / düzenleme)
 export interface StartupProfileInput {
   name: string
   sector: string
@@ -245,7 +239,7 @@ export interface Introduction {
   created_at: string
   responded_at: string | null
   pilot_id: number | null
-  email?: IntroEmail | null // yalnızca firma ve yönetici görür
+  email?: IntroEmail | null
 }
 
 export interface IntroEmail {
@@ -296,7 +290,6 @@ export interface Claim {
   created_at: string
 }
 
-// Program yöneticisi raporu (backend/app/api/report_routes.py)
 export interface Report {
   generated_at: string
   funnel: { needs: number; briefed: number; matched: number; no_match: number; introduced: number; piloted: number; worked: number }

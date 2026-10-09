@@ -10,7 +10,6 @@ import type { Report } from '../types'
 
 const pct = (value: number | null) => (value === null ? '—' : `%${Math.round(value * 100)}`)
 
-// Program yöneticisi raporu: programın ne ürettiği ve havuzun nerede yetersiz kaldığı
 export default function ReportPage() {
   const [report, setReport] = useState<Report | null>(null)
   const [error, setError] = useState<string | null>(null)

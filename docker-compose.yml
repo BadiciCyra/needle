@@ -1,16 +1,3 @@
-# Needle yerel geliştirme ortamı
-#
-# Kullanım:
-#   1. cp .env.example .env  ve  LLM_API_KEY'e Gemini anahtarını yaz (https://aistudio.google.com/apikey)
-#   2. docker compose up -d --build        → arayüz http://localhost:3000, API http://localhost:8000/docs
-#      (API ilk açılışta girişim tablosu boşsa STARTUPS_FILE'daki girişimleri yükler)
-#
-# Servisler:
-#   db         5432   Postgres 16 + pgvector
-#   omniroute  20128  İsteğe bağlı çoklu sağlayıcı LLM geçidi (--profile omniroute ile açılır)
-#   api        8000   Needle FastAPI backend
-#   web        3000   Needle arayüzü (React, nginx; /api → api)
-
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -30,13 +17,12 @@ services:
     restart: unless-stopped
 
   omniroute:
-    profiles: ["omniroute"]  # varsayılan olarak kapalı; LLM doğrudan sağlayıcıya bağlanır
+    profiles: ["omniroute"]
     image: diegosouzapw/omniroute
     environment:
       DATA_DIR: /app/data
       PORT: 20128
     ports:
-      # Sadece loopback: içinde sağlayıcı anahtarları durduğu için dışarıya açılmaz
       - "127.0.0.1:20128:20128"
     volumes:
       - omniroute-data:/app/data
@@ -50,10 +36,9 @@ services:
       DATABASE_URL: postgresql+psycopg://needle:needle@db:5432/needle
     command: sh -c "python -m seed.seed_db --if-empty && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     ports:
-      - "127.0.0.1:${API_PORT:-8000}:8000"  # 8000 başka bir uygulamadaysa: API_PORT=8010
+      - "127.0.0.1:${API_PORT:-8000}:8000"
     volumes:
       - ./backend/demo_cache:/app/demo_cache
-      # embedding / reranker modelleri her yeniden kurulumda tekrar inmesin
       - hf-cache:/root/.cache/huggingface
     depends_on:
       db:

@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 
     try:
         init_db()
-    except Exception as error:  # veritabanı yoksa API yine açılır; /health durumu gösterir
+    except Exception as error:
         logger.warning("Veritabanı başlatılamadı: %s", error)
     yield
 

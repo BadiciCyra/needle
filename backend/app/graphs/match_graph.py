@@ -36,17 +36,17 @@ from app.schemas import (
 )
 
 
-PREFERENCE_PENALTY = 0.85  # lokasyon / olgunluk tercihi dışındaki adayın skor çarpanı
+PREFERENCE_PENALTY = 0.85
 
 
 class MatchState(TypedDict, total=False):
     brief: dict
     filters: SearchFilters
     queries: list[SearchQuery]
-    pool: dict[str, Candidate]        # startup_id → en iyi aday (turlar arasında birikir)
+    pool: dict[str, Candidate]
     round: int
     trace: list[str]
-    steps: list[dict]                 # yapılandırılmış iz (TraceStep sözlükleri)
+    steps: list[dict]
     shortlist: list[Candidate]
     rejected: list[Candidate]
     rationales: RationaleBatch
@@ -115,7 +115,7 @@ def _guard_rationales(
             if _normalize(e.startup_capability) not in allowed:
                 continue
             phrase = _normalize(e.brief_phrase)
-            if not phrase or phrase not in brief_text:  # boş metin her metnin "içinde" sayılır
+            if not phrase or phrase not in brief_text:
                 continue
             phrase_vec, cap_vec = embedder.embed_documents([e.brief_phrase, e.startup_capability])
             score = cosine(phrase_vec, cap_vec)
@@ -224,17 +224,14 @@ def build_match_graph(
         pool = annotate_relaxations(pool[: settings.retrieve_top_k], brief)
         ranked = reranker.rerank(brief.to_search_text(), pool)
 
-        # Lokasyon / olgunluk tercihleri yumuşak cezadır: alakalı ama tercih dışı aday yine üst sıraya çıkabilir,
-        # yalnızca skoru düşürülür ve notu sonuçta görünür. Alaka düzeyi tercihin önüne geçer.
         for candidate in ranked:
-            candidate.raw_rerank_score = candidate.rerank_score  # ham skor, ceza öncesi (kalibrasyon için saklanır)
+            candidate.raw_rerank_score = candidate.rerank_score
             if candidate.filter_notes:
                 candidate.rerank_score = (candidate.rerank_score or 0.0) * PREFERENCE_PENALTY
         ranked.sort(key=lambda c: c.rerank_score or 0.0, reverse=True)
 
         shortlist, rejected, threshold_note = select_shortlist(
             ranked,
-            # Skor ölçeği sıralayıcıya göre değişir; ayar verilmediyse sıralayıcının kendi eşiği kullanılır
             min_score=_or(settings.shortlist_min_score, reranker.min_score),
             ratio=_or(settings.shortlist_relative_ratio, reranker.relative_ratio),
             max_size=settings.shortlist_size,
@@ -246,7 +243,7 @@ def build_match_graph(
             candidates=len(ranked),
         )
         indirect = sum(c.direct_fit is False for c in ranked)
-        log = _log(  # ikinci adım, ilk adımın eklendiği güncel izi görmeli
+        log = _log(
             {**state, **log}, "threshold", threshold_note,
             indirect=indirect or None, shortlist_size=len(shortlist), rejected_size=len(rejected),
         )

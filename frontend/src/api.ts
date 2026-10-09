@@ -51,7 +51,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>
 }
 
-// Oturum düşerse (süre doldu, başka sekmede çıkış) uygulama giriş ekranına döner
 let onUnauthorized: (() => void) | null = null
 export const setUnauthorizedHandler = (handler: (() => void) | null) => {
   onUnauthorized = handler
@@ -92,24 +91,20 @@ export const api = {
     post<Pilot>(`/pilots/${pilotId}/milestones`, { title, due_date: due_date || null }),
   completeMilestone: (milestoneId: number) => post<Pilot>(`/milestones/${milestoneId}/complete`),
 
-  // Girişim hesabı
   claimStartup: (startup_id: string) => post<Me>('/startup-account/claim', { startup_id }),
   createStartupProfile: (profile: StartupProfileInput) => post<Me>('/startup-account/new', profile),
   myStartupProfile: () => request<StartupProfile>('/startup-account/profile'),
   updateStartupProfile: (profile: StartupProfileInput) =>
     request<StartupProfile>('/startup-account/profile', { method: 'PUT', body: JSON.stringify(profile) }),
 
-  // Yönetici onayları
   claims: () => request<Claim[]>('/admin/claims'),
   approveClaim: (userId: number) => post<void>(`/admin/claims/${userId}/approve`),
   rejectClaim: (userId: number) => post<void>(`/admin/claims/${userId}/reject`),
 
   organizations: () => request<OrganizationCard[]>('/organizations'),
 
-  // Program yöneticisi raporu
   report: () => request<Report>('/admin/report'),
 
-  // Tanıştırmalar
   introductions: () => request<Introduction[]>('/introductions'),
   respondIntroduction: (id: number, decision: 'kabul' | 'ret', note?: string) =>
     post<Introduction>(`/introductions/${id}/respond`, { decision, note }),
@@ -118,7 +113,6 @@ export const api = {
     request<Introduction>(`/introductions/${id}/email`, { method: 'PUT', body: JSON.stringify(body) }),
   markIntroEmailSent: (id: number, sent: boolean) => post<Introduction>(`/introductions/${id}/email/sent`, { sent }),
 
-  // Açık çağrılar
   calls: () => request<OpenCall[]>('/calls'),
   call: (id: number) => request<OpenCall>(`/calls/${id}`),
   createCall: (body: { brief_id: number; title: string; summary: string; hide_organization: boolean; deadline: string | null }) =>
@@ -139,7 +133,6 @@ export interface RegisterBody {
   kvkk_onay: boolean
 }
 
-// POST /match cevabını kayıtlı sonuç biçimine çevirir (yeni koşuda herkes "suggested")
 export function toMatchView(out: MatchOut): MatchView {
   const withIds = (items: MatchOut['shortlist']) =>
     items.map((item) => ({ ...item, match_id: out.match_ids[item.startup.id], status: 'suggested' as const }))

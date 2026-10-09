@@ -10,7 +10,7 @@ from app.embeddings import Embedder
 from app.retrieval.base import MATURITY_ORDER, Retriever, SearchFilters, SearchQuery
 from app.schemas import Brief, Candidate
 
-RRF_K = 60  # reciprocal rank fusion sabiti (literatürdeki standart değer)
+RRF_K = 60
 
 
 def initial_filters(brief: Brief) -> SearchFilters:

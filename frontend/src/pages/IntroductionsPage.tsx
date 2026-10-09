@@ -24,10 +24,8 @@ function IntroCard({
   onChange: (i: Introduction) => void
 }) {
   const { isStartup, isAdmin } = useAuth()
-  // Girişim kendi bakış açısından okur: "Girişimin cevabı bekleniyor" değil "Cevabınız bekleniyor"
   const status = isStartup ? { ...INTRO_STATUS[intro.status], label: STARTUP_VIEW[intro.status] } : INTRO_STATUS[intro.status]
   const b = intro.brief
-  // Girişim kurumu ve ihtiyacı görür; kurum ve yönetici girişimi
   const counterpart = isStartup ? intro.organization ?? 'Kurum' : intro.startup.name
   return (
     <Card>

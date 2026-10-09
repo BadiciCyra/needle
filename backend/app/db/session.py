@@ -29,12 +29,10 @@ def get_db() -> Iterator[Session]:
         session.close()
 
 
-# create_all mevcut tablolara sütun eklemez; sonradan eklenen sütunlar burada (MVP için migration yerine)
 _ADDED_COLUMNS = [
     "ALTER TABLE organizations ADD COLUMN IF NOT EXISTS profile JSONB NOT NULL DEFAULT '{}'",
     "ALTER TABLE organizations ADD COLUMN IF NOT EXISTS onboarded_at TIMESTAMPTZ",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS result VARCHAR(10)",
-    # Girişim hesapları, tanıştırma ve açık çağrı
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS startup_id VARCHAR(40) REFERENCES startups(id)",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS startup_verified_at TIMESTAMPTZ",
     "ALTER TABLE startups ADD COLUMN IF NOT EXISTS website VARCHAR(300)",
@@ -45,7 +43,6 @@ _ADDED_COLUMNS = [
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS brief_id INTEGER REFERENCES briefs(id)",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS startup_id VARCHAR(40) REFERENCES startups(id)",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS introduction_id INTEGER REFERENCES introductions(id)",
-    # Eski pilotlar yalnızca match_id taşıyordu: brief ve girişimi eşleşmeden doldur
     "ALTER TABLE startups ADD COLUMN IF NOT EXISTS contact_email VARCHAR(254)",
     "ALTER TABLE startups ADD COLUMN IF NOT EXISTS contact_source VARCHAR(300)",
     "ALTER TABLE introductions ADD COLUMN IF NOT EXISTS email_to VARCHAR(254)",

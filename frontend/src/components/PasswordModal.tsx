@@ -4,7 +4,6 @@ import { useState, type FormEvent } from 'react'
 
 import { api } from '../api'
 
-// Oturumdayken şifre değiştirme: diğer cihazlardaki oturumlar kapanır, bu cihaz açık kalır
 export default function PasswordModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')

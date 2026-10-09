@@ -26,10 +26,8 @@ class Organization(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200))
     sector: Mapped[str | None] = mapped_column(String(100))
-    # İhtiyacı yazan birim (ör. inovasyon) ve yaşayan birim (ör. saha satış) ayrı tutulur.
     author_unit: Mapped[str | None] = mapped_column(String(200))
     owner_unit: Mapped[str | None] = mapped_column(String(200))
-    # Firma hesabının ilk girişte doldurduğu profil (api.schemas.OrgProfile); brief'in boş alanlarını besler
     profile: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     onboarded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -38,13 +36,11 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(254), unique=True, index=True)  # küçük harfe çevrilmiş
-    password_hash: Mapped[str] = mapped_column(String(255))  # argon2id
+    email: Mapped[str] = mapped_column(String(254), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(200))
-    role: Mapped[str] = mapped_column(String(20), default="firma")  # firma | yonetici | girisim
+    role: Mapped[str] = mapped_column(String(20), default="firma")
     organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"))
-    # Girişim hesabı: sahiplendiği profil. Doğrulanana kadar (alan adı eşleşmesi ya da yönetici onayı)
-    # davetleri göremez, profili düzenleyemez.
     startup_id: Mapped[str | None] = mapped_column(ForeignKey("startups.id"))
     startup_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -104,9 +100,8 @@ class BriefRecord(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     need_id: Mapped[int] = mapped_column(ForeignKey("needs.id"), unique=True)
-    # draft → needs_input (takip sorusu bekliyor) → final
     status: Mapped[str] = mapped_column(String(20), default="draft")
-    data: Mapped[dict] = mapped_column(JSONB)                       # schemas.Brief
+    data: Mapped[dict] = mapped_column(JSONB)
     followup_questions: Mapped[list] = mapped_column(JSONB, default=list)
     answers: Mapped[dict] = mapped_column(JSONB, default=dict)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
@@ -129,14 +124,12 @@ class Startup(Base):
     capabilities: Mapped[list] = mapped_column(JSONB)
     description: Mapped[str] = mapped_column(Text)
     past_pilots: Mapped[list] = mapped_column(JSONB, default=list)
-    # Embedding yalnızca aktif profilde var: onay bekleyen yeni profil aramaya hiç girmez
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
-    website: Mapped[str | None] = mapped_column(String(300))  # sahiplenmede e-posta alan adıyla karşılaştırılır
-    # Sitesinden toplanan iletişim adresi (seed/iletisim_topla.py); tanıştırma e-postası taslağının alıcısı
+    website: Mapped[str | None] = mapped_column(String(300))
     contact_email: Mapped[str | None] = mapped_column(String(254))
     contact_source: Mapped[str | None] = mapped_column(String(300))
-    status: Mapped[str] = mapped_column(String(20), default="aktif")  # aktif | onay_bekliyor | reddedildi
-    source: Mapped[str] = mapped_column(String(20), default="havuz")  # havuz (seed) | girisim (kendisi açtı)
+    status: Mapped[str] = mapped_column(String(20), default="aktif")
+    source: Mapped[str] = mapped_column(String(20), default="havuz")
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -158,14 +151,13 @@ class Match(Base):
     run_id: Mapped[int] = mapped_column(ForeignKey("match_runs.id"), index=True)
     brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), index=True)
     startup_id: Mapped[str] = mapped_column(ForeignKey("startups.id"))
-    kind: Mapped[str] = mapped_column(String(20))            # shortlist | rejected
+    kind: Mapped[str] = mapped_column(String(20))
     rank: Mapped[int] = mapped_column(Integer)
     score: Mapped[float] = mapped_column(Float)
     vector_score: Mapped[float] = mapped_column(Float)
     rerank_score: Mapped[float | None] = mapped_column(Float)
-    rationale: Mapped[dict | None] = mapped_column(JSONB)     # gerekçe izleri
-    rejection: Mapped[dict | None] = mapped_column(JSONB)     # negatif eşleşme: "yakındı ama X"
-    # suggested → accepted (pilot açılır) | declined (program yöneticisi reddetti)
+    rationale: Mapped[dict | None] = mapped_column(JSONB)
+    rejection: Mapped[dict | None] = mapped_column(JSONB)
     status: Mapped[str] = mapped_column(String(20), default="suggested")
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -179,10 +171,10 @@ class OpenCall(Base):
     brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), unique=True)
     organization_id: Mapped[int | None] = mapped_column(ForeignKey("organizations.id"), index=True)
     title: Mapped[str] = mapped_column(String(200))
-    summary: Mapped[str] = mapped_column(Text)  # girişimlerin göreceği metin (brief'in kendisi değil)
+    summary: Mapped[str] = mapped_column(Text)
     hide_organization: Mapped[bool] = mapped_column(Boolean, default=False)
     deadline: Mapped[date | None] = mapped_column(Date)
-    status: Mapped[str] = mapped_column(String(20), default="acik")  # acik | kapali
+    status: Mapped[str] = mapped_column(String(20), default="acik")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -193,8 +185,8 @@ class Application(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     call_id: Mapped[int] = mapped_column(ForeignKey("open_calls.id"), index=True)
     startup_id: Mapped[str] = mapped_column(ForeignKey("startups.id"), index=True)
-    note: Mapped[str] = mapped_column(Text)  # "bu problemi şöyle çözüyoruz"
-    status: Mapped[str] = mapped_column(String(20), default="yeni")  # yeni | kabul | ret
+    note: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(20), default="yeni")
     decision_note: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -208,15 +200,12 @@ class Introduction(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     brief_id: Mapped[int] = mapped_column(ForeignKey("briefs.id"), index=True)
     startup_id: Mapped[str] = mapped_column(ForeignKey("startups.id"), index=True)
-    match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.id"), unique=True)  # eşleştirmeden geldiyse
-    application_id: Mapped[int | None] = mapped_column(ForeignKey("call_applications.id"), unique=True)  # çağrıdan
-    status: Mapped[str] = mapped_column(String(20), default="bekliyor")  # bekliyor | kabul | ret
+    match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.id"), unique=True)
+    application_id: Mapped[int | None] = mapped_column(ForeignKey("call_applications.id"), unique=True)
+    status: Mapped[str] = mapped_column(String(20), default="bekliyor")
     firm_note: Mapped[str | None] = mapped_column(Text)
     startup_note: Mapped[str | None] = mapped_column(Text)
-    # Girişimin hesabı yoksa yönetici onun adına cevap verir ("telefonla görüştüm"); kim cevapladı izlenir
-    responded_by: Mapped[str | None] = mapped_column(String(20))  # girisim | yonetici
-    # Hesabı olmayan girişime gidecek e-postanın taslağı. Uygulama göndermez: firma ya da yönetici düzenleyip
-    # kendi e-postasından gönderir, sonra "gönderildi" diye işaretler
+    responded_by: Mapped[str | None] = mapped_column(String(20))
     email_to: Mapped[str | None] = mapped_column(String(254))
     email_subject: Mapped[str | None] = mapped_column(String(300))
     email_body: Mapped[str | None] = mapped_column(Text)
@@ -230,18 +219,16 @@ class Pilot(Base):
     __tablename__ = "pilots"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Pilot ya bir eşleşmeden ya da açık çağrı başvurusundan doğar; brief ve girişim her iki durumda da doğrudan tutulur
     match_id: Mapped[int | None] = mapped_column(ForeignKey("matches.id"), unique=True)
     brief_id: Mapped[int | None] = mapped_column(ForeignKey("briefs.id"), index=True)
     startup_id: Mapped[str | None] = mapped_column(ForeignKey("startups.id"), index=True)
     introduction_id: Mapped[int | None] = mapped_column(ForeignKey("introductions.id"), unique=True)
-    status: Mapped[str] = mapped_column(String(20), default="active")  # active | paused | done | cancelled
+    status: Mapped[str] = mapped_column(String(20), default="active")
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_activity_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    # Kapalı döngü: pilot sonucu ileride eşleştirme ağırlıklarına geri beslenebilir.
     outcome: Mapped[str | None] = mapped_column(Text)
-    outcome_score: Mapped[float | None] = mapped_column(Float)  # eski 0-10 puan; yerini result aldı
-    result: Mapped[str | None] = mapped_column(String(10))  # İşe yaradı mı: evet | kismen | hayir
+    outcome_score: Mapped[float | None] = mapped_column(Float)
+    result: Mapped[str | None] = mapped_column(String(10))
 
 
 class Milestone(Base):

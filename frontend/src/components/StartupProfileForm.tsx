@@ -29,7 +29,6 @@ export function toInput(p: StartupProfile): StartupProfileInput {
   }
 }
 
-// Girişimin kendi profili: yeni profil açarken ve doğrulanmış profili düzenlerken aynı form
 export default function StartupProfileForm({
   initial,
   submitLabel,

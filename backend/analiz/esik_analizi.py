@@ -33,14 +33,13 @@ from app.seed_data import load_needs, load_startups  # noqa: E402
 
 NEGATIF_DOSYA = Path(__file__).resolve().parent / "negatif_ihtiyaclar.json"
 
-# Her ihtiyacın "doğru" girişimi (sistem_testleri/07_reranker.py ile aynı etiketler)
 DOGRU = {
     "n01": "s01", "n02": "s06", "n03": "s10", "n04": "s17", "n05": "s27", "n06": "s23", "n07": "s33",
     "n08": "s29", "n09": "s14", "n10": "s07", "n11": "s02", "n12": "s08", "n13": "s09", "n14": "s03",
     "n15": "s12", "n16": "s35", "n17": "s15", "n18": "s38", "n19": "s25", "n20": "s37",
 }
-HAVUZ = 20       # reranker'a giden aday sayısı (match_graph'taki retrieve_top_k ile aynı)
-KISA_LISTE = 5   # bugünkü sabit kısa liste boyu
+HAVUZ = 20
+KISA_LISTE = 5
 
 
 def load_negatives() -> list[dict]:

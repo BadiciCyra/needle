@@ -29,7 +29,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!(e instanceof ApiError && e.status === 401)) console.error(e)
       })
       .finally(() => setLoading(false))
-    // Herhangi bir istek 401 dönerse oturum düşmüştür
     setUnauthorizedHandler(() => setMe(null))
     return () => setUnauthorizedHandler(null)
   }, [])

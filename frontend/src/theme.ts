@@ -13,7 +13,6 @@ import {
   type MantineColorsTuple,
 } from '@mantine/core'
 
-// Mürekkep: birincil renk (butonlar, linkler, ilerleme). Açık temada koyu, koyu temada açık ton kullanılır.
 const ink: MantineColorsTuple = [
   '#f4f2ee',
   '#e6e3dc',
@@ -27,7 +26,6 @@ const ink: MantineColorsTuple = [
   '#1a1916',
 ]
 
-// İplik: tek vurgu rengi (aktif menü, kanıt çizgisi, önemli işaretler)
 const thread: MantineColorsTuple = [
   '#fff1ec',
   '#ffe0d5',
@@ -41,7 +39,6 @@ const thread: MantineColorsTuple = [
   '#a3360e',
 ]
 
-// Sıcak gri (açık tema yüzeyleri) ve sıcak koyu (koyu tema)
 const gray: MantineColorsTuple = [
   '#faf9f6',
   '#f4f2ed',

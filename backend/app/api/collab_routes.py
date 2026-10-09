@@ -51,10 +51,6 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
-# --------------------------------------------------------------------------- #
-# Ortak yardımcılar (routes.py de kullanır)
-# --------------------------------------------------------------------------- #
-
 def verified_owner(session: Session, startup_id: str) -> User | None:
     return session.scalar(
         select(User).where(User.startup_id == startup_id, User.startup_verified_at.is_not(None)).limit(1)
@@ -147,7 +143,6 @@ def intro_out(session: Session, intro: Introduction, viewer: User | None = None)
         created_at=intro.created_at,
         responded_at=intro.responded_at,
         pilot_id=pilot_id,
-        # Taslak firmanın iç yazışması: girişime gösterilmez
         email=api.IntroEmail(
             to=intro.email_to,
             subject=intro.email_subject,
@@ -167,10 +162,6 @@ def _brief_org(session: Session, brief_id: int) -> int | None:
         raise HTTPException(404, "Kayıt bulunamadı")
     return record.need.organization_id
 
-
-# --------------------------------------------------------------------------- #
-# Girişim hesabı: profil sahiplenme, yeni profil, düzenleme
-# --------------------------------------------------------------------------- #
 
 def _require_startup_role(user: User) -> None:
     if user.role != "girisim":
@@ -193,8 +184,6 @@ def claim_startup(
     if verified_owner(session, startup.id):
         raise HTTPException(409, "Bu profil başka bir hesap tarafından sahiplenilmiş; program yöneticisine yazın")
     user.startup_id = startup.id
-    # Varsayılan: yönetici onaylar (alan adı eşleşmesi onay listesinde ipucu olarak görünür). Anında doğrulama
-    # yalnızca e-posta doğrulaması varken açılmalı (bkz. config.startup_domain_autoverify)
     autoverify = settings.startup_domain_autoverify and email_matches_site(user.email, startup.website)
     user.startup_verified_at = _now() if autoverify else None
     session.commit()
@@ -208,7 +197,6 @@ def create_startup_profile(
     _require_startup_role(user)
     if user.startup_verified_at is not None:
         raise HTTPException(409, "Hesabınız zaten bir girişim profiline bağlı")
-    # Önceki onaylanmamış yeni profil varsa onun yerine geçer
     old = session.get(Startup, user.startup_id) if user.startup_id else None
     if old is not None and old.source == "girisim" and old.status == "onay_bekliyor":
         startup = old
@@ -216,7 +204,7 @@ def create_startup_profile(
         startup = Startup(id=f"u{uuid4().hex[:10]}", source="girisim", status="onay_bekliyor")
         session.add(startup)
     _apply_profile(startup, payload)
-    startup.embedding = None  # yönetici onaylayınca embedding'i hesaplanıp aramaya girer
+    startup.embedding = None
     session.flush()
     user.startup_id = startup.id
     user.startup_verified_at = None
@@ -258,15 +246,10 @@ def update_startup_profile(
         raise HTTPException(403, "Profil sahipliğiniz henüz doğrulanmadı")
     _apply_profile(startup, payload)
     if startup.status == "aktif":
-        # Değişiklik eşleştirmeye hemen yansısın
         startup.embedding = embedder.embed_documents([to_profile(startup).to_search_text()])[0]
     session.commit()
     return to_profile(startup)
 
-
-# --------------------------------------------------------------------------- #
-# Yönetici: sahiplenme ve yeni profil onayları
-# --------------------------------------------------------------------------- #
 
 @router.get("/admin/claims", response_model=list[api.ClaimOut], summary="Onay bekleyen girişim hesapları")
 def list_claims(session: Session = Depends(get_db), _: User = Depends(require_admin)):
@@ -326,13 +309,9 @@ def reject_claim(user_id: int, session: Session = Depends(get_db), _: User = Dep
     if user.startup.status == "onay_bekliyor":
         user.startup.status = "reddedildi"
     else:
-        user.startup_id = None  # sahiplenme reddi: hesap başka bir profili deneyebilir
+        user.startup_id = None
     session.commit()
 
-
-# --------------------------------------------------------------------------- #
-# Tanıştırmalar
-# --------------------------------------------------------------------------- #
 
 @router.get("/introductions", response_model=list[api.IntroductionOut], summary="Tanıştırmalar (en yeni önce)")
 def list_introductions(session: Session = Depends(get_db), user: User = Depends(current_user)):
@@ -424,10 +403,6 @@ def mark_intro_email_sent(
     session.commit()
     return intro_out(session, intro, user)
 
-
-# --------------------------------------------------------------------------- #
-# Açık çağrılar ve başvurular
-# --------------------------------------------------------------------------- #
 
 def _application_out(session: Session, app_: Application) -> api.ApplicationOut:
     intro_id = session.scalar(select(Introduction.id).where(Introduction.application_id == app_.id))
@@ -594,7 +569,6 @@ def decide_application(
     app_.decision_note = payload.note
     app_.decided_at = _now()
     if payload.decision == "kabul":
-        # Girişim başvurarak ilgisini zaten bildirdi: tanıştırma kabul edilmiş sayılır ve pilot açılır
         intro = Introduction(
             brief_id=call.brief_id,
             startup_id=app_.startup_id,
@@ -615,10 +589,6 @@ def decide_application(
 def call_id_for_brief(session: Session, brief_id: int) -> int | None:
     return session.scalar(select(OpenCall.id).where(OpenCall.brief_id == brief_id))
 
-
-# --------------------------------------------------------------------------- #
-# Kurumlar dizini
-# --------------------------------------------------------------------------- #
 
 @router.get("/organizations", response_model=list[api.OrganizationCard], summary="Kurumlar dizini")
 def list_organizations(session: Session = Depends(get_db), user: User = Depends(current_user)):
@@ -658,4 +628,3 @@ def list_organizations(session: Session = Depends(get_db), user: User = Depends(
             )
         )
     return out
-

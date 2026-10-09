@@ -231,7 +231,6 @@ export function RegisterPage() {
             value={form.password}
             onChange={set('password')}
           />
-          {/* Etikette bağlantı olursa tıklamayı yutar ve kutunun erişilebilir adı bozulur; bağlantı ayrı durur */}
           <div>
             <Checkbox checked={consent} onChange={(e) => setConsent(e.currentTarget.checked)} label="Aydınlatma metnini okudum." />
             <Anchor component="button" type="button" size="xs" c="dimmed" td="underline" ml={30} onClick={kvkk.open}>
@@ -281,7 +280,6 @@ export function ForgotPasswordPage() {
       }
     >
       {sent ? (
-        // Adres kayıtlı olsun olmasın aynı mesaj: hangi e-postaların hesabı olduğu sızmaz
         <Alert color="gray" variant="light">
           Bu adresle bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Bağlantı 60 dakika geçerli. E-posta
           gelmediyse gereksiz klasörüne bakın.
@@ -318,7 +316,7 @@ export function ResetPasswordPage() {
     setError(null)
     try {
       await api.confirmPasswordReset(token, password)
-      await logout() // bütün oturumlar sunucuda düştü; bu sekme de giriş ekranına döner
+      await logout()
       navigate('/giris?sifirlandi=1', { replace: true })
     } catch (err) {
       setError((err as Error).message)

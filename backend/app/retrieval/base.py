@@ -5,7 +5,6 @@ from typing import Protocol
 
 from app.schemas import Candidate, Maturity
 
-# Olgunluk sıralaması: filtrelerde "en az şu seviye" karşılaştırması için
 MATURITY_ORDER: list[Maturity] = [
     Maturity.idea,
     Maturity.prototype,
@@ -38,7 +37,7 @@ class SearchFilters:
 
 @dataclass
 class SearchQuery:
-    label: str                      # izleme için: "brief" ya da "yetenek: Türkçe NLP"
+    label: str
     vector: list[float]
     filters: SearchFilters = field(default_factory=SearchFilters)
     top_k: int = 20
