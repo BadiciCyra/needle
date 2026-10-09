@@ -229,6 +229,18 @@ class Pilot(Base):
     outcome: Mapped[str | None] = mapped_column(Text)
     outcome_score: Mapped[float | None] = mapped_column(Float)
     result: Mapped[str | None] = mapped_column(String(10))
+    goal: Mapped[str | None] = mapped_column(Text)
+    scope: Mapped[str | None] = mapped_column(Text)
+    start_date: Mapped[date | None] = mapped_column(Date)
+    end_date: Mapped[date | None] = mapped_column(Date)
+    firm_contact: Mapped[str | None] = mapped_column(String(200))
+    startup_contact: Mapped[str | None] = mapped_column(String(200))
+    next_step: Mapped[str | None] = mapped_column(String(20))
+    startup_rating: Mapped[int | None] = mapped_column(Integer)
+    evaluated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    startup_feedback: Mapped[str | None] = mapped_column(Text)
+    collab_rating: Mapped[int | None] = mapped_column(Integer)
+    startup_feedback_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Milestone(Base):
@@ -239,3 +251,41 @@ class Milestone(Base):
     title: Mapped[str] = mapped_column(String(200))
     due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    owner: Mapped[str] = mapped_column(String(10), default="ortak")
+
+
+class PilotMetric(Base):
+    __tablename__ = "pilot_metrics"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pilot_id: Mapped[int] = mapped_column(ForeignKey("pilots.id"), index=True)
+    name: Mapped[str] = mapped_column(String(200))
+    unit: Mapped[str | None] = mapped_column(String(30))
+    baseline: Mapped[float | None] = mapped_column(Float)
+    target: Mapped[float | None] = mapped_column(Float)
+    direction: Mapped[str] = mapped_column(String(10), default="artis")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MetricMeasurement(Base):
+    __tablename__ = "metric_measurements"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    metric_id: Mapped[int] = mapped_column(ForeignKey("pilot_metrics.id", ondelete="CASCADE"), index=True)
+    value: Mapped[float] = mapped_column(Float)
+    measured_on: Mapped[date] = mapped_column(Date)
+    note: Mapped[str | None] = mapped_column(String(300))
+    author_role: Mapped[str] = mapped_column(String(10))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PilotActivity(Base):
+    __tablename__ = "pilot_activity"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pilot_id: Mapped[int] = mapped_column(ForeignKey("pilots.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(10))
+    author_role: Mapped[str] = mapped_column(String(10))
+    author_name: Mapped[str | None] = mapped_column(String(200))
+    body: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

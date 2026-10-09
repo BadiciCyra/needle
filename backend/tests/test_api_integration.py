@@ -559,3 +559,64 @@ def test_startups_can_explore_organizations_before_verification(client):
 
     client.patch(f"/calls/{visible}", json={"status": "kapali"})
     assert startup.get("/organizations").json()[0]["open_calls"] == []
+
+
+def test_pilot_management_plan_metrics_activity_and_evaluation(client):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    register(client, "inovasyon@kuzey.example", "Kuzey Beyaz Eşya")
+    brief_id, result = matched_need(client)
+    intro_id = client.post(f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept"}).json()["introduction_id"]
+    pilot_id = admin_client().post(f"/introductions/{intro_id}/respond", json={"decision": "kabul"}).json()["pilot_id"]
+
+    # Pilot açılınca plan brief'ten önerilir: amaç, tarihler (3 ay), 5 kilometre taşı ve başarı kriterinden hedef
+    pilot = client.get(f"/pilots/{pilot_id}").json()
+    assert pilot["goal"] and pilot["start_date"] and pilot["end_date"]
+    assert [m["owner"] for m in pilot["milestones"]] == ["ortak", "kurum", "girisim", "ortak", "ortak"]
+    [metric] = pilot["metrics"]
+    assert metric["target"] == 85.0 and metric["unit"] == "%"
+    assert "Pilot açıldı" in pilot["activity"][-1]["body"]
+
+    pilot = client.patch(f"/pilots/{pilot_id}/plan", json={"firm_contact": "Ayşe Yılmaz, ayse@kuzey.example"}).json()
+    assert pilot["firm_contact"].startswith("Ayşe")
+    assert client.patch(f"/pilots/{pilot_id}/plan", json={"start_date": "2026-12-01", "end_date": "2026-11-01"}).status_code == 422
+
+    client.patch(f"/metrics/{metric['id']}", json={**{k: metric[k] for k in ("name", "unit", "target", "direction")}, "baseline": 60})
+    pilot = client.post(f"/metrics/{metric['id']}/measurements", json={"value": 72.5, "measured_on": "2026-11-15"}).json()
+    assert pilot["metrics"][0]["latest"] == 72.5 and pilot["metrics"][0]["progress"] == 0.5
+
+    late = client.post(f"/pilots/{pilot_id}/milestones", json={"title": "Geciken iş", "due_date": "2020-01-01", "owner": "girisim"}).json()
+    assert late["overdue_milestones"] == 1
+
+    # Girişim pilotu görür, not yazar, ölçüm ekler; durumu ve kurumun değerlendirmesini değiştiremez
+    startup = TestClient(app)
+    register(startup, "ali@metinsel.example", account_type="girisim")
+    set_website("s01", "https://metinsel.example")
+    startup.post("/startup-account/claim", json={"startup_id": "s01"})
+    [claim] = admin_client().get("/admin/claims").json()
+    admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
+    assert startup.post(f"/pilots/{pilot_id}/activity", json={"body": "Örnek veri setini aldık, kuruluma başlıyoruz."}).status_code == 200
+    assert startup.post(f"/metrics/{metric['id']}/measurements", json={"value": 80}).status_code == 200
+    assert startup.patch(f"/pilots/{pilot_id}", json={"status": "paused"}).status_code == 403
+    evaluation = {"result": "evet", "next_step": "satin_alma", "startup_rating": 5, "comment": "Hedef tuttu."}
+    assert startup.post(f"/pilots/{pilot_id}/evaluation", json=evaluation).status_code == 403
+    assert client.post(f"/pilots/{pilot_id}/startup-feedback", json={"feedback": "Kurum yazmamalı bunu."}).status_code == 403
+
+    # Başka firma göremez
+    other = TestClient(app)
+    register(other, "b@firma-b.example", "Firma B")
+    assert other.get(f"/pilots/{pilot_id}").status_code == 404
+    assert other.post(f"/pilots/{pilot_id}/activity", json={"body": "merhaba"}).status_code == 404
+
+    done = client.post(f"/pilots/{pilot_id}/evaluation", json=evaluation).json()
+    assert done["status"] == "done" and done["next_step"] == "satin_alma" and done["startup_rating"] == 5
+    fb = startup.post(f"/pilots/{pilot_id}/startup-feedback", json={"feedback": "Veri erişimi hızlıydı, iyi bir iş birliği oldu.", "collab_rating": 4}).json()
+    assert fb["collab_rating"] == 4 and fb["startup_feedback_at"]
+
+    bodies = [a["body"] for a in client.get(f"/pilots/{pilot_id}").json()["activity"]]
+    assert bodies[0] == "Girişim pilotu değerlendirdi (iş birliği 4/5)"
+    assert any(b.startswith("Pilot değerlendirildi: işe yaradı mı evet") for b in bodies)
+    assert "Örnek veri setini aldık, kuruluma başlıyoruz." in bodies
+    assert any(b.startswith("Ölçüm: ") and b.endswith(" = 72,5%") for b in bodies)

@@ -19,6 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import embedder_dep
+from app.api.pilot_routes import NEXT_STEP_LABEL
 from app.auth import require_admin
 from app.config import Settings, get_settings
 from app.db.models import (
@@ -391,8 +392,17 @@ def report_xlsx(
             pilot.started_at.strftime("%d.%m.%Y"),
             pilot.last_activity_at.strftime("%d.%m.%Y"),
             pilot.outcome or "",
+            NEXT_STEP_LABEL.get(pilot.next_step or "", ""),
+            pilot.startup_rating or "",
+            pilot.startup_feedback or "",
+            pilot.collab_rating or "",
         ])
-    sheet("Pilotlar", ["İhtiyaç", "Kurum", "Girişim", "Durum", "İşe yaradı mı", "Başlangıç", "Son hareket", "Not"], pilot_rows)
+    sheet(
+        "Pilotlar",
+        ["İhtiyaç", "Kurum", "Girişim", "Durum", "İşe yaradı mı", "Başlangıç", "Son hareket", "Not",
+         "Sonraki adım", "Girişime puan", "Girişimin değerlendirmesi", "İş birliği puanı"],
+        pilot_rows,
+    )
     sheet("Havuz", ["Sektör", "Girişim", "Hesabı olan"], [[r.sector, r.startups, r.with_account] for r in data.pool])
 
     buffer = BytesIO()

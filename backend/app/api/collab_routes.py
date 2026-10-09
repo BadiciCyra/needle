@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.api import schemas as api
 from app.api.auth_routes import me_out
 from app.api.deps import embedder_dep
+from app.api.pilot_routes import apply_plan_defaults, log_event
 from app.auth import (
     current_user,
     email_matches_site,
@@ -63,6 +64,8 @@ def create_pilot(session: Session, intro: Introduction) -> Pilot:
     )
     session.add(pilot)
     session.flush()
+    apply_plan_defaults(session, pilot)
+    log_event(session, pilot, "Pilot açıldı; plan, kilometre taşları ve hedef brief'ten önerildi")
     return pilot
 
 
