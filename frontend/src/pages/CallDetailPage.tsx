@@ -194,6 +194,18 @@ export default function CallDetailPage() {
                 <Text className="app-section-title">Başvurunuz</Text>
                 <ApplicationCard app={call.my_application} onOpen={setDrawer} />
               </Stack>
+            ) : isOpen && !me?.startup?.verified ? (
+              <EmptyState
+                title={me?.startup ? 'Onaydan sonra başvurabilirsiniz' : 'Başvurmak için profilinizi bağlayın'}
+                description="Kurum başvurunuzu girişim profilinizle birlikte görür; bu yüzden başvuru, profiliniz program yöneticisince doğrulandıktan sonra açılır."
+                action={
+                  !me?.startup && (
+                    <Button component={Link} to="/profil-bagla">
+                      Profilimi bağla
+                    </Button>
+                  )
+                }
+              />
             ) : isOpen ? (
               <SectionCard title="Başvur" description={`${me?.startup?.name} adına`}>
                 <Stack>

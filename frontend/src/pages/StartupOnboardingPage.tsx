@@ -1,7 +1,8 @@
-import { Alert, Anchor, Box, Button, Card, Group, Stack, Tabs, Text, TextInput, Title } from '@mantine/core'
+import { Alert, Box, Button, Card, Group, Stack, Tabs, Text, TextInput, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconAlertCircle, IconSearch } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { api } from '../api'
 import { useAuth } from '../auth'
@@ -11,26 +12,9 @@ import type { StartupProfile } from '../types'
 
 const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
 
+// Artık uygulama kabuğunun içinde açılır (girişim doğrulanmadan da gezinebilir); üst çubuk ve çıkış kabukta
 function Frame({ children }: { children: React.ReactNode }) {
-  const { me, logout } = useAuth()
-  return (
-    <Box maw={760} mx="auto" px="md" py={48}>
-      <Group justify="space-between" mb="xl">
-        <Text className="app-display" fz={26}>
-          needle
-        </Text>
-        <Group gap="xs">
-          <Text size="sm" c="dimmed">
-            {me?.email}
-          </Text>
-          <Anchor component="button" size="sm" onClick={logout}>
-            Çıkış
-          </Anchor>
-        </Group>
-      </Group>
-      {children}
-    </Box>
-  )
+  return <Box maw={760}>{children}</Box>
 }
 
 // Doğrulama bekleyen girişim: ne beklediğini ve ne yapabileceğini görür
@@ -52,12 +36,18 @@ function Pending() {
           {isNew
             ? `${startup.name} için açtığınız profil program yöneticisinin onayında. Onaylanınca havuza girer ve eşleştirmelerde görünür.`
             : `${startup.name} profilini sahiplenme isteğiniz program yöneticisinin onayında.`}{' '}
-          Onaylanınca davetleri ve açık çağrılara başvuruları buradan yöneteceksiniz.
+          Onaylanınca davetleri ve açık çağrılara başvuruları buradan yöneteceksiniz. Bu arada kurumları ve diğer
+          girişimleri keşfedebilirsiniz.
         </Text>
       )}
-      <Button mt="xl" variant="default" onClick={() => window.location.reload()}>
-        Durumu yenile
-      </Button>
+      <Group mt="xl" gap="xs">
+        <Button variant="default" onClick={() => window.location.reload()}>
+          Durumu yenile
+        </Button>
+        <Button component={Link} to="/kurumlar" variant="default">
+          Kurumları keşfet
+        </Button>
+      </Group>
     </Frame>
   )
 }

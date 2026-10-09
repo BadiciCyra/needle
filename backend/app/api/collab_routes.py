@@ -34,6 +34,7 @@ from app.db.models import (
     Match,
     Need,
     OpenCall,
+    Organization,
     Pilot,
     Startup,
     User,
@@ -613,3 +614,48 @@ def decide_application(
 
 def call_id_for_brief(session: Session, brief_id: int) -> int | None:
     return session.scalar(select(OpenCall.id).where(OpenCall.brief_id == brief_id))
+
+
+# --------------------------------------------------------------------------- #
+# Kurumlar dizini
+# --------------------------------------------------------------------------- #
+
+@router.get("/organizations", response_model=list[api.OrganizationCard], summary="Kurumlar dizini")
+def list_organizations(session: Session = Depends(get_db), user: User = Depends(current_user)):
+    """Profilini tamamlamış ve dizinde görünmeyi kapatmamış kurumlar.
+
+    Girişim hesabı doğrulanmadan da görebilir: talep tarafını tanımak, profil sahiplenmekten önce gelebilir.
+    Gösterilen yalnızca kurumun kendi yazdığı tanıtım ve kurum adını gizlemeyen açık çağrılar; ihtiyaçlar,
+    eşleştirme ayarları (sistemler, bütçe, veri kısıtları) ve kurum adını gizleyen çağrılar görünmez.
+    """
+    organizations = session.scalars(
+        select(Organization).where(Organization.onboarded_at.is_not(None)).order_by(Organization.name)
+    ).all()
+    calls: dict[int, list[api.DirectoryCall]] = {}
+    for call in session.scalars(
+        select(OpenCall).where(OpenCall.hide_organization.is_(False)).order_by(OpenCall.id.desc())
+    ):
+        if _is_open(call) and call.organization_id is not None:
+            calls.setdefault(call.organization_id, []).append(
+                api.DirectoryCall(id=call.id, title=call.title, deadline=call.deadline)
+            )
+    out = []
+    for org in organizations:
+        profile = org.profile or {}
+        if profile.get("directory_visible") is False:
+            continue
+        out.append(
+            api.OrganizationCard(
+                id=org.id,
+                name=org.name,
+                sector=org.sector,
+                city=profile.get("city"),
+                employee_range=profile.get("employee_range"),
+                description=profile.get("description"),
+                website=profile.get("website"),
+                open_calls=calls.get(org.id, []),
+                joined_at=org.onboarded_at,
+            )
+        )
+    return out
+

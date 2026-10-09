@@ -1,4 +1,5 @@
-import { Anchor, Button, Grid, Group, Stack, Text, UnstyledButton } from '@mantine/core'
+import { Alert, Anchor, Button, Grid, Group, SimpleGrid, Stack, Text, UnstyledButton } from '@mantine/core'
+import { IconBuildingCommunity, IconBuildingStore, IconInfoCircle } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 
 import { useAuth } from '../auth'
@@ -12,6 +13,7 @@ export default function StartupHomePage() {
   const { introductions, calls, pilots } = useAppData()
   if (!introductions || !calls || !pilots) return <PageLoader />
 
+  const verified = !!me?.startup?.verified
   const waiting = introductions.filter((i) => i.status === 'bekliyor')
   const openCalls = calls.filter((c) => c.status === 'acik' && !c.my_application)
   const active = pilots.filter((p) => p.status === 'active')
@@ -20,14 +22,48 @@ export default function StartupHomePage() {
     <>
       <PageHeader
         eyebrow="Girişim"
-        title={me?.startup?.name ?? 'Genel bakış'}
+        title={me?.startup?.name ?? 'Hoş geldiniz'}
         description="Kurumlardan gelen tanıştırma istekleri, başvurabileceğiniz açık çağrılar ve süren pilotlarınız."
         actions={
-          <Button component={Link} to="/profil" variant="default">
-            Profili düzenle
+          <Button component={Link} to={me?.startup ? '/profil' : '/profil-bagla'} variant="default">
+            {me?.startup ? 'Profili düzenle' : 'Profilimi bağla'}
           </Button>
         }
       />
+      {!verified && (
+        <Alert variant="light" color="gray" icon={<IconInfoCircle size={18} />} mb="lg" title={me?.startup ? 'Profiliniz onay bekliyor' : 'Profilinizi bağlayın'}>
+          <Stack gap="xs" align="flex-start">
+            <Text size="sm">
+              {me?.startup
+                ? `${me.startup.name} profili program yöneticisinin onayında. Onaylanınca tanıştırma isteklerini görür, açık çağrılara başvurursunuz.`
+                : 'Havuzdaki profilinizi sahiplenin ya da yeni profil açın; onaylanınca kurumlardan gelen istekleri görürsünüz. O zamana kadar kurumları, diğer girişimleri ve açık çağrıları inceleyebilirsiniz.'}
+            </Text>
+            {!me?.startup && (
+              <Button size="xs" component={Link} to="/profil-bagla">
+                Profilimi bağla
+              </Button>
+            )}
+          </Stack>
+        </Alert>
+      )}
+      <SimpleGrid cols={{ base: 1, sm: 2 }} mb="lg">
+        <UnstyledButton component={Link} to="/kurumlar" display="block">
+          <SectionCard title="Kurumlar" description="Çözüm arayan firmalar, ne iş yaptıkları ve açık çağrıları" padding="0">
+            <Group gap="sm" p="md">
+              <IconBuildingStore size={20} stroke={1.5} />
+              <Text size="sm">Talep tarafını tanıyın</Text>
+            </Group>
+          </SectionCard>
+        </UnstyledButton>
+        <UnstyledButton component={Link} to="/girisimler" display="block">
+          <SectionCard title="Girişimler" description="Havuzdaki diğer girişimler ve yetkinlikleri" padding="0">
+            <Group gap="sm" p="md">
+              <IconBuildingCommunity size={20} stroke={1.5} />
+              <Text size="sm">Ekosistemi keşfedin</Text>
+            </Group>
+          </SectionCard>
+        </UnstyledButton>
+      </SimpleGrid>
       <StatStrip
         items={[
           { label: 'Bekleyen davet', value: waiting.length, tone: waiting.length ? 'alert' : undefined },
