@@ -11,6 +11,7 @@
   --app-accent: var(--mantine-color-thread-7);
   --app-accent-text: var(--mantine-color-thread-8);
   --app-danger: #c0392b;
+  --app-on-primary: #fffefb;
   --mantine-color-body: var(--app-canvas);
   --mantine-color-dimmed: var(--app-muted);
 }
@@ -27,6 +28,7 @@
   --app-accent: var(--mantine-color-thread-5);
   --app-accent-text: var(--mantine-color-thread-5);
   --app-danger: #e0614f;
+  --app-on-primary: #141311;
   --mantine-color-body: var(--app-canvas);
   --mantine-color-dimmed: var(--app-muted);
 }
@@ -108,6 +110,18 @@ body {
 [data-mantine-color-scheme='dark'] .app-navbar {
   background: #0f0e0c;
   border-right: 1px solid var(--app-border);
+}
+
+.app-nav-icon {
+  --ai-color: #b9b4a8;
+  --ai-hover: rgba(255, 255, 255, 0.08);
+  --ai-hover-color: #fffdf8;
+  color: #b9b4a8;
+}
+
+.app-nav-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fffdf8;
 }
 
 .app-nav-link {

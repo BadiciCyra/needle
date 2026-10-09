@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   createTheme,
+  defaultVariantColorsResolver,
   Drawer,
   Modal,
   Paper,
@@ -11,6 +12,7 @@ import {
   Table,
   Tooltip,
   type MantineColorsTuple,
+  type VariantColorsResolver,
 } from '@mantine/core'
 
 const ink: MantineColorsTuple = [
@@ -65,7 +67,17 @@ const dark: MantineColorsTuple = [
   '#0f0e0c',
 ]
 
+const variantColorResolver: VariantColorsResolver = (input) => {
+  const result = defaultVariantColorsResolver(input)
+  const color = input.color ?? input.theme.primaryColor
+  if (input.variant === 'filled' && (color === 'ink' || color.startsWith('ink.'))) {
+    return { ...result, color: 'var(--app-on-primary)', hoverColor: 'var(--app-on-primary)' }
+  }
+  return result
+}
+
 export const theme = createTheme({
+  variantColorResolver,
   primaryColor: 'ink',
   primaryShade: { light: 9, dark: 1 },
   autoContrast: true,
