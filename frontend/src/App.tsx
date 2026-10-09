@@ -19,6 +19,7 @@ import {
   IconApi,
   IconBuildingCommunity,
   IconBuildingSkyscraper,
+  IconBuildingStore,
   IconChartBar,
   IconFileDescription,
   IconHeartHandshake,
@@ -41,6 +42,7 @@ import { StitchLoader } from './components/StitchLoader'
 import { AppDataProvider, useAppData } from './data'
 import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from './pages/AuthPages'
 import PasswordModal from './components/PasswordModal'
+import RequireVerified from './components/RequireVerified'
 import BriefPage from './pages/BriefPage'
 import CallDetailPage from './pages/CallDetailPage'
 import CallsPage from './pages/CallsPage'
@@ -51,6 +53,7 @@ import EcosystemPage from './pages/EcosystemPage'
 import NeedsPage from './pages/NeedsPage'
 import NewNeedPage from './pages/NewNeedPage'
 import OnboardingPage from './pages/OnboardingPage'
+import OrganizationsPage from './pages/OrganizationsPage'
 import PilotsPage from './pages/PilotsPage'
 import ReportPage from './pages/ReportPage'
 import StartupHomePage from './pages/StartupHomePage'
@@ -80,7 +83,7 @@ function AccountCard() {
       <Group justify="space-between" wrap="nowrap" gap="xs">
         <div style={{ minWidth: 0 }}>
           <Text size="sm" c="#f4f1ea" fw={500} truncate>
-            {me.role === 'yonetici' ? 'Program yöneticisi' : me.role === 'girisim' ? me.startup?.name : me.organization?.name}
+            {me.role === 'yonetici' ? 'Program yöneticisi' : me.role === 'girisim' ? me.startup?.name ?? 'Girişim hesabı' : me.organization?.name}
           </Text>
           <Text size="xs" c="#9a958a" truncate>
             {me.name}
@@ -130,7 +133,7 @@ const isActive = (pathname: string, to: string) => (to === '/' ? pathname === '/
 function Navigation({ onNavigate }: { onNavigate: () => void }) {
   const { pathname } = useLocation()
   const { needs, pilots, startups, introductions, calls, claims } = useAppData()
-  const { isAdmin, isStartup } = useAuth()
+  const { me, isAdmin, isStartup } = useAuth()
   const openNeeds = needs?.filter((n) => n.accepted_count === 0).length
   const activePilots = pilots?.filter((p) => p.status === 'active').length
   const stale = pilots?.some((p) => p.stale)
@@ -175,8 +178,11 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
         {item('/tanistirmalar', 'Tanıştırma istekleri', IconHeartHandshake, count(waitingIntros, true))}
         {item('/cagrilar', 'Açık çağrılar', IconSpeakerphone, count(callCount))}
         {pilotItem}
+        <div className="app-section-label">Keşfet</div>
+        {item('/kurumlar', 'Kurumlar', IconBuildingStore)}
+        {item('/girisimler', 'Girişimler', IconBuildingCommunity, count(startups?.length))}
         <div className="app-section-label">Hesap</div>
-        {item('/profil', 'Girişim profili', IconBuildingSkyscraper)}
+        {me?.startup ? item('/profil', 'Girişim profili', IconBuildingSkyscraper) : item('/profil-bagla', 'Profilimi bağla', IconBuildingSkyscraper)}
       </>
     )
 
@@ -190,6 +196,7 @@ function Navigation({ onNavigate }: { onNavigate: () => void }) {
       {item('/cagrilar', 'Açık çağrılar', IconSpeakerphone, count(callCount))}
       <div className="app-section-label">Ekosistem</div>
       {item('/ekosistem', 'Girişimler', IconBuildingCommunity, count(startups?.length))}
+      {item('/kurumlar', 'Kurumlar', IconBuildingStore)}
       {isAdmin && item('/hesap-onaylari', 'Girişim hesapları', IconUserCheck, count(claims?.length, true))}
       {isAdmin && (
         <>
@@ -222,6 +229,8 @@ function GlobalSearch() {
                 { id: 'p-intro', label: 'Tanıştırma istekleri', onClick: () => navigate('/tanistirmalar'), leftSection: <IconHeartHandshake size={18} /> },
                 { id: 'p-calls', label: 'Açık çağrılar', onClick: () => navigate('/cagrilar'), leftSection: <IconSpeakerphone size={18} /> },
                 { id: 'p-pilots', label: 'Pilotlar', onClick: () => navigate('/pilotlar'), leftSection: <IconRocket size={18} /> },
+                { id: 'p-orgs', label: 'Kurumlar', onClick: () => navigate('/kurumlar'), leftSection: <IconBuildingStore size={18} /> },
+                { id: 'p-startups', label: 'Girişimler', onClick: () => navigate('/girisimler'), leftSection: <IconBuildingCommunity size={18} /> },
                 { id: 'p-profile', label: 'Girişim profili', onClick: () => navigate('/profil'), leftSection: <IconBuildingSkyscraper size={18} /> },
               ],
             },
@@ -285,7 +294,7 @@ function GlobalSearch() {
 
 function Shell() {
   const [opened, { toggle, close }] = useDisclosure()
-  const { isStartup, isAdmin } = useAuth()
+  const { me, isStartup, isAdmin } = useAuth()
   const { setColorScheme } = useMantineColorScheme()
   const scheme = useComputedColorScheme('light')
 
@@ -374,11 +383,14 @@ function Shell() {
           {isStartup ? (
             <Routes>
               <Route path="/" element={<StartupHomePage />} />
-              <Route path="/tanistirmalar" element={<IntroductionsPage />} />
+              <Route path="/tanistirmalar" element={<RequireVerified title="Tanıştırmalar"><IntroductionsPage /></RequireVerified>} />
               <Route path="/cagrilar" element={<CallsPage />} />
               <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
-              <Route path="/pilotlar" element={<PilotsPage />} />
-              <Route path="/profil" element={<StartupProfilePage />} />
+              <Route path="/pilotlar" element={<RequireVerified title="Pilotlar"><PilotsPage /></RequireVerified>} />
+              <Route path="/kurumlar" element={<OrganizationsPage />} />
+              <Route path="/girisimler" element={<EcosystemPage />} />
+              <Route path="/profil-bagla" element={<StartupOnboardingPage />} />
+              <Route path="/profil" element={me?.startup ? <StartupProfilePage /> : <Navigate to="/profil-bagla" replace />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           ) : (
@@ -392,6 +404,7 @@ function Shell() {
               <Route path="/cagrilar" element={<CallsPage />} />
               <Route path="/cagrilar/:callId" element={<CallDetailPage />} />
               <Route path="/ekosistem" element={<EcosystemPage />} />
+              <Route path="/kurumlar" element={<OrganizationsPage />} />
               {isAdmin && <Route path="/hesap-onaylari" element={<ClaimsPage />} />}
               {isAdmin && <Route path="/rapor" element={<ReportPage />} />}
               <Route path="/profil" element={<OnboardingPage mode="edit" />} />
@@ -429,7 +442,6 @@ function Gate() {
     )
   // Firma ilk girişte profilini doldurur; girişim profilini bağlar ve doğrulanır; yönetici doğrudan panele girer
   if (me.role === 'firma' && !me.organization?.onboarded) return <OnboardingPage mode="onboarding" />
-  if (me.role === 'girisim' && !me.startup?.verified) return <StartupOnboardingPage />
   return (
     // Hesap değişince (çıkış/giriş) veriler sıfırdan yüklensin
     <AppDataProvider key={me.id}>

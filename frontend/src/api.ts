@@ -1,5 +1,6 @@
 import type {
   Claim,
+  OrganizationCard,
   Report,
   Introduction,
   OpenCall,
@@ -102,6 +103,8 @@ export const api = {
   claims: () => request<Claim[]>('/admin/claims'),
   approveClaim: (userId: number) => post<void>(`/admin/claims/${userId}/approve`),
   rejectClaim: (userId: number) => post<void>(`/admin/claims/${userId}/reject`),
+
+  organizations: () => request<OrganizationCard[]>('/organizations'),
 
   // Program yöneticisi raporu
   report: () => request<Report>('/admin/report'),
