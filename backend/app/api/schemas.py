@@ -226,6 +226,10 @@ class OrgProfile(BaseModel):
     budget_range: str | None = Field(None, max_length=100)
     pilot_duration: str | None = Field(None, max_length=100)
     data_constraints: list[str] = Field(default_factory=list, max_length=8)
+    # Kurumlar dizininde girişimlere görünen tanıtım. Eşleştirme bilgileri (sistemler, bütçe, veri kısıtları) gösterilmez
+    description: str | None = Field(None, max_length=600, description="Firmanız ne iş yapıyor?")
+    website: str | None = Field(None, max_length=300, pattern=r"^https?://")
+    directory_visible: bool = Field(True, description="Kurumlar dizininde girişimlere görünsün mü")
 
 
 class OrganizationOut(BaseModel):
@@ -337,3 +341,26 @@ class OpenCallOut(BaseModel):
     application_count: int = 0
     my_application: ApplicationOut | None = Field(None, description="Girişim hesabı için kendi başvurusu")
     applications: list[ApplicationOut] = Field(default_factory=list, description="Firma ve yönetici için başvurular")
+
+
+# --------------------------------------------------------------------------- #
+# Kurumlar dizini (girişimlerin talep tarafını tanıması için)
+# --------------------------------------------------------------------------- #
+
+class DirectoryCall(BaseModel):
+    id: int
+    title: str
+    deadline: date | None
+
+
+class OrganizationCard(BaseModel):
+    id: int
+    name: str
+    sector: str | None
+    city: str | None
+    employee_range: str | None
+    description: str | None
+    website: str | None
+    open_calls: list[DirectoryCall] = Field(description="Kurum adını gizlemeyen açık çağrılar")
+    joined_at: datetime | None
+
