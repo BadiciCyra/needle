@@ -1,12 +1,12 @@
 import { Text } from '@mantine/core'
 
+import { withUnit } from '../labels'
 import type { Metric } from '../types'
 
 const W = 320
 const H = 96
 const PAD = { left: 6, right: 6, top: 10, bottom: 18 }
 
-const fmt = (v: number) => v.toLocaleString('tr-TR', { maximumFractionDigits: 2 })
 const day = (d: string) => new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
 
 export default function MetricChart({ metric }: { metric: Metric }) {
@@ -40,8 +40,7 @@ export default function MetricChart({ metric }: { metric: Metric }) {
         <g>
           <line x1={PAD.left} x2={W - PAD.right} y1={y(metric.target)} y2={y(metric.target)} stroke="var(--app-accent)" strokeDasharray="4 3" strokeWidth={1} />
           <text x={W - PAD.right} y={y(metric.target) - 3} textAnchor="end" fontSize={9} fill="var(--app-accent-text)">
-            hedef {fmt(metric.target)}
-            {metric.unit ?? ''}
+            hedef {withUnit(metric.target, metric.unit)}
           </text>
         </g>
       )}
@@ -52,8 +51,7 @@ export default function MetricChart({ metric }: { metric: Metric }) {
       {points.map((p, i) => (
         <circle key={p.id} cx={x(i)} cy={y(p.value)} r={2.8} fill="var(--app-surface)" stroke="var(--app-ink)" strokeWidth={1.4}>
           <title>
-            {day(p.measured_on)}: {fmt(p.value)}
-            {metric.unit ?? ''}
+            {day(p.measured_on)}: {withUnit(p.value, metric.unit)}
             {p.note ? ` · ${p.note}` : ''}
           </title>
         </circle>
