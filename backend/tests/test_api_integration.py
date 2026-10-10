@@ -588,26 +588,30 @@ def test_pilot_management_plan_metrics_activity_and_evaluation(client):
     intro_id = client.post(f"/matches/{result['match_ids']['s01']}/decision", json={"decision": "accept"}).json()["introduction_id"]
     pilot_id = admin_client().post(f"/introductions/{intro_id}/respond", json={"decision": "kabul"}).json()["pilot_id"]
 
-    # Pilot açılınca plan brief'ten önerilir: amaç, tarihler (3 ay), 5 kilometre taşı ve başarı kriterinden hedef
     pilot = client.get(f"/pilots/{pilot_id}").json()
     assert pilot["goal"] and pilot["start_date"] and pilot["end_date"]
     assert [m["owner"] for m in pilot["milestones"]] == ["ortak", "kurum", "girisim", "ortak", "ortak"]
     [metric] = pilot["metrics"]
-    assert metric["target"] == 85.0 and metric["unit"] == "%"
+    assert metric["name"] == "%85 doğru kategori" and metric["due_date"] == pilot["end_date"] and metric["status"] == "bekliyor"
     assert "Pilot açıldı" in pilot["activity"][-1]["body"]
 
     pilot = client.patch(f"/pilots/{pilot_id}/plan", json={"firm_contact": "Ayşe Yılmaz, ayse@kuzey.example"}).json()
     assert pilot["firm_contact"].startswith("Ayşe")
     assert client.patch(f"/pilots/{pilot_id}/plan", json={"start_date": "2026-12-01", "end_date": "2026-11-01"}).status_code == 422
 
-    client.patch(f"/metrics/{metric['id']}", json={**{k: metric[k] for k in ("name", "unit", "target", "direction")}, "baseline": 60})
-    pilot = client.post(f"/metrics/{metric['id']}/measurements", json={"value": 72.5, "measured_on": "2026-11-15"}).json()
-    assert pilot["metrics"][0]["latest"] == 72.5 and pilot["metrics"][0]["progress"] == 0.5
+    pilot = client.post(f"/pilots/{pilot_id}/metrics", json={"name": "Ortalama atama süresi 1 saatin altına insin", "due_date": "2020-01-01"}).json()
+    late_goal = next(m for m in pilot["metrics"] if m["due_date"] == "2020-01-01")
+    assert late_goal["overdue"] and pilot["metrics"][0]["id"] == late_goal["id"]
+    pilot = client.post(f"/metrics/{late_goal['id']}/result", json={"status": "tutmadi", "note": "Entegrasyon gecikti."}).json()
+    late_goal = next(m for m in pilot["metrics"] if m["id"] == late_goal["id"])
+    assert late_goal["status"] == "tutmadi" and late_goal["resolved_at"] and not late_goal["overdue"]
+    assert client.post(f"/metrics/{late_goal['id']}/result", json={"status": "bekliyor"}).json()["metrics"][0]["resolved_at"] is None
+    assert client.patch(f"/metrics/{metric['id']}", json={"name": "%85 doğru kategori", "due_date": "2027-02-01"}).json()["metrics"][-1]["due_date"] == "2027-02-01"
+    assert client.post(f"/pilots/{pilot_id}/metrics", json={"name": "x"}).status_code == 422
 
     late = client.post(f"/pilots/{pilot_id}/milestones", json={"title": "Geciken iş", "due_date": "2020-01-01", "owner": "girisim"}).json()
     assert late["overdue_milestones"] == 1
 
-    # Girişim pilotu görür, not yazar, ölçüm ekler; durumu ve kurumun değerlendirmesini değiştiremez
     startup = TestClient(app)
     register(startup, "ali@metinsel.example", account_type="girisim")
     set_website("s01", "https://metinsel.example")
@@ -615,13 +619,12 @@ def test_pilot_management_plan_metrics_activity_and_evaluation(client):
     [claim] = admin_client().get("/admin/claims").json()
     admin_client().post(f"/admin/claims/{claim['user_id']}/approve")
     assert startup.post(f"/pilots/{pilot_id}/activity", json={"body": "Örnek veri setini aldık, kuruluma başlıyoruz."}).status_code == 200
-    assert startup.post(f"/metrics/{metric['id']}/measurements", json={"value": 80}).status_code == 200
+    assert startup.post(f"/metrics/{metric['id']}/result", json={"status": "tuttu"}).status_code == 200
     assert startup.patch(f"/pilots/{pilot_id}", json={"status": "paused"}).status_code == 403
     evaluation = {"result": "evet", "next_step": "satin_alma", "startup_rating": 5, "comment": "Hedef tuttu."}
     assert startup.post(f"/pilots/{pilot_id}/evaluation", json=evaluation).status_code == 403
     assert client.post(f"/pilots/{pilot_id}/startup-feedback", json={"feedback": "Kurum yazmamalı bunu."}).status_code == 403
 
-    # Başka firma göremez
     other = TestClient(app)
     register(other, "b@firma-b.example", "Firma B")
     assert other.get(f"/pilots/{pilot_id}").status_code == 404
@@ -636,7 +639,8 @@ def test_pilot_management_plan_metrics_activity_and_evaluation(client):
     assert bodies[0] == "Girişim pilotu değerlendirdi (iş birliği 4/5)"
     assert any(b.startswith("Pilot değerlendirildi: işe yaradı mı evet") for b in bodies)
     assert "Örnek veri setini aldık, kuruluma başlıyoruz." in bodies
-    assert any(b.startswith("Ölçüm: ") and b.endswith(" = 72,5%") for b in bodies)
+    assert "Hedef tuttu: %85 doğru kategori" in bodies and "Hedef tutmadı: Ortalama atama süresi 1 saatin altına insin" in bodies
+    assert "Hedef eklendi: Ortalama atama süresi 1 saatin altına insin (son tarih 01.01.2020)" in bodies
 
 
 def test_admin_account_is_bootstrapped_from_settings(client):

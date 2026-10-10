@@ -63,6 +63,10 @@ _ADDED_COLUMNS = [
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS collab_rating INTEGER",
     "ALTER TABLE pilots ADD COLUMN IF NOT EXISTS startup_feedback_at TIMESTAMPTZ",
     "ALTER TABLE milestones ADD COLUMN IF NOT EXISTS owner VARCHAR(10) NOT NULL DEFAULT 'ortak'",
+    "ALTER TABLE pilot_metrics ADD COLUMN IF NOT EXISTS due_date DATE",
+    "ALTER TABLE pilot_metrics ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'bekliyor'",
+    "ALTER TABLE pilot_metrics ADD COLUMN IF NOT EXISTS result_note TEXT",
+    "ALTER TABLE pilot_metrics ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ",
     "UPDATE pilots p SET brief_id = m.brief_id, startup_id = m.startup_id FROM matches m "
     "WHERE p.match_id = m.id AND p.brief_id IS NULL",
 ]

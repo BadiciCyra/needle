@@ -157,25 +157,16 @@ export interface Pilot {
 
 export type NextStep = 'satin_alma' | 'genisletme' | 'yeni_pilot' | 'bitir'
 
-export interface Measurement {
-  id: number
-  value: number
-  measured_on: string
-  note: string | null
-  author_role: string
-}
+export type GoalStatus = 'bekliyor' | 'tuttu' | 'tutmadi'
 
 export interface Metric {
   id: number
   name: string
-  unit: string | null
-  baseline: number | null
-  target: number | null
-  direction: 'artis' | 'azalis'
-  latest: number | null
-  progress: number | null
-  achieved: boolean | null
-  measurements: Measurement[]
+  due_date: string | null
+  status: GoalStatus
+  result_note: string | null
+  resolved_at: string | null
+  overdue: boolean
 }
 
 export interface Activity {
@@ -211,10 +202,7 @@ export interface PilotPlanInput {
 
 export interface MetricInput {
   name: string
-  unit: string | null
-  baseline: number | null
-  target: number | null
-  direction: 'artis' | 'azalis'
+  due_date: string | null
 }
 
 export interface Health {

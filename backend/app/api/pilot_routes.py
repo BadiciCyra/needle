@@ -9,7 +9,7 @@ import re
 from datetime import date, datetime, time, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.api import schemas as api
@@ -56,10 +56,6 @@ def _short(text: str, limit: int = 60) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
-def _fmt(value: float) -> str:
-    return f"{value:g}".replace(".", ",")
-
-
 def duration_days(timeline: str | None) -> int:
     """Brief'teki süre metninden ("3 ay", "6 hafta içinde") gün sayısı; anlaşılmazsa 90."""
     match = re.search(r"(\d+)\s*(gün|gun|hafta|ay)", (timeline or "").lower())
@@ -67,17 +63,6 @@ def duration_days(timeline: str | None) -> int:
         return 90
     amount, unit = int(match.group(1)), match.group(2)
     return max(7, amount * {"gün": 1, "gun": 1, "hafta": 7, "ay": 30}[unit])
-
-
-def metric_from_criteria(criteria: str | None) -> dict | None:
-    """Başarı kriterinden ilk hedefi çıkarır: "%85 doğruluk" → hedef 85, birim %."""
-    if not criteria or not criteria.strip():
-        return None
-    text = criteria.strip()
-    direction = "azalis" if re.search(r"azal|düş|dus|indir|kısal|kisal", text.lower()) else "artis"
-    number = re.search(r"%\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*%", text)
-    target = float((number.group(1) or number.group(2)).replace(",", ".")) if number else None
-    return {"name": text[:200], "unit": "%" if number else None, "target": target, "direction": direction}
 
 
 def apply_plan_defaults(session: Session, pilot: Pilot) -> None:
@@ -104,9 +89,9 @@ def apply_plan_defaults(session: Session, pilot: Pilot) -> None:
             session.add(Milestone(pilot_id=pilot.id, title=title, due_date=due, owner=owner))
 
     has_metric = session.scalar(select(PilotMetric.id).where(PilotMetric.pilot_id == pilot.id).limit(1))
-    suggestion = metric_from_criteria(data.get("success_criteria"))
-    if not has_metric and suggestion:
-        session.add(PilotMetric(pilot_id=pilot.id, **suggestion))
+    criteria = (data.get("success_criteria") or "").strip()
+    if not has_metric and criteria:
+        session.add(PilotMetric(pilot_id=pilot.id, name=criteria[:200], due_date=pilot.end_date))
     session.flush()
 
 
@@ -141,47 +126,22 @@ def _milestones(session: Session, pilot: Pilot) -> list[api.MilestoneOut]:
     ]
 
 
-def _progress(metric: PilotMetric, latest: float | None) -> tuple[float | None, bool | None]:
-    if latest is None or metric.target is None:
-        return None, None
-    achieved = latest >= metric.target if metric.direction == "artis" else latest <= metric.target
-    if metric.baseline is not None and metric.baseline != metric.target:
-        share = (latest - metric.baseline) / (metric.target - metric.baseline)
-    elif metric.direction == "artis" and metric.target:
-        share = latest / metric.target
-    else:
-        return (1.0 if achieved else None), achieved
-    return max(0.0, min(1.0, share)), achieved
-
-
 def _metrics(session: Session, pilot: Pilot) -> list[api.MetricOut]:
-    out = []
-    for metric in session.scalars(select(PilotMetric).where(PilotMetric.pilot_id == pilot.id).order_by(PilotMetric.id)):
-        rows = session.scalars(
-            select(MetricMeasurement)
-            .where(MetricMeasurement.metric_id == metric.id)
-            .order_by(MetricMeasurement.measured_on, MetricMeasurement.id)
-        ).all()
-        latest = rows[-1].value if rows else None
-        progress, achieved = _progress(metric, latest)
-        out.append(
-            api.MetricOut(
-                id=metric.id,
-                name=metric.name,
-                unit=metric.unit,
-                baseline=metric.baseline,
-                target=metric.target,
-                direction=metric.direction,
-                latest=latest,
-                progress=progress,
-                achieved=achieved,
-                measurements=[
-                    api.MeasurementOut(id=r.id, value=r.value, measured_on=r.measured_on, note=r.note, author_role=r.author_role)
-                    for r in rows
-                ],
-            )
+    today = _today()
+    return [
+        api.MetricOut(
+            id=m.id,
+            name=m.name,
+            due_date=m.due_date,
+            status=m.status,
+            result_note=m.result_note,
+            resolved_at=m.resolved_at,
+            overdue=m.status == "bekliyor" and m.due_date is not None and m.due_date < today,
         )
-    return out
+        for m in session.scalars(
+            select(PilotMetric).where(PilotMetric.pilot_id == pilot.id).order_by(PilotMetric.due_date.nulls_last(), PilotMetric.id)
+        )
+    ]
 
 
 def pilot_out(session: Session, pilot: Pilot, settings: Settings) -> api.PilotOut:
@@ -430,7 +390,11 @@ def reopen_milestone(
     return pilot_detail(session, pilot, settings)
 
 
-@router.post("/pilots/{pilot_id}/metrics", response_model=api.PilotDetailOut, summary="Ölçülebilir hedef ekle")
+def _due_text(value: date | None) -> str:
+    return f" (son tarih {value.strftime('%d.%m.%Y')})" if value else ""
+
+
+@router.post("/pilots/{pilot_id}/metrics", response_model=api.PilotDetailOut, summary="Hedef ekle")
 def add_metric(
     pilot_id: int,
     payload: api.MetricIn,
@@ -439,9 +403,8 @@ def add_metric(
     settings: Settings = Depends(get_settings),
 ):
     pilot = get_pilot(session, pilot_id, user)
-    session.add(PilotMetric(pilot_id=pilot.id, **payload.model_dump()))
-    target = f" (hedef {_fmt(payload.target)}{payload.unit or ''})" if payload.target is not None else ""
-    log_event(session, pilot, f"Hedef eklendi: {_short(payload.name)}{target}", user)
+    session.add(PilotMetric(pilot_id=pilot.id, name=payload.name.strip(), due_date=payload.due_date))
+    log_event(session, pilot, f"Hedef eklendi: {_short(payload.name)}{_due_text(payload.due_date)}", user)
     session.commit()
     return pilot_detail(session, pilot, settings)
 
@@ -455,9 +418,27 @@ def edit_metric(
     settings: Settings = Depends(get_settings),
 ):
     metric, pilot = _metric_pilot(session, metric_id, user)
-    for field, value in payload.model_dump().items():
-        setattr(metric, field, value)
-    log_event(session, pilot, f"Hedef güncellendi: {_short(metric.name)}", user)
+    metric.name = payload.name.strip()
+    metric.due_date = payload.due_date
+    log_event(session, pilot, f"Hedef güncellendi: {_short(metric.name)}{_due_text(metric.due_date)}", user)
+    session.commit()
+    return pilot_detail(session, pilot, settings)
+
+
+@router.post("/metrics/{metric_id}/result", response_model=api.PilotDetailOut, summary="Hedefin sonucunu işaretle")
+def set_metric_result(
+    metric_id: int,
+    payload: api.MetricResultIn,
+    session: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    settings: Settings = Depends(get_settings),
+):
+    metric, pilot = _metric_pilot(session, metric_id, user)
+    metric.status = payload.status
+    metric.result_note = (payload.note or "").strip() or None
+    metric.resolved_at = None if payload.status == "bekliyor" else _now()
+    label = {"tuttu": "tuttu", "tutmadi": "tutmadı", "bekliyor": "yeniden açıldı"}[payload.status]
+    log_event(session, pilot, f"Hedef {label}: {_short(metric.name)}", user)
     session.commit()
     return pilot_detail(session, pilot, settings)
 
@@ -471,47 +452,8 @@ def delete_metric(
 ):
     metric, pilot = _metric_pilot(session, metric_id, user)
     log_event(session, pilot, f"Hedef silindi: {_short(metric.name)}", user)
+    session.execute(delete(MetricMeasurement).where(MetricMeasurement.metric_id == metric.id))
     session.delete(metric)
-    session.commit()
-    return pilot_detail(session, pilot, settings)
-
-
-@router.post("/metrics/{metric_id}/measurements", response_model=api.PilotDetailOut, summary="Ölçüm ekle")
-def add_measurement(
-    metric_id: int,
-    payload: api.MeasurementIn,
-    session: Session = Depends(get_db),
-    user: User = Depends(current_user),
-    settings: Settings = Depends(get_settings),
-):
-    metric, pilot = _metric_pilot(session, metric_id, user)
-    session.add(
-        MetricMeasurement(
-            metric_id=metric.id,
-            value=payload.value,
-            measured_on=payload.measured_on or _today(),
-            note=(payload.note or "").strip() or None,
-            author_role=ROLE_LABEL.get(user.role, "sistem"),
-        )
-    )
-    log_event(session, pilot, f"Ölçüm: {_short(metric.name)} = {_fmt(payload.value)}{metric.unit or ''}", user)
-    session.commit()
-    return pilot_detail(session, pilot, settings)
-
-
-@router.delete("/measurements/{measurement_id}", response_model=api.PilotDetailOut, summary="Ölçümü sil")
-def delete_measurement(
-    measurement_id: int,
-    session: Session = Depends(get_db),
-    user: User = Depends(current_user),
-    settings: Settings = Depends(get_settings),
-):
-    row = session.get(MetricMeasurement, measurement_id)
-    if row is None:
-        raise HTTPException(404, "Ölçüm bulunamadı")
-    metric, pilot = _metric_pilot(session, row.metric_id, user)
-    session.delete(row)
-    log_event(session, pilot, f"Ölçüm silindi: {_short(metric.name)} = {_fmt(row.value)}{metric.unit or ''}", user)
     session.commit()
     return pilot_detail(session, pilot, settings)
 

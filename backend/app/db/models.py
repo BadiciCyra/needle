@@ -264,6 +264,10 @@ class PilotMetric(Base):
     baseline: Mapped[float | None] = mapped_column(Float)
     target: Mapped[float | None] = mapped_column(Float)
     direction: Mapped[str] = mapped_column(String(10), default="artis")
+    due_date: Mapped[date | None] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(20), default="bekliyor")
+    result_note: Mapped[str | None] = mapped_column(Text)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
