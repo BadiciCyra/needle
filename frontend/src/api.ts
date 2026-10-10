@@ -1,5 +1,6 @@
 import type {
   Claim,
+  GoalStatus,
   MetricInput,
   MilestoneOwner,
   NextStep,
@@ -109,9 +110,7 @@ export const api = {
   editMetric: (metricId: number, body: MetricInput) =>
     request<PilotDetail>(`/metrics/${metricId}`, { method: 'PATCH', body: JSON.stringify(body) }),
   deleteMetric: (metricId: number) => request<PilotDetail>(`/metrics/${metricId}`, { method: 'DELETE' }),
-  addMeasurement: (metricId: number, value: number, measured_on?: string, note?: string) =>
-    post<PilotDetail>(`/metrics/${metricId}/measurements`, { value, measured_on: measured_on || null, note: note || null }),
-  deleteMeasurement: (measurementId: number) => request<PilotDetail>(`/measurements/${measurementId}`, { method: 'DELETE' }),
+  setMetricResult: (metricId: number, status: GoalStatus, note?: string) => post<PilotDetail>(`/metrics/${metricId}/result`, { status, note: note || null }),
   addNote: (pilotId: number, body: string) => post<PilotDetail>(`/pilots/${pilotId}/activity`, { body }),
   evaluatePilot: (pilotId: number, body: { result: PilotResult; next_step: NextStep; startup_rating: number; comment?: string }) =>
     post<PilotDetail>(`/pilots/${pilotId}/evaluation`, body),

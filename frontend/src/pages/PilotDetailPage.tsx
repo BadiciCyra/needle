@@ -2,14 +2,12 @@ import {
   ActionIcon,
   Alert,
   Anchor,
-  Autocomplete,
   Button,
   Checkbox,
   Grid,
   Group,
   Menu,
   Modal,
-  NumberInput,
   Progress,
   Rating,
   SegmentedControl,
@@ -23,21 +21,19 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconAlertCircle, IconDots, IconPencil, IconPlus, IconSparkles, IconTrash } from '@tabler/icons-react'
+import { IconAlertCircle, IconDots, IconPencil, IconSparkles, IconTrash } from '@tabler/icons-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { api } from '../api'
 import { useAuth } from '../auth'
-import MetricChart from '../components/MetricChart'
 import { MetaItem, OrgAvatar, PageLoader, SectionCard, Tag } from '../components/ui'
 import { useAppData } from '../data'
-import { formatDate, METRIC_UNITS, NEXT_STEP, OWNER_LABEL, PILOT_RESULT, PILOT_STATUS, ROLE_LABEL, suggestUnit, TAG_COLOR, timeAgo, withUnit } from '../labels'
-import type { Metric, MetricInput, MilestoneOwner, NextStep, PilotDetail, PilotResult, PilotStatus } from '../types'
+import { formatDate, NEXT_STEP, OWNER_LABEL, PILOT_RESULT, PILOT_STATUS, ROLE_LABEL, TAG_COLOR, timeAgo } from '../labels'
+import type { GoalStatus, Metric, MilestoneOwner, NextStep, PilotDetail, PilotResult, PilotStatus } from '../types'
 
 type Run = (action: () => Promise<PilotDetail>, message?: string) => Promise<boolean>
 
-const fmt = (v: number | null, unit?: string | null) => (v === null ? '—' : withUnit(v, unit))
 const dayInput = (value: string | null) => (value ? value.slice(0, 10) : '')
 
 function PlanSection({ pilot, run }: { pilot: PilotDetail; run: Run }) {
@@ -138,165 +134,123 @@ function PlanSection({ pilot, run }: { pilot: PilotDetail; run: Run }) {
   )
 }
 
-const EMPTY_METRIC: MetricInput = { name: '', unit: '', baseline: null, target: null, direction: 'artis' }
+const GOAL_STATUS: Record<GoalStatus, { label: string; color: string }> = {
+  bekliyor: { label: 'Sürüyor', color: TAG_COLOR.gray },
+  tuttu: { label: 'Tuttu', color: TAG_COLOR.green },
+  tutmadi: { label: 'Tutmadı', color: TAG_COLOR.red },
+}
 
-function MetricForm({ initial, onSubmit, onCancel }: { initial: MetricInput; onSubmit: (m: MetricInput) => void; onCancel: () => void }) {
-  const [m, setM] = useState<MetricInput>(initial)
-  const [unitTouched, setUnitTouched] = useState(!!initial.unit)
-  const num = (v: string | number) => (v === '' ? null : Number(v))
-  const unit = m.unit?.trim() || null
-  const percent = unit === '%'
-  const unitSuffix = unit ? (
-    <Text size="xs" c="dimmed" pr={28} style={{ whiteSpace: 'nowrap' }}>
-      {unit}
-    </Text>
-  ) : undefined
-  const valueProps = {
-    decimalSeparator: ',',
-    min: percent ? 0 : undefined,
-    max: percent ? 100 : undefined,
-    rightSection: unitSuffix,
-    rightSectionWidth: unit ? 64 : undefined,
-  }
-  const setName = (name: string) => setM({ ...m, name, unit: unitTouched ? m.unit : (suggestUnit(name) ?? '') })
+function GoalRow({ goal, run }: { goal: Metric; run: Run }) {
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState(goal.name)
+  const [due, setDue] = useState(goal.due_date ?? '')
+  const status = GOAL_STATUS[goal.status]
+  const result = (next: GoalStatus, message: string) => run(() => api.setMetricResult(goal.id, next), message)
   return (
-    <Stack>
-      <TextInput label="Hedef" placeholder="Örn. Şikayetlerin doğru kategoriye atanma oranı" value={m.name} onChange={(e) => setName(e.currentTarget.value)} />
-      <SimpleGrid cols={{ base: 1, xs: 3 }}>
-        <Autocomplete
-          label="Birim"
-          description={!unitTouched && unit ? 'Addan önerildi' : 'Seçin ya da yazın'}
-          placeholder="Seçin ya da yazın"
-          data={METRIC_UNITS}
-          value={m.unit ?? ''}
-          onChange={(v) => {
-            setUnitTouched(true)
-            setM({ ...m, unit: v })
-          }}
-          maxLength={20}
-          comboboxProps={{ withinPortal: true }}
-        />
-        <NumberInput label="Başlangıç değeri" description="Pilottan önce" {...valueProps} value={m.baseline ?? ''} onChange={(v) => setM({ ...m, baseline: num(v) })} />
-        <NumberInput label="Hedef değer" description="Pilot sonunda" {...valueProps} value={m.target ?? ''} onChange={(v) => setM({ ...m, target: num(v) })} />
-      </SimpleGrid>
-      <div>
-        <Text size="sm" fw={500} mb={4}>
-          Yön
+    <Group className="app-list-row" px="lg" py="sm" justify="space-between" wrap="nowrap" align="flex-start">
+      <div style={{ minWidth: 0 }}>
+        <Text size="sm" fw={500}>
+          {goal.name}
         </Text>
-        <SegmentedControl
-          value={m.direction}
-          onChange={(v) => setM({ ...m, direction: v as MetricInput['direction'] })}
-          data={[
-            { value: 'artis', label: 'Artması iyi' },
-            { value: 'azalis', label: 'Azalması iyi' },
-          ]}
-        />
+        <Text size="xs" c={goal.overdue ? 'var(--app-danger)' : 'dimmed'}>
+          {goal.status !== 'bekliyor' && goal.resolved_at
+            ? `${status.label} · ${formatDate(goal.resolved_at)}`
+            : goal.due_date
+              ? `${goal.overdue ? 'Tarihi geçti' : 'Son tarih'} · ${formatDate(goal.due_date)}`
+              : 'Son tarih belirtilmedi'}
+          {goal.result_note ? ` · ${goal.result_note}` : ''}
+        </Text>
       </div>
-      <Group justify="flex-end">
-        <Button variant="default" onClick={onCancel}>
-          Vazgeç
-        </Button>
-        <Button disabled={m.name.trim().length < 2} onClick={() => onSubmit({ ...m, name: m.name.trim(), unit: m.unit?.trim() || null })}>
-          Kaydet
-        </Button>
+      <Group gap={6} wrap="nowrap">
+        {goal.status === 'bekliyor' ? (
+          <>
+            <Button size="compact-xs" variant="default" onClick={() => result('tuttu', 'Hedef tuttu olarak işaretlendi')}>
+              Tuttu
+            </Button>
+            <Button size="compact-xs" variant="default" onClick={() => result('tutmadi', 'Hedef tutmadı olarak işaretlendi')}>
+              Tutmadı
+            </Button>
+          </>
+        ) : (
+          <Tag color={status.color}>{status.label}</Tag>
+        )}
+        <Menu position="bottom-end">
+          <Menu.Target>
+            <ActionIcon variant="subtle" color="gray" aria-label="Hedef işlemleri">
+              <IconDots size={16} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditing(true)}>
+              Düzenle
+            </Menu.Item>
+            {goal.status !== 'bekliyor' && <Menu.Item onClick={() => result('bekliyor', 'Hedef yeniden açıldı')}>Sonucu geri al</Menu.Item>}
+            <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => run(() => api.deleteMetric(goal.id), 'Hedef silindi')}>
+              Sil
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Group>
-    </Stack>
+      <Modal opened={editing} onClose={() => setEditing(false)} title={<Text fw={600}>Hedefi düzenle</Text>}>
+        <Stack>
+          <TextInput label="Hedef" value={name} onChange={(e) => setName(e.currentTarget.value)} />
+          <TextInput label="Son tarih" type="date" value={due} onChange={(e) => setDue(e.currentTarget.value)} />
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setEditing(false)}>
+              Vazgeç
+            </Button>
+            <Button
+              disabled={name.trim().length < 2}
+              onClick={async () => (await run(() => api.editMetric(goal.id, { name: name.trim(), due_date: due || null }), 'Hedef güncellendi')) && setEditing(false)}
+            >
+              Kaydet
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </Group>
   )
 }
 
-function MetricRow({ metric, run }: { metric: Metric; run: Run }) {
-  const [value, setValue] = useState<string | number>('')
-  const [date, setDate] = useState('')
-  const [editing, setEditing] = useState(false)
-  const color = metric.achieved ? 'green' : 'ink'
+function MetricsSection({ pilot, run }: { pilot: PilotDetail; run: Run }) {
+  const [name, setName] = useState('')
+  const [due, setDue] = useState('')
+  const reached = pilot.metrics.filter((m) => m.status === 'tuttu').length
+  const late = pilot.metrics.filter((m) => m.overdue).length
   return (
-    <Stack gap="xs" className="app-list-row" p="md">
-      <Group justify="space-between" wrap="nowrap" align="flex-start">
-        <div style={{ minWidth: 0 }}>
-          <Text fw={600} size="sm">
-            {metric.name}
-          </Text>
-          <Text size="xs" c="dimmed">
-            Şu an {fmt(metric.latest, metric.unit)} · hedef {fmt(metric.target, metric.unit)}
-            {metric.baseline !== null ? ` · başlangıç ${fmt(metric.baseline, metric.unit)}` : ''} ·{' '}
-            {metric.direction === 'artis' ? 'artması iyi' : 'azalması iyi'}
-          </Text>
-        </div>
-        <Group gap={6} wrap="nowrap">
-          {metric.achieved && <Tag color={TAG_COLOR.green}>Hedef tuttu</Tag>}
-          <Menu position="bottom-end">
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" aria-label="Hedef işlemleri">
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditing(true)}>
-                Düzenle
-              </Menu.Item>
-              <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => run(() => api.deleteMetric(metric.id), 'Hedef silindi')}>
-                Sil
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-      </Group>
-      {metric.progress !== null && <Progress value={metric.progress * 100} color={color} />}
-      <MetricChart metric={metric} />
-      <Group gap="xs" wrap="nowrap" align="flex-end">
-        <NumberInput size="xs" placeholder="Yeni ölçüm" decimalSeparator="," value={value} onChange={setValue} style={{ flex: 1 }} />
-        <TextInput size="xs" type="date" value={date} onChange={(e) => setDate(e.currentTarget.value)} w={140} />
+    <SectionCard
+      title="Hedefler"
+      description={
+        pilot.metrics.length
+          ? `${reached}/${pilot.metrics.length} hedef tuttu${late ? ` · ${late} tanesinin tarihi geçti` : ''}`
+          : 'Pilotun neyi başarması gerektiği ve ne zamana kadar'
+      }
+      padding="0"
+    >
+      {pilot.metrics.length === 0 && (
+        <Text size="sm" c="dimmed" p="lg">
+          Henüz hedef yok. Örneğin “Şikayetlerin %85’i doğru kategoriye atansın” yazıp son tarihini seçin.
+        </Text>
+      )}
+      {pilot.metrics.map((m) => (
+        <GoalRow key={m.id} goal={m} run={run} />
+      ))}
+      <Group gap="xs" p="md" wrap="nowrap" align="flex-end" style={{ borderTop: '1px solid var(--app-border)' }}>
+        <TextInput size="xs" placeholder="Yeni hedef" value={name} onChange={(e) => setName(e.currentTarget.value)} style={{ flex: 1 }} />
+        <TextInput size="xs" type="date" value={due} onChange={(e) => setDue(e.currentTarget.value)} w={140} aria-label="Son tarih" />
         <Button
           size="xs"
-          disabled={value === ''}
+          disabled={name.trim().length < 2}
           onClick={async () => {
-            if (await run(() => api.addMeasurement(metric.id, Number(value), date), 'Ölçüm eklendi')) {
-              setValue('')
-              setDate('')
+            if (await run(() => api.addMetric(pilot.id, { name: name.trim(), due_date: due || null }), 'Hedef eklendi')) {
+              setName('')
+              setDue('')
             }
           }}
         >
           Ekle
         </Button>
       </Group>
-      <Modal opened={editing} onClose={() => setEditing(false)} title={<Text fw={600}>Hedefi düzenle</Text>}>
-        <MetricForm
-          initial={{ name: metric.name, unit: metric.unit, baseline: metric.baseline, target: metric.target, direction: metric.direction }}
-          onCancel={() => setEditing(false)}
-          onSubmit={async (m) => (await run(() => api.editMetric(metric.id, m), 'Hedef güncellendi')) && setEditing(false)}
-        />
-      </Modal>
-    </Stack>
-  )
-}
-
-function MetricsSection({ pilot, run }: { pilot: PilotDetail; run: Run }) {
-  const [adding, setAdding] = useState(false)
-  return (
-    <SectionCard
-      title="Ölçülebilir hedefler"
-      description="Başarı kriterini sayıya bağlayın; ölçümler eklendikçe gidişat çizilir"
-      padding="0"
-      action={
-        <Button size="xs" variant="default" leftSection={<IconPlus size={14} />} onClick={() => setAdding(true)}>
-          Hedef ekle
-        </Button>
-      }
-    >
-      {pilot.metrics.length === 0 ? (
-        <Text size="sm" c="dimmed" p="lg">
-          Henüz hedef yok. Örneğin “Şikayetlerin %85’i doğru kategoriye atansın” gibi ölçülebilir bir hedef ekleyin.
-        </Text>
-      ) : (
-        pilot.metrics.map((m) => <MetricRow key={m.id} metric={m} run={run} />)
-      )}
-      <Modal opened={adding} onClose={() => setAdding(false)} title={<Text fw={600}>Ölçülebilir hedef ekle</Text>}>
-        <MetricForm
-          initial={EMPTY_METRIC}
-          onCancel={() => setAdding(false)}
-          onSubmit={async (m) => (await run(() => api.addMetric(pilot.id, m), 'Hedef eklendi')) && setAdding(false)}
-        />
-      </Modal>
     </SectionCard>
   )
 }

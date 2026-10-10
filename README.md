@@ -118,8 +118,9 @@ uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Exc
 Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
 
 **Pilot:** Her pilotun kendi sayfası var. Pilot açılınca plan brief'ten önerilir (amaç, kapsam, brief'teki süreye göre
-tarihler, sorumlu tarafı belli beş kilometre taşı ve başarı kriterinden ölçülebilir hedef). Kurum ve girişim hedeflere
-ölçüm ekler, gidişat grafikte görünür; iki taraf güncelleme akışında birbirine not yazar ve her değişiklik akışa düşer.
+tarihler, sorumlu tarafı belli beş kilometre taşı ve başarı kriterinden ilk hedef). Hedef, ne başarılacağı ve son
+tarihinden ibarettir; iki taraf da hedefi "tuttu" ya da "tutmadı" diye işaretler, tarihi geçen hedef işaretlenir. İki
+taraf güncelleme akışında birbirine not yazar ve her değişiklik akışa düşer.
 Pilot bitince kurum işe yarayıp yaramadığını, sonraki adımı (satın alma, genişletme, yeni pilot, bitirme) ve girişime
 puanını kaydeder; girişim de kendi değerlendirmesini yazar.
 

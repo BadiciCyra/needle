@@ -200,39 +200,27 @@ class PilotPlanIn(BaseModel):
     startup_contact: str | None = Field(None, max_length=200)
 
 
+GoalStatus = Literal["bekliyor", "tuttu", "tutmadi"]
+
+
 class MetricIn(BaseModel):
-    name: str = Field(min_length=2, max_length=200)
-    unit: str | None = Field(None, max_length=30)
-    baseline: float | None = None
-    target: float | None = None
-    direction: Literal["artis", "azalis"] = "artis"
+    name: str = Field(min_length=2, max_length=200, description="Hedefin ne olduğu, ör. 'Şikayetlerin %85'i doğru kategoriye atansın'")
+    due_date: date | None = Field(None, description="Hedefe ulaşılması gereken tarih")
 
 
-class MeasurementIn(BaseModel):
-    value: float
-    measured_on: date | None = None
-    note: str | None = Field(None, max_length=300)
-
-
-class MeasurementOut(BaseModel):
-    id: int
-    value: float
-    measured_on: date
-    note: str | None
-    author_role: str
+class MetricResultIn(BaseModel):
+    status: GoalStatus
+    note: str | None = Field(None, max_length=1000)
 
 
 class MetricOut(BaseModel):
     id: int
     name: str
-    unit: str | None
-    baseline: float | None
-    target: float | None
-    direction: Literal["artis", "azalis"]
-    latest: float | None
-    progress: float | None = Field(description="Hedefe ilerleme 0-1 (hesaplanabiliyorsa)")
-    achieved: bool | None
-    measurements: list[MeasurementOut]
+    due_date: date | None
+    status: GoalStatus
+    result_note: str | None
+    resolved_at: datetime | None
+    overdue: bool = Field(description="Tarihi geçti ve hâlâ sonuçlanmadı")
 
 
 class ActivityIn(BaseModel):
