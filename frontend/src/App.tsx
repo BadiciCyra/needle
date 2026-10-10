@@ -120,11 +120,6 @@ function SystemStatus() {
           {apiDown ? 'API’ye ulaşılamıyor' : ok ? 'Çevrimiçi' : 'Bağlanıyor…'}
         </Text>
       </Group>
-      {health && (
-        <Text size="xs" c="#7a756a" mt={4} ff="monospace">
-          {health.llm_model}
-        </Text>
-      )}
     </Box>
   )
 }

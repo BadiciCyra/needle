@@ -77,8 +77,7 @@ export const BRIEF_FIELD_LABEL: Record<string, string> = {
   min_maturity: 'En düşük olgunluk',
 }
 
-export const formatDate = (value: string | null) =>
-  value ? new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
+export const formatDate = (value: string | null) => (value ? new Date(value).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—')
 
 const rtf = new Intl.RelativeTimeFormat('tr', { numeric: 'auto' })
 
@@ -105,4 +104,33 @@ export const trLower = (s: string) => s.toLocaleLowerCase('tr-TR')
 export const trFilter: OptionsFilter = ({ options, search }) => {
   const q = trLower(search.trim())
   return (options as ComboboxItem[]).filter((o) => trLower(o.label).includes(q))
+}
+
+export const METRIC_UNITS = [
+  { group: 'Oran', items: ['%'] },
+  { group: 'Sayı', items: ['adet'] },
+  { group: 'Süre', items: ['dakika', 'saat', 'gün'] },
+  { group: 'Para', items: ['TL'] },
+  { group: 'Ölçek', items: ['puan'] },
+  { group: 'Fiziksel', items: ['kWh', 'ton', 'km'] },
+]
+
+const UNIT_HINTS: [RegExp, string][] = [
+  [/oran|doğruluk|yüzde|isabet|doluluk|başarı/, '%'],
+  [/maliyet|tasarruf|gider|ücret|harcama|gelir|ciro/, 'TL'],
+  [/memnuniyet|nps|puan|skor/, 'puan'],
+  [/enerji|elektrik|kwh/, 'kWh'],
+  [/süre|zaman|bekleme|gecikme/, 'dakika'],
+  [/sayı|adet|miktar/, 'adet'],
+]
+
+export function suggestUnit(name: string): string | null {
+  const text = trLower(name)
+  return UNIT_HINTS.find(([pattern]) => pattern.test(text))?.[1] ?? null
+}
+
+export function withUnit(value: number, unit?: string | null): string {
+  const n = value.toLocaleString('tr-TR', { maximumFractionDigits: 2 })
+  if (!unit) return n
+  return unit === '%' ? `%${n}` : `${n} ${unit}`
 }

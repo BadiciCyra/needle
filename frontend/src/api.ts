@@ -135,7 +135,7 @@ export const api = {
   report: () => request<Report>('/admin/report'),
 
   introductions: () => request<Introduction[]>('/introductions'),
-  createIntroduction: (body: { brief_id: number; startup_id: string; note: string | null }) => post<Introduction>('/introductions', body),
+  createIntroduction: (body: { brief_id?: number; title?: string; problem?: string; startup_id: string; note: string | null }) => post<Introduction>('/introductions', body),
   respondIntroduction: (id: number, decision: 'kabul' | 'ret', note?: string) =>
     post<Introduction>(`/introductions/${id}/respond`, { decision, note }),
   createIntroEmail: (id: number) => post<Introduction>(`/introductions/${id}/email/draft`),

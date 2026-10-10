@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Alert,
   Anchor,
+  Autocomplete,
   Button,
   Checkbox,
   Grid,
@@ -31,12 +32,12 @@ import { useAuth } from '../auth'
 import MetricChart from '../components/MetricChart'
 import { MetaItem, OrgAvatar, PageLoader, SectionCard, Tag } from '../components/ui'
 import { useAppData } from '../data'
-import { formatDate, NEXT_STEP, OWNER_LABEL, PILOT_RESULT, PILOT_STATUS, ROLE_LABEL, TAG_COLOR, timeAgo } from '../labels'
+import { formatDate, METRIC_UNITS, NEXT_STEP, OWNER_LABEL, PILOT_RESULT, PILOT_STATUS, ROLE_LABEL, suggestUnit, TAG_COLOR, timeAgo, withUnit } from '../labels'
 import type { Metric, MetricInput, MilestoneOwner, NextStep, PilotDetail, PilotResult, PilotStatus } from '../types'
 
 type Run = (action: () => Promise<PilotDetail>, message?: string) => Promise<boolean>
 
-const fmt = (v: number | null, unit?: string | null) => (v === null ? '—' : `${v.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}${unit ?? ''}`)
+const fmt = (v: number | null, unit?: string | null) => (v === null ? '—' : withUnit(v, unit))
 const dayInput = (value: string | null) => (value ? value.slice(0, 10) : '')
 
 function PlanSection({ pilot, run }: { pilot: PilotDetail; run: Run }) {
@@ -141,14 +142,42 @@ const EMPTY_METRIC: MetricInput = { name: '', unit: '', baseline: null, target: 
 
 function MetricForm({ initial, onSubmit, onCancel }: { initial: MetricInput; onSubmit: (m: MetricInput) => void; onCancel: () => void }) {
   const [m, setM] = useState<MetricInput>(initial)
+  const [unitTouched, setUnitTouched] = useState(!!initial.unit)
   const num = (v: string | number) => (v === '' ? null : Number(v))
+  const unit = m.unit?.trim() || null
+  const percent = unit === '%'
+  const unitSuffix = unit ? (
+    <Text size="xs" c="dimmed" pr={28} style={{ whiteSpace: 'nowrap' }}>
+      {unit}
+    </Text>
+  ) : undefined
+  const valueProps = {
+    decimalSeparator: ',',
+    min: percent ? 0 : undefined,
+    max: percent ? 100 : undefined,
+    rightSection: unitSuffix,
+    rightSectionWidth: unit ? 64 : undefined,
+  }
+  const setName = (name: string) => setM({ ...m, name, unit: unitTouched ? m.unit : (suggestUnit(name) ?? '') })
   return (
     <Stack>
-      <TextInput label="Hedef" placeholder="Örn. Şikayetlerin doğru kategoriye atanma oranı" value={m.name} onChange={(e) => setM({ ...m, name: e.currentTarget.value })} />
-      <SimpleGrid cols={3}>
-        <TextInput label="Birim" placeholder="%, adet, gün…" value={m.unit ?? ''} onChange={(e) => setM({ ...m, unit: e.currentTarget.value })} />
-        <NumberInput label="Başlangıç değeri" decimalSeparator="," value={m.baseline ?? ''} onChange={(v) => setM({ ...m, baseline: num(v) })} />
-        <NumberInput label="Hedef değer" decimalSeparator="," value={m.target ?? ''} onChange={(v) => setM({ ...m, target: num(v) })} />
+      <TextInput label="Hedef" placeholder="Örn. Şikayetlerin doğru kategoriye atanma oranı" value={m.name} onChange={(e) => setName(e.currentTarget.value)} />
+      <SimpleGrid cols={{ base: 1, xs: 3 }}>
+        <Autocomplete
+          label="Birim"
+          description={!unitTouched && unit ? 'Addan önerildi' : 'Seçin ya da yazın'}
+          placeholder="Seçin ya da yazın"
+          data={METRIC_UNITS}
+          value={m.unit ?? ''}
+          onChange={(v) => {
+            setUnitTouched(true)
+            setM({ ...m, unit: v })
+          }}
+          maxLength={20}
+          comboboxProps={{ withinPortal: true }}
+        />
+        <NumberInput label="Başlangıç değeri" description="Pilottan önce" {...valueProps} value={m.baseline ?? ''} onChange={(v) => setM({ ...m, baseline: num(v) })} />
+        <NumberInput label="Hedef değer" description="Pilot sonunda" {...valueProps} value={m.target ?? ''} onChange={(v) => setM({ ...m, target: num(v) })} />
       </SimpleGrid>
       <div>
         <Text size="sm" fw={500} mb={4}>

@@ -745,3 +745,20 @@ def test_firm_can_request_introduction_from_pool(client):
     startup = TestClient(app)
     register(startup, "ali@metinsel.example", account_type="girisim")
     assert startup.post("/introductions", json={"brief_id": brief_id, "startup_id": outside}).status_code == 403
+
+
+def test_firm_can_write_own_problem_when_requesting_introduction(client):
+    register(client, "a@firma-a.example", "Firma A")
+    startup_id = client.get("/startups").json()[0]["id"]
+    body = {"startup_id": startup_id, "title": "Depo sayımı", "problem": "Depolarda stok sayımı elle yapılıyor ve hata çok."}
+
+    intro = client.post("/introductions", json=body)
+    assert intro.status_code == 200, intro.text
+    assert intro.json()["source"] == "havuz" and intro.json()["brief"]["title"] == "Depo sayımı"
+    [need] = client.get("/needs").json()
+    assert need["brief_id"] == intro.json()["brief_id"] and need["status"] == "final"
+    assert client.get(f"/briefs/{need['brief_id']}").json()["brief"]["problem"].startswith("Depolarda")
+
+    assert client.post("/introductions", json={"startup_id": startup_id}).status_code == 422
+    assert client.post("/introductions", json={**body, "brief_id": need["brief_id"]}).status_code == 422
+    assert client.post("/introductions", json={**body, "problem": "kısa"}).status_code == 422

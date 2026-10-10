@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schemas import Brief, FollowUpQuestion, Maturity, MatchResult, MatchResultItem, StartupProfile, TraceStep
 
@@ -116,9 +116,19 @@ class IntroductionOut(BaseModel):
 
 
 class DirectIntroIn(BaseModel):
-    brief_id: int = Field(description="Tanışmanın konusu olan ihtiyaç")
+    brief_id: int | None = Field(None, description="Tanışmanın konusu olan mevcut ihtiyaç")
+    title: str | None = Field(None, min_length=3, max_length=120, description="Listede olmayan sorun için kısa başlık")
+    problem: str | None = Field(None, min_length=20, max_length=4000, description="Listede olmayan sorunun firmanın kendi anlatımı")
     startup_id: str
     note: str | None = Field(None, max_length=2000, description="Girişime giden tanıştırma notu")
+
+    @model_validator(mode="after")
+    def _brief_or_problem(self):
+        if self.brief_id is None and not (self.title and self.problem):
+            raise ValueError("Bir ihtiyaç seçin ya da sorunu başlığıyla birlikte yazın")
+        if self.brief_id is not None and (self.title or self.problem):
+            raise ValueError("Ya mevcut ihtiyacı seçin ya da yeni sorunu yazın, ikisi birden olmaz")
+        return self
 
 
 class IntroResponseIn(BaseModel):

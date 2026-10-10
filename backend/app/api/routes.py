@@ -306,23 +306,48 @@ def decide_match(
     return api.DecisionOut(match_id=match.id, status=match.status, introduction_id=introduction_id)
 
 
+def _own_problem_brief(session: Session, user: User, title: str, problem: str, embedder: Embedder) -> BriefRecord:
+    need = Need(raw_text=problem, organization_id=user.organization_id)
+    session.add(need)
+    session.flush()
+    brief = Brief(title=title, problem=problem)
+    record = BriefRecord(
+        need_id=need.id,
+        status="final",
+        data=brief.model_dump(mode="json"),
+        followup_questions=[],
+        answers={},
+        embedding=embedder.embed_query(brief.to_search_text()),
+    )
+    session.add(record)
+    session.flush()
+    return record
+
+
 @router.post("/introductions", response_model=api.IntroductionOut, summary="Havuzdan doğrudan tanışma iste")
 def create_direct_introduction(
     payload: api.DirectIntroIn,
     session: Session = Depends(get_db),
     user: User = Depends(current_user),
     settings: Settings = Depends(get_settings),
+    embedder: Embedder = Depends(embedder_dep),
 ):
     """Firma, eşleştirmenin önermediği bir girişimle de kendi ihtiyacı için tanışma isteyebilir.
 
     Aynı ihtiyaç ve girişim için bekleyen ya da kabul edilmiş bir tanışma varsa yenisi açılmaz. Girişim bu
     ihtiyacın kısa listesinde öneri olarak duruyorsa öneri kabul edilmiş sayılır ve tanışmaya bağlanır.
+
+    Sorun listede yoksa firma başlığını ve anlatımını kendisi yazar; LLM'e gitmeden, yazdığı haliyle
+    tamamlanmış bir ihtiyaç olarak kaydedilir ve tanışma ona bağlanır.
     """
     org_scope(user)
-    record = _get_brief(session, payload.brief_id, user)
     startup = session.get(Startup, payload.startup_id)
     if startup is None or startup.status != "aktif":
         raise HTTPException(404, "Girişim bulunamadı")
+    if payload.brief_id is not None:
+        record = _get_brief(session, payload.brief_id, user)
+    else:
+        record = _own_problem_brief(session, user, payload.title.strip(), payload.problem.strip(), embedder)
     existing = session.scalar(
         select(Introduction).where(
             Introduction.brief_id == record.id,
