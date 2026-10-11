@@ -2,15 +2,17 @@
 
 # 🪡 Needle
 
-**Needs & Leads için açık kaynak eşleştirme ve pilot takip platformu**
+**Kurum ihtiyaçlarını girişimlerle gerekçesiyle eşleştiren ve pilotu sonuna kadar takip eden açık kaynak platform**
 
-Kurumun dağınık ihtiyaç metnini yapılandırılmış bir brief'e çevirir, o brief'i uygun girişimlerle
-**gerekçesiyle** eşleştirir ve eşleşme sonrası pilot sürecini ölçülebilir şekilde takip eder.
+Kurumun dağınık ihtiyaç metnini yapılandırılmış bir brief'e çevirir, girişim havuzundan problemi **doğrudan çözen**
+adayları gerekçesi ve kanıtıyla bulur, tanıştırmadan pilotun kapanış değerlendirmesine kadar süreci tek yerde tutar.
 
 [![CI](https://github.com/BadiciCyra/needle/actions/workflows/ci.yml/badge.svg)](https://github.com/BadiciCyra/needle/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/durum-geli%C5%9Ftirme%20a%C5%9Famas%C4%B1nda-orange)
 ![Zemin360](https://img.shields.io/badge/Zemin360-Hackathon%202026-8A2BE2)
+
+[Problem](#problem) · [Ne yapar](#ne-yapar) · [Eşleştirme nasıl çalışır](#eşleştirme-nasıl-çalışır) · [Kurulum](#kurulum) · [Yayına alma](#yayına-alma) · [Geliştirme](#geliştirme)
 
 </div>
 
@@ -22,70 +24,114 @@ Bir kurumun inovasyon sorumlusu şunu yazıyor:
 
 > "Sahadaki bayilerimizden gelen şikayetleri daha hızlı sınıflandırmak istiyoruz, çok manuel gidiyor."
 
-Bu cümle bir girişim için kullanılamaz: kaç şikayet, hangi formatta, hangi sistemde, bütçe ne,
-başarı kriteri ne? Bugün bu boşluğu bir insan dolduruyor. Program yöneticisi ihtiyacı deşifre
-ediyor, kafasındaki listeden birkaç girişim çıkarıyor, tanıştırıyor ve pilotu Excel'de takip
-ediyor. O kişi giderse bilgi de gidiyor.
+Bu cümle bir girişim için kullanılamaz: kaç şikayet, hangi formatta, hangi sistemde, bütçe ne, başarı kriteri ne?
+Bugün bu boşluğu bir insan dolduruyor. Program yöneticisi ihtiyacı deşifre ediyor, aklındaki listeden birkaç girişim
+çıkarıyor, tanıştırıyor ve pilotu Excel'de takip ediyor. O kişi giderse bilgi de gidiyor.
 
 **Asıl problem tanıştırmak değil, tanıştırdıktan sonra ne olduğunu bilmemek.**
 
-## Nasıl çalışır
+## Ne yapar
 
 ```mermaid
 flowchart LR
-    A["0 · Girdi<br/>Serbest ihtiyaç metni"] --> B["1 · Brief<br/>LLM yapılandırır,<br/>eksikse takip sorusu sorar"]
-    B --> C["2 · Eşleştir<br/>Anlamsal benzerlik + filtre<br/>5 aday + 3 elenen, gerekçeli"]
-    C --> D["3 · Pilot<br/>Kilometre taşları,<br/>hareketsizlik uyarısı"]
+    A["İhtiyaç<br/>serbest metin"] --> B["Brief<br/>LLM yapılandırır,<br/>eksikse soru sorar"]
+    B --> C["Eşleştirme<br/>gerekçeli kısa liste<br/>+ yakındı ama olmadı"]
+    C --> D["Tanıştırma<br/>e-posta taslağı,<br/>girişim kabul eder"]
+    D --> E["Pilot<br/>plan, hedefler,<br/>kilometre taşları"]
+    E --> F["Kapanış<br/>işe yaradı mı,<br/>sonraki adım"]
+    C -.->|uygun girişim yoksa| G["Açık çağrı<br/>girişimler başvurur"]
+    G --> E
 ```
 
-| Adım | Ne oluyor | Çıktı |
-|---|---|---|
-| **0 · Girdi** | Kurum ihtiyacını serbest metin olarak yazar | Dağınık, eksik bir paragraf |
-| **1 · Brief'e çevir** | LLM metni yapılandırır; eksik alan varsa 2–3 takip sorusu sorar | Problem, kapsam, gereken yetkinlikler, süre, başarı kriteri |
-| **2 · Eşleştir** | Brief embed edilir; profil havuzunda anlamsal benzerlik + filtre (sektör, olgunluk, lokasyon) | 5 uygun aday + 3 elenen aday, her biri gerekçesiyle |
-| **3 · Pilotu takip et** | Eşleşme kabul edilince otomatik pilot kartı açılır | Kilometre taşları, durum, hareketsizlik uyarısı, haftalık özet |
+Üç rol var; her biri yalnızca kendi kayıtlarını görür.
+
+**Firma (çözüm arayan kurum)**
+- İhtiyacını kendi cümleleriyle yazar. Needle onu brief'e çevirir; eksik alan varsa en fazla 3 takip sorusu sorar.
+- Gerekçeli kısa listeyi görür: hangi cümlesinin girişimin hangi yetkinliğiyle örtüştüğü ve elenenlerin neden elendiği.
+- Adayı kabul edince tanıştırma isteği gider. Girişimin platformda hesabı yoksa iletişim adresiyle bir e-posta taslağı hazırlanır; firma düzenleyip kendisi gönderir.
+- Havuzdaki herhangi bir girişimden de doğrudan tanışma isteyebilir. Sorun listede yoksa kendisi yazar.
+- Uygun girişim çıkmazsa ihtiyacı tek tıkla **açık çağrıya** çevirir (kurum adı gizlenebilir).
+- Genel bakışta tanıtımına ve ihtiyaçlarına göre **size uygun girişimler** listesi var.
+
+**Girişim (çözüm sunan)**
+- Havuzdaki profilini sahiplenir ya da yeni profil açar; program yöneticisi onaylar.
+- Onaydan önce de kurumları, ne iş yaptıklarını ve açık çağrıları inceleyebilir.
+- Ana sayfada **size uygun** bölümü: yetkinliklerine en yakın açık çağrılar ("sizin X yetkinliğiniz ↔ aranan Y" gerekçesiyle), kurumlar ve **talep sinyalleri**. Talep sinyali, son dört ayda en az iki farklı kurumun aradığı yetkinliktir; kurum adı gösterilmez.
+- Tanıştırma isteklerine cevap verir, çağrılara başvurur, pilotlarını kurumla birlikte yürütür.
+
+**Program yöneticisi**
+- Girişim hesaplarını onaylar. Hesabı olmayan girişim adına tanıştırmaya cevap verir.
+- **Program raporu:** İhtiyaçların pilota ve sonuca dönüşme oranı, sektörler, tanıştırma kabul oranı, uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler, Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
+
+### Pilot
+
+Tanıştırma kabul edilince ya da çağrı başvurusu onaylanınca pilot açılır ve iki taraf aynı sayfayı görür.
+
+| Bölüm | İçerik |
+|---|---|
+| **Plan** | Amaç, kapsam, tarihler ve iki tarafın sorumluları. Pilot açılınca brief'ten önerilir; süre brief'teki metinden hesaplanır ("3 ay" → 90 gün). |
+| **Hedefler** | Ne başarılacağı ve son tarihi. İki taraf da "tuttu" ya da "tutmadı" diye işaretler; tarihi geçen hedef öne çıkar. İlk hedef brief'teki başarı kriteridir. |
+| **Kilometre taşları** | Sorumlu tarafı belli adımlar (kurum, girişim, ortak). Beş adımlık plan otomatik önerilir; geciken adım işaretlenir. |
+| **Güncellemeler** | İki tarafın notları ve pilottaki her değişiklik zaman sırasıyla. Belli bir süre hareket olmayan pilot "hareketsiz" uyarısı alır. |
+| **Kapanış** | Kurum: işe yaradı mı, sonraki adım (satın alma, genişletme, yeni pilot, bitirme), girişime 1–5 puan. Girişim: kendi değerlendirmesi ve iş birliği puanı. |
+
+## Eşleştirme nasıl çalışır
+
+```mermaid
+flowchart TD
+    A["Brief"] --> B["Çoklu sorgu<br/>brief'in tamamı + her aranan yetkinlik"]
+    B --> C["pgvector kosinüs araması<br/>her sorgu için en yakın 40"]
+    C --> D["RRF ile birleştirme"]
+    D --> E{"Havuz yeterli mi?<br/>en az 8 aday"}
+    E -->|hayır| F["Filtre gevşet<br/>önce lokasyon, sonra olgunluk"] --> C
+    E -->|evet| G["LLM puanlama<br/>her aday 0–10"]
+    G --> H["Doğrudan çözüm denetimi<br/>en iyi 8 aday, 3 soru, 3 paralel oy"]
+    H --> I["Güven eşiği<br/>kısa liste ≤ 5 + yakındı ama olmadı"]
+    I --> J["Gerekçe ve kanıt kontrolü"]
+```
+
+1. **Çoklu sorgu ve RRF.** Brief'in tamamı ve her aranan yetkinlik ayrı birer sorgu olarak aranır. Sonuçlar ham skorla değil sırayla (Reciprocal Rank Fusion) birleştirilir. Böylece birden çok açıdan uygun çıkan aday, tek bir kısa sorguda yüksek skor alanın önüne geçer.
+2. **Dinamik gevşetme.** Lokasyon ve olgunluk filtreleri yeterli aday bırakmazsa adım adım gevşetilir. Gevşetilmiş filtreyle gelen adaya küçük bir ceza uygulanır ve kartında not olarak gösterilir.
+3. **LLM puanlama.** Adaylar ihtiyaca göre 0–10 arası puanlanır. Sıralamayı belirleyen bu puandır; kosinüs yalnızca adayları toplamaya yarar.
+4. **Doğrudan çözüm denetimi.** En iyi 8 aday için üç soru sorulur: aynı nesneyle mi çalışıyor, aynı işi mi yapıyor, başka alana uyarlanması gerekiyor mu? Cevap ancak evet / evet / hayır ise aday "doğrudan çözüyor" sayılır. Kararsızlığı azaltmak için denetim 3 kez paralel çalışır ve çoğunluk oyu geçer.
+5. **Güven eşiği.** Kısa liste sabit sayıyla değil kaliteyle kesilir. Doğrudan çözmeyen aday alınmaz. En iyi aday tabanın altındaysa "uygun girişim yok" denir ve en yakın adaylar "yakındı ama X eksik" gerekçesiyle gösterilir.
+6. **Kanıt kontrolü.** LLM her aday için gerekçe yazar ve brief'ten bir ifadeyi girişimin bir yetkinliğiyle eşleştirir. Her kanıt üç kontrolden geçmek zorundadır: yetkinlik profilde birebir var mı, ifade brief'te gerçekten geçiyor mu, ikisi anlamca yeterince yakın mı? Geçemeyen kanıt atılır.
+
+Her eşleştirme turunun izi (hangi turda kaç aday geldi, hangi filtre gevşedi, kaç kanıt elendi) kaydedilir ve arayüzde gösterilir.
 
 ## Neden farklı
 
-Açık inovasyon platformu kategorisinde olgun ürünler var (Skipso, Innoget, Ambivation).
-Needle'ın farkı kategori değil, **uyum**:
+Açık inovasyon platformu kategorisinde olgun ürünler var (Skipso, Innoget, Ambivation). Needle'ın farkı kategori değil, **uyum**:
 
-- **Gerekçeli eşleşme:** Her eşleşmede hangi cümlenin hangi yetkinlikle örtüştüğünün izi tutulur.
-- **Negatif eşleşme:** "Yakındı ama olmadı, çünkü X" kaydı. Elenenler de gerekçesiyle saklanır.
-- **Pilot erken uyarısı:** "12 gündür hareketsiz" uyarısı. Pilotlar sessizce ölmesin.
-- **Türkçe ve açık kaynak:** Zemin360'ın Needs & Leads akışına göre kurgulandı, İSTKA raporlamasına doğrudan çıktı verecek şekilde tasarlandı.
+- **Gerekçeli ve kanıtlı eşleşme:** Her eşleşmede hangi cümlenin hangi yetkinlikle örtüştüğü izlenir; uydurma kanıt kodla elenir.
+- **"Uygun yok" diyebilmek:** Güven eşiği zayıf adayları kısa listeye sokmaz. Elenenler de gerekçesiyle saklanır.
+- **Pilot sonuna kadar:** Plan, hedef, kilometre taşı ve kapanış değerlendirmesi tek sayfada; hareketsiz pilot uyarı alır.
+- **İki yönlü:** Firma uygun girişimi, girişim uygun çağrıyı ve kurumu aynı vektör uzayında görür.
+- **Türkçe ve açık kaynak:** Zemin360'ın Needs & Leads akışına göre kurgulandı; program raporu Excel olarak alınır.
 
 ## Teknoloji
 
 | Katman | Seçim |
 |---|---|
-| LLM orkestrasyon | LangGraph + Gemini |
-| Vektör arama | PostgreSQL + pgvector |
-| Frontend | React + hazır component kütüphanesi |
-| Dağıtım | Docker |
+| API | FastAPI, SQLAlchemy 2 |
+| LLM orkestrasyonu | LangGraph; OpenAI uyumlu uç nokta üzerinden Gemini 2.5 Flash (Ollama vb. ile de çalışır) |
+| Embedding | `paraphrase-multilingual-MiniLM-L12-v2` (384 boyut, yerelde çalışır) |
+| Vektör arama | PostgreSQL 16 + pgvector |
+| Arayüz | React 19, TypeScript, Mantine 9, Vite |
+| Dağıtım | Docker Compose (yerel), Dokploy ya da nginx arkasında VPS |
+| CI | GitHub Actions: pgvector'lü Postgres ile backend testleri ve arayüz derlemesi |
 
-## Kapsam
-
-Bilinçli olarak yalnızca yukarıdaki dört adım kodlanıyor. Mesajlaşma, bildirim, profil doğrulama,
-rozet, sosyal ağ ve mobil uygulama [yol haritasında](#yol-haritası) duruyor.
-
-## Yol haritası
-
-- [ ] Veri modeli + brief üretimi (Adım 1)
-- [ ] Eşleştirme motoru, gerekçeli skor ve negatif eşleşme (Adım 2)
-- [ ] Pilot tracker (Adım 3)
-- [ ] Demo modu (cache'li LLM cevapları)
-- [ ] Kapalı döngü: pilot sonucunun sonraki eşleştirmelerin ağırlığına geri dönmesi
-- [ ] İhtiyacı yazan birim ile ihtiyacı yaşayan saha birimini ayrıştırma
+Girişim havuzu, kaynağı belirtilmiş 282 gerçek girişimle gelir ([`startups_gercek.json`](backend/seed/startups_gercek.json)).
 
 ## Kurulum
 
-Gereken: Docker Desktop. (Geliştirme için ayrıca Python 3.12+ ve Node 20+.)
+Gereken: Docker Desktop ve bir Gemini API anahtarı ([Google AI Studio](https://aistudio.google.com/apikey)).
 
-1. `.env.example` dosyasını `.env` olarak kopyala ve `LLM_API_KEY` satırına bir Gemini API anahtarı yaz
-   ([Google AI Studio](https://aistudio.google.com/apikey)). LLM katmanı herhangi bir OpenAI uyumlu uç noktayla
-   çalışır; Ollama veya OmniRoute için `.env.example`'daki notlara bak.
-2. Her şeyi başlat:
+```bash
+cp .env.example .env
+```
+
+`.env` dosyasında `LLM_API_KEY` satırını doldurun, sonra başlatın:
 
 ```bash
 docker compose up -d --build
@@ -96,59 +142,50 @@ docker compose up -d --build
 | http://localhost:3000 | Needle arayüzü |
 | http://localhost:8000/docs | API dokümanı (`.env`'de `API_PORT` verildiyse o port) |
 
-API ilk açılışta girişim tablosu boşsa `STARTUPS_FILE` dosyasındaki girişimleri (varsayılan:
-[kaynaklı gerçek girişimler](backend/seed/startups_gercek.json)) embedding'leriyle yükler. İlk açılışta
-embedding ve reranker modelleri indirildiği için birkaç dakika sürebilir.
+İlk açılışta girişim havuzu embedding'leriyle veritabanına yüklenir ve model indirilir; birkaç dakika sürebilir.
+API her yeniden başladığında ilk embedding isteği modeli belleğe yükler, o istek 20–30 saniye sürebilir.
 
-### Hesaplar
+### Önemli ayarlar
 
-Üç rol var:
+| Değişken | Ne işe yarar |
+|---|---|
+| `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL` | LLM bağlantısı. Herhangi bir OpenAI uyumlu uç nokta olabilir. |
+| `RERANK_BACKEND` | `llm` (önerilen), `cross_encoder` (yerel model) ya da `none` (yalnızca vektör skoru) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Doluysa açılışta program yöneticisi hesabı oluşturulur; hesap varsa dokunulmaz. |
+| `COOKIE_SECURE` | HTTPS arkasında `true` olmalı. |
+| `APP_BASE_URL`, `SMTP_*` | Şifre sıfırlama e-postası. SMTP boşsa bağlantı API loguna yazılır. |
+| `DEMO_MODE` | `record` LLM cevaplarını kaydeder, `replay` onları tekrar oynatır (internetsiz demo). |
+| `STARTUP_DOMAIN_AUTOVERIFY` | `true` olursa e-posta alan adı sitesiyle eşleşen girişim onaysız doğrulanır. |
 
-| Rol | Nasıl açılır | Ne görür |
-|---|---|---|
-| **Firma** | Arayüzde "Hesap açın" → "Çözüm arıyorum" | Yalnızca kendi kurumunun ihtiyaçları, eşleşmeleri, tanıştırmaları, çağrıları ve pilotları. İlk girişte 3 adımlık firma profili doldurulur; sektör, şehir, olgunluk, bütçe ve süre bilgisi brief'in boş alanlarını tamamlar. |
-| **Girişim** | Arayüzde "Hesap açın" → "Çözüm sunuyorum" | Havuzdaki profilini sahiplenir ya da yeni profil açar; program yöneticisi onaylar (şirket e-postasının sitenin alan adıyla eşleşip eşleşmediği onay listesinde görünür). E-posta doğrulaması eklenince `STARTUP_DOMAIN_AUTOVERIFY=true` ile eşleşenler anında doğrulanabilir. Doğrulandıktan sonra kendisine gelen tanıştırma isteklerini, açık çağrıları ve kendi pilotlarını görür; ihtiyaç listesine erişemez. |
-| **Program yöneticisi** | Komut satırından (aşağıda) | Bütün kayıtlar; girişim hesaplarını onaylar, hesabı olmayan girişim adına tanıştırmaya cevap verir |
+Tamamı ve açıklamaları [`.env.example`](.env.example) dosyasında.
 
-**Tanıştırma:** Firma eşleşmedeki bir adayı kabul edince girişime tanıştırma isteği gider; girişim kabul edince pilot
-kartı açılır ve iki taraf aynı kartı görür (girişim kilometre taşı ekler, "işe yaradı mı" kararı kurumdadır).
+### Program yöneticisi hesabı
 
-**Program raporu** (yönetici → Rapor): ihtiyaçların pilota ve sonuca dönüşme akışı, sektörler, tanıştırma kabul oranı,
-uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler,
-Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
+İki yol var:
 
-**Pilot:** Her pilotun kendi sayfası var. Pilot açılınca plan brief'ten önerilir (amaç, kapsam, brief'teki süreye göre
-tarihler, sorumlu tarafı belli beş kilometre taşı ve başarı kriterinden ilk hedef). Hedef, ne başarılacağı ve son
-tarihinden ibarettir; iki taraf da hedefi "tuttu" ya da "tutmadı" diye işaretler, tarihi geçen hedef işaretlenir. İki
-taraf güncelleme akışında birbirine not yazar ve her değişiklik akışa düşer.
-Pilot bitince kurum işe yarayıp yaramadığını, sonraki adımı (satın alma, genişletme, yeni pilot, bitirme) ve girişime
-puanını kaydeder; girişim de kendi değerlendirmesini yazar.
-
-**Size uygun:** İki taraf aynı vektör uzayında birbirini görür. Girişim, yetkinliklerine en yakın açık çağrıları
-("sizin X yetkinliğiniz ↔ aranan Y" gerekçesiyle), kurumları ve son dört ayda en az iki kurumun aradığı yetkinlikleri
-(talep sinyali, kurum adı gizli) görür. Firma da tanıtımı ve son ihtiyaçlarında aranan yetkinliklere göre en yakın
-girişimleri; platformda hesabı olanları ve çağrısına başvuranları işaretli olarak görür.
-
-**Açık çağrı:** Havuzda problemi doğrudan çözen girişim bulunamazsa ihtiyaç tek tıkla açık çağrıya çevrilir (kurum
-adı gizlenebilir, son tarih verilebilir). Doğrulanmış girişimler başvurur; firma kabul edince pilot doğrudan açılır.
+- `.env` içine `ADMIN_EMAIL` ve `ADMIN_PASSWORD` (en az 10 karakter) yazıp API'yi yeniden başlatmak.
+- Konsoldan açmak. Bu yolda şifre ekrandan sorulur ve komut geçmişinde kalmaz:
 
 ```bash
 docker compose exec api python -m seed.create_admin yonetici@kurum.org "Ad Soyad"
 ```
 
-Şifre ekrandan sorulur (komut geçmişinde kalmaz). Konsola erişim yoksa `.env` içine `ADMIN_EMAIL` ve
-`ADMIN_PASSWORD` yazıp api konteynerini yeniden başlatmak yeterli: hesap açılışta oluşturulur, varsa dokunulmaz. Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
-Aynı e-postaya 15 dakikada 5 hatalı denemeden sonra giriş geçici olarak kilitlenir. "Şifremi unuttum" bağlantısı
-e-postayla gider: `.env`'de SMTP ayarlanmadıysa bağlantı `docker compose logs api` çıktısına yazılır. Şifre
-sıfırlanınca ya da değiştirilince diğer cihazlardaki oturumlar kapanır.
+Firma ve girişim hesapları arayüzden açılır ("Çözüm arıyorum" / "Çözüm sunuyorum").
 
-HTTPS arkasında yayına alınırken `.env`'de `COOKIE_SECURE=true` yapılmalı. Kayıt ekranındaki aydınlatma metni
-bir taslaktır ve yayından önce hukuki inceleme gerektirir.
+### Güvenlik
 
-### Yayına alma (Dokploy + VPS)
+- Şifreler argon2 ile saklanır, oturum httpOnly çerezle taşınır.
+- Aynı e-postaya 15 dakikada 5 hatalı denemeden sonra giriş geçici olarak kilitlenir.
+- Şifre sıfırlanınca ya da değiştirilince diğer cihazlardaki oturumlar kapanır.
+- Firma yalnızca kendi kurumunun kayıtlarını görür; başka kurumun kaydı için 404 döner.
 
-Sunucuda en az 4 GB RAM gerekir (embedding modeli yüklüyken API ~1,2 GB kullanır). Dokploy'da **Compose** servisi
-açılır, repo bağlanır ve compose yolu olarak `docker-compose.dokploy.yml` seçilir. Environment sekmesine:
+Kayıt ekranındaki aydınlatma metni bir taslaktır ve yayından önce hukuki inceleme gerektirir.
+
+## Yayına alma
+
+Sunucuda en az 4 GB RAM gerekir; embedding modeli yüklüyken API yaklaşık 1,2 GB kullanır. Sunucu için
+[`docker-compose.dokploy.yml`](docker-compose.dokploy.yml) kullanılır: hiçbir portu dışarı açmaz ve veritabanı şifresini
+ortamdan alır. `.env` dosyasına en az şunlar girilir:
 
 ```
 POSTGRES_PASSWORD=<uzun rastgele şifre>
@@ -157,10 +194,21 @@ APP_BASE_URL=https://<domain>
 COOKIE_SECURE=true
 ```
 
-Domains sekmesinde `web` servisine, 80 numaralı porta domain bağlanır. İlk deploy imajları derler ve 282 girişimi
-yükler (10–15 dk). Yönetici hesabı api konteynerinde `python -m seed.create_admin <e-posta> "<Ad>"` ile açılır.
+**Dokploy:** Compose servisi açılır, repo bağlanır, compose yolu olarak `docker-compose.dokploy.yml` seçilir ve
+değişkenler Environment sekmesine yazılır. Domains sekmesinde `web` servisinin 80 numaralı portuna domain bağlanır.
 
-### Geliştirme (Docker'sız API ve arayüz)
+**Kendi VPS'iniz (nginx arkasında):** `web` servisini yalnızca yerel bir porta açan küçük bir override dosyası
+eklenir, örneğin `127.0.0.1:3210:80`. Sunucudaki nginx de domaini o porta yönlendirir. Güncellemek için:
+
+```bash
+git pull && docker compose -f docker-compose.dokploy.yml -f docker-compose.vps.yml up -d --build
+```
+
+Yeni tablo ve sütunlar API açılırken otomatik eklenir (`ADD COLUMN IF NOT EXISTS`); ayrı bir migration adımı yoktur.
+
+## Geliştirme
+
+Docker'sız API ve arayüz:
 
 ```bash
 docker compose up -d db
@@ -170,12 +218,56 @@ npm --prefix frontend install
 npm --prefix frontend run dev        # http://localhost:5173, /api → 127.0.0.1:8010
 ```
 
-Testler: `cd backend && python -m pytest`. GitHub Actions her PR'da backend testlerini (pgvector'lü Postgres ile, entegrasyon dahil) ve arayüz derlemesini çalıştırır. Uçtan uca API testi ayrı bir veritabanı ister
-(test tabloları silip yeniden kurar): `NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@127.0.0.1:5432/needle_test`.
+**Testler.** Birim testleri için `cd backend && python -m pytest` yeterli. Uçtan uca API testleri ayrı bir veritabanı
+ister, çünkü tabloları silip yeniden kurar:
+
+```bash
+NEEDLE_TEST_DATABASE_URL=postgresql+psycopg://needle:needle@127.0.0.1:5432/needle_test python -m pytest
+```
+
+GitHub Actions her PR'da entegrasyon dahil backend testlerini ve arayüz derlemesini çalıştırır.
+
+**Sistem testleri.** [`backend/sistem_testleri`](backend/sistem_testleri) her parçayı (ayarlar, LLM, embedding,
+retrieval, reranker, brief ve eşleştirme akışı, API) tek başına çalıştırıp ne yaptığını adım adım ekrana yazar.
+Öğrenmek ve denetlemek için.
+
+**Analiz.** [`backend/analiz`](backend/analiz) eşik ve kararlılık ölçümlerini içerir. Örneğin aynı brief'in birkaç
+çalıştırmada aynı kararı verip vermediği ve kanıt benzerlik eşiğinin nereye konacağı burada ölçüldü.
+
+### Proje yapısı
+
+```
+backend/
+  app/
+    api/          HTTP uç noktaları (ihtiyaç, eşleştirme, tanıştırma, çağrı, pilot, rapor, hesap)
+    graphs/       LangGraph akışları: brief_graph (brief + takip soruları), match_graph (eşleştirme)
+    retrieval/    pgvector araması, çoklu sorgu, RRF, filtre gevşetme
+    rerank/       LLM puanlama ve doğrudan çözüm denetimi
+    prompts/      LLM yönergeleri
+    db/           modeller ve açılışta şema güncellemesi
+  seed/           girişim havuzu, örnek ihtiyaçlar, yönetici hesabı
+  tests/          pytest (birim + entegrasyon)
+  sistem_testleri/, analiz/
+frontend/src/
+  pages/          sayfalar (genel bakış, ihtiyaçlar, pilot, çağrılar, kurumlar, rapor...)
+  components/     ortak bileşenler
+```
+
+## Yol haritası
+
+- [x] Brief üretimi ve takip soruları
+- [x] Gerekçeli eşleştirme, doğrudan çözüm denetimi, negatif eşleşme ve kanıt kontrolü
+- [x] Tanıştırma, e-posta taslağı ve açık çağrı
+- [x] Pilot yönetimi: plan, hedefler, kilometre taşları, güncelleme akışı, kapanış
+- [x] Girişim hesapları, iki yönlü öneriler ve program raporu
+- [x] Demo modu (kayıtlı LLM cevapları)
+- [ ] Kapalı döngü: pilot sonucunun sonraki eşleştirmelerin ağırlığına geri dönmesi
+- [ ] İhtiyacı yazan birim ile ihtiyacı yaşayan saha birimini ayrıştırma
+- [ ] E-posta doğrulaması ve bildirimler
 
 ## Katkı
 
-Katkı rehberi için [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına bak.
+Katkı rehberi için [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına bakın.
 
 ## Lisans
 
