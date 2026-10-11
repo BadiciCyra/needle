@@ -5,7 +5,7 @@ Needle'a katkı vermek istediğin için teşekkürler!
 ## Başlarken
 
 1. Repoyu fork'la ve klonla.
-2. `main` dalından yeni bir dal aç: `git checkout -b feat/kisa-aciklama`
+2. `temiz-gecmis` (varsayılan) dalından yeni bir dal aç: `git checkout -b feat/kisa-aciklama`
 3. Değişikliğini yap, commit'le ve pull request aç.
 
 ## Dal isimleri
@@ -33,7 +33,7 @@ docs: kurulum adımlarını ekle
 - Her PR tek bir işe odaklansın.
 - Ne değiştiğini ve neden değiştiğini kısaca açıkla.
 - Arayüz değişikliklerinde ekran görüntüsü ekle.
-- `main` dalına doğrudan push yapma.
+- Varsayılan dala (`temiz-gecmis`) doğrudan push yapma.
 
 ## Kapsam
 
