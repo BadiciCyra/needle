@@ -16,6 +16,11 @@ adayları gerekçesi ve kanıtıyla bulur, tanıştırmadan pilotun kapanış de
 
 </div>
 
+<p align="center">
+  <img src="docs/ekran/eslestirme.png" alt="Eşleştirme sonucu: brief, gerekçeli kısa liste ve her adayın kanıt izleri" width="900">
+  <br><sub>Serbest metinden çıkarılan brief ve gerekçeli kısa liste. Her kanıt, ihtiyaçtaki bir ifadeyi girişimin bir yetkinliğine bağlar.</sub>
+</p>
+
 ---
 
 ## Problem
@@ -63,6 +68,11 @@ flowchart LR
 - Girişim hesaplarını onaylar. Hesabı olmayan girişim adına tanıştırmaya cevap verir.
 - **Program raporu:** İhtiyaçların pilota ve sonuca dönüşme oranı, sektörler, tanıştırma kabul oranı, uygun girişim bulunamayan ihtiyaçlar ve havuzda eksik kalan yetkinlikler. "Excel indir" aynı veriyi Özet, Sektörler, Eksik yetkinlikler, Uygun bulunamayan, Pilotlar ve Havuz sayfalarıyla verir.
 
+<p align="center">
+  <img src="docs/ekran/genel-bakis.png" alt="Firma genel bakışı: süreç özeti ve size uygun girişimler" width="900">
+  <br><sub>Firma genel bakışı: açık işler, son ihtiyaçlar ve tanıtıma göre size uygun girişimler.</sub>
+</p>
+
 ### Pilot
 
 Tanıştırma kabul edilince ya da çağrı başvurusu onaylanınca pilot açılır ve iki taraf aynı sayfayı görür.
@@ -74,6 +84,11 @@ Tanıştırma kabul edilince ya da çağrı başvurusu onaylanınca pilot açıl
 | **Kilometre taşları** | Sorumlu tarafı belli adımlar (kurum, girişim, ortak). Beş adımlık plan otomatik önerilir; geciken adım işaretlenir. |
 | **Güncellemeler** | İki tarafın notları ve pilottaki her değişiklik zaman sırasıyla. Belli bir süre hareket olmayan pilot "hareketsiz" uyarısı alır. |
 | **Kapanış** | Kurum: işe yaradı mı, sonraki adım (satın alma, genişletme, yeni pilot, bitirme), girişime 1–5 puan. Girişim: kendi değerlendirmesi ve iş birliği puanı. |
+
+<p align="center">
+  <img src="docs/ekran/pilot.png" alt="Pilot sayfası: plan, hedefler, kilometre taşları, güncellemeler ve kapanış değerlendirmesi" width="900">
+  <br><sub>Pilot sayfası: iki taraf aynı planı, hedefleri ve güncelleme akışını görür.</sub>
+</p>
 
 ## Eşleştirme nasıl çalışır
 
